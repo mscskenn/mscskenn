@@ -1,43 +1,48 @@
 # Hi, I'm Kenn 👋
 
 🎓 4th Year Computer Science Student  
-🤖 Aspiring AI Engineer / Data Engineer  
-💻 Interested in AI, Machine Learning, Data Pipelines, Computer Vision & Software Development
+📊 Aspiring Data Engineer  
+💻 Interested in Data Engineering, Data Pipelines, Databases & Software Development
 
 ---
 
 ## 🚀 About Me
 
-I'm a Computer Science student passionate about building practical
-software and AI-powered systems.
+I'm a Computer Science student passionate about building systems
+that collect, process, transform, and organize data efficiently.
 
-Currently, I'm focusing on:
+I'm currently focused on developing my skills in:
 
-- Artificial Intelligence
-- Machine Learning
-- Computer Vision
+- Data Engineering
+- SQL & Database Systems
+- ETL / ELT Pipelines
+- Data Processing & Transformation
 - Python
+- Data Warehousing
 - Backend Development
-- Database Systems
+- Cloud Technologies
 
 ---
 
 ## 🛠️ Technologies
 
 ### Programming
-Python • JavaScript • Java • C#
+Python · JavaScript · Java · C#
 
-### AI / Data
-Python • NumPy • Pandas 
+### Data Engineering
+SQL · ETL / ELT · Data Pipelines · Data Processing
 
-### Web Development
-HTML • CSS • JavaScript • Node.js • Express
+### Databases
+MySQL · PostgreSQL
 
-### Database
-MySQL • PostgreSQL
+### Data & Analytics
+Pandas · NumPy
+
+### Web / Backend
+Node.js · Express · HTML · CSS · JavaScript
 
 ### Tools
-Git • GitHub • Docker • VS Code 
+Git · GitHub · Docker · VS Code
 
 ---
 
@@ -45,24 +50,29 @@ Git • GitHub • Docker • VS Code
 
 ### THREADY
 AI-enhanced web-based production management system
-with computer vision for garment monitoring.
+with computer vision for garment defect checking.
 
-**Tech:** React.js, Node.js, Express, MySQL, Python, Computer Vision
+**Tech:** Node.js · Express · MySQL · Python · Computer Vision
 
-### Project 2
-Short description of what the project does.
-
-**Tech:** Python, etc.
-
-### Project 3
-Short description of what the project does.
-
-**Tech:** JavaScript, etc.
+### More projects coming soon...
 
 ---
 
-## 📫 Contact
+## 🎯 Currently Learning
 
-- GitHub: @mcskenn (https://github.com/mcskenn)
-- LinkedIn:
+- Advanced SQL
+- Data Structures & Algorithms
+- ETL / ELT Pipeline Development
+- Data Warehousing
+- Apache Airflow
+- Cloud Data Platforms
+- Data Modeling
+- Python for Data Engineering
+
+---
+
+## 📫 Connect With Me
+
+- GitHub: [@mcskenn](https://github.com/mcskenn)
+- LinkedIn: www.linkedin.com/in/john-kenneth-moscosa
 - Email: moscosajohnkenneth1@gmail.com
