@@ -8,8 +8,9 @@
 
 ## 🚀 About Me
 
-I'm a Computer Science student passionate about building systems
-that collect, process, transform, and organize data efficiently.
+I'm a Computer Science student passionate about building
+systems that collect, process, transform, and organize
+data efficiently.
 
 I'm currently focused on developing my skills in:
 
@@ -33,13 +34,13 @@ Python · JavaScript · Java · C#
 SQL · ETL / ELT · Data Pipelines · Data Processing
 
 ### Databases
-MySQL · PostgreSQL
+MySQL · PostgreSQL · MongoDB
 
 ### Data & Analytics
 Pandas · NumPy
 
-### Web / Backend
-Node.js · Express · HTML · CSS · JavaScript
+### Backend Development
+Node.js · Express
 
 ### Tools
 Git · GitHub · Docker · VS Code
@@ -48,13 +49,9 @@ Git · GitHub · Docker · VS Code
 
 ## 📌 Featured Projects
 
-### THREADY
-AI-enhanced web-based production management system
-with computer vision for garment defect checking.
+🚧 Currently building my Data Engineering portfolio.
 
-**Tech:** Node.js · Express · MySQL · Python · Computer Vision
-
-### More projects coming soon...
+More projects coming soon!
 
 ---
 
@@ -64,9 +61,9 @@ with computer vision for garment defect checking.
 - Data Structures & Algorithms
 - ETL / ELT Pipeline Development
 - Data Warehousing
+- Data Modeling
 - Apache Airflow
 - Cloud Data Platforms
-- Data Modeling
 - Python for Data Engineering
 
 ---
