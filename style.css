@@ -652,3 +652,369 @@ a {
     font-size: 1.75rem;
   }
 }
+
+/* ==========================================================================
+   7. About
+   ========================================================================== */
+.about-panel {
+  display: grid;
+  gap: 24px;
+}
+
+.about-text p {
+  max-width: 65ch;
+}
+
+.about-text p:last-child {
+  margin-bottom: 0;
+}
+
+.about-photo {
+  width: 160px;
+  height: 160px;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+@media (min-width: 640px) {
+  .about-panel {
+    grid-template-columns: 1fr 200px;
+    align-items: start;
+  }
+
+  .about-photo {
+    width: 200px;
+    height: 200px;
+  }
+}
+
+/* ==========================================================================
+   8. Skills
+   ========================================================================== */
+.skills-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+
+.mark {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 8px;
+  border-radius: 2px;
+  vertical-align: -1px;
+}
+
+.mark-used {
+  background-color: var(--accent);
+}
+
+.mark-learning {
+  background-color: var(--progress);
+}
+
+.skills-grid {
+  display: grid;
+  gap: 24px;
+}
+
+.skill-group h3 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+
+.skill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skill {
+  padding: 4px 10px;
+  background-color: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-size: 0.9375rem;
+}
+
+.skill.is-used {
+  border-color: var(--accent);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.skill.is-learning {
+  border-color: var(--progress);
+  box-shadow: inset 3px 0 0 var(--progress);
+}
+
+.skill-note {
+  display: inline-block;
+  margin-left: 8px;
+  white-space: nowrap;
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .skills-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1025px) {
+  .skills-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ==========================================================================
+   9. Projects
+   ========================================================================== */
+.case-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.case-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.case-title {
+  flex: 1 1 240px;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.case-meta {
+  margin: 6px 0 16px;
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+
+.status {
+  flex: none;
+  padding: 2px 10px;
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.status-progress {
+  color: var(--progress);
+}
+
+.status-done {
+  color: var(--link);
+}
+
+.case-parts {
+  display: grid;
+  gap: 14px;
+  margin: 0 0 16px;
+}
+
+.case-parts dt {
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.case-parts dd {
+  margin: 2px 0 0;
+}
+
+.case-parts ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.case-parts li + li {
+  margin-top: 4px;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag-list li {
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+
+.case-links {
+  margin: 8px 0 0;
+}
+
+.case-links a {
+  display: inline-block;
+  padding: 10px 0;
+}
+
+@media (min-width: 1025px) {
+  .case-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ==========================================================================
+   10. Activity timeline
+   ========================================================================== */
+.timeline {
+  margin: 0;
+  padding: 0 0 0 20px;
+  list-style: none;
+  border-left: 2px solid var(--line);
+}
+
+.timeline li {
+  position: relative;
+  padding-bottom: 20px;
+}
+
+.timeline li:last-child {
+  padding-bottom: 0;
+}
+
+.timeline li::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: -27px;
+  width: 12px;
+  height: 12px;
+  background-color: var(--accent);
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+}
+
+.timeline time {
+  display: block;
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+
+.timeline p {
+  margin: 2px 0 0;
+}
+
+/* ==========================================================================
+   11. Contact
+   ========================================================================== */
+.contact-grid {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.contact-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color var(--ease);
+}
+
+a.contact-item:hover {
+  border-color: var(--accent);
+}
+
+a.contact-item .contact-value {
+  color: var(--link);
+}
+
+a.contact-item:hover .contact-value {
+  text-decoration: underline;
+}
+
+.contact-label {
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+
+.contact-value {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 640px) {
+  .contact-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1025px) {
+  .contact-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ==========================================================================
+   12. Footer
+   ========================================================================== */
+.site-footer {
+  margin-top: 24px;
+  padding: 24px 0 32px;
+  border-top: 1px solid var(--line);
+}
+
+.footer-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.copyright {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.footer-links a {
+  display: inline-block;
+  padding: 10px 0;
+  font-size: 0.9375rem;
+}
+
+@media (min-width: 1025px) {
+  .footer-inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
