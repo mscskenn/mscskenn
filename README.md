@@ -1,75 +1,71 @@
 # Hi, I'm Kenn 👋
 
-🎓 4th Year Computer Science Student  
-📊 Aspiring Data Engineer  
-💻 Interested in Data Engineering, Data Pipelines, Databases & Software Development
+🎓 4th Year Computer Science Student at STI College Lucena  
+📊 Looking for data analyst roles and OJT opportunities  
+🛠️ Backend and database developer, growing toward data engineering
 
 ---
 
 ## 🚀 About Me
 
-I'm a Computer Science student passionate about building
-systems that collect, process, transform, and organize
-data efficiently.
+I'm a fourth-year Computer Science student from Sariaya, Quezon, Philippines, expected to graduate in July 2027. I was a Dean's Lister in 2023–2024.
 
-I'm currently focused on developing my skills in:
-
-- Data Engineering
-- SQL & Database Systems
-- ETL / ELT Pipelines
-- Data Processing & Transformation
-- Python
-- Data Warehousing
-- Backend Development
-- Cloud Technologies
+For my group thesis, I'm the backend and database developer of an AI-enhanced production management system for a garment manufacturer. Working with orders, inventory, and pay records every day made me want to analyze that data, not only store it. I'm looking for a data analyst role first, with data engineering as my longer-term goal.
 
 ---
 
 ## 🛠️ Technologies
 
-### Programming
-Python · JavaScript · Java · C#
+### Languages
+SQL · Python · JavaScript · TypeScript · Java (intermediate) · C# (intermediate)
 
-### Data Engineering
-SQL · ETL / ELT · Data Pipelines · Data Processing
+### Backend and Databases
+MySQL · PostgreSQL · Node.js · Express · REST APIs · JWT auth · role-based access · rate limiting
 
-### Databases
-MySQL · PostgreSQL · MongoDB
+### Frontend
+Next.js · React · Tailwind CSS
 
-### Data & Analytics
-Pandas · NumPy
+### Testing and Tools
+Vitest · Supertest · Docker · Git · GitHub
 
-### Backend Development
-Node.js · Express
-
-### Tools
-Git · GitHub · Docker · VS Code
+### AI-Assisted Development
+Claude · Gemini · Antigravity
 
 ---
 
-## 📌 Featured Projects
+## 📌 Featured Project
 
-🚧 Currently building my Data Engineering portfolio.
+### thReady: AI-Enhanced Production Management System
+*Group thesis · Backend and Database Developer · Defense: November 2026*
 
-More projects coming soon!
+A system that replaces a garment manufacturer's manual tracking of orders, inventory, and output. My teammates lead the frontend and computer vision; I own the backend and database.
+
+- Built backend API modules for orders and production planning, material requests, and weekly piece-rate pay records
+- Implemented stock-checked material approvals and order-to-production workflows using MySQL transactions and row-level locking
+- Hardened authentication and session security, including single-session locking and audit log protections
+- Wrote the majority of a backend suite of 880+ automated tests
+
+**Stack:** Node.js, Express, MySQL, Vitest, Supertest
 
 ---
 
 ## 🎯 Currently Learning
 
-- Advanced SQL
-- Data Structures & Algorithms
-- ETL / ELT Pipeline Development
-- Data Warehousing
-- Data Modeling
-- Apache Airflow
-- Cloud Data Platforms
-- Python for Data Engineering
+- DataCamp: Associate Data Analyst in SQL (in progress)
+- DataCamp: Data Analyst in Python (in progress)
+
+---
+
+## 🏆 Hackathons and Activities
+
+- Participant, DICT Hackathon (Team JDK), Oct 2026 – present
+- Participant, STI College Lucena Hackathon, Feb 2026
 
 ---
 
 ## 📫 Connect With Me
 
-- GitHub: [@mcskenn](https://github.com/mcskenn)
-- LinkedIn: www.linkedin.com/in/john-kenneth-moscosa
-- Email: moscosajohnkenneth1@gmail.com
+- Portfolio: [mscskenn.github.io/mscskenn](https://mscskenn.github.io/mscskenn/)
+- GitHub: [@mscskenn](https://github.com/mscskenn)
+- LinkedIn: [john-kenneth-moscosa](https://www.linkedin.com/in/john-kenneth-moscosa)
+- Email: [moscosajohnkenneth1@gmail.com](mailto:moscosajohnkenneth1@gmail.com)
