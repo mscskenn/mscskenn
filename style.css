@@ -156,9 +156,10 @@ a {
 
 .header-inner {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  height: var(--header-h);
+  min-height: var(--header-h);
 }
 
 .brand {
@@ -174,31 +175,23 @@ a {
 }
 
 .site-nav {
-  display: none;
-  position: absolute;
-  top: var(--header-h);
-  left: 0;
-  right: 0;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--line);
-}
-
-.site-nav.is-open {
-  display: block;
+  order: 3;
+  flex-basis: 100%;
 }
 
 .nav-list {
   list-style: none;
   margin: 0;
-  padding: 8px 16px;
+  padding: 0 0 8px;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 0 4px;
 }
 
 .nav-link {
   display: block;
   min-height: 44px;
-  padding: 10px 4px;
+  padding: 10px 8px;
   color: var(--ink-muted);
   text-decoration: none;
   transition: color var(--ease);
@@ -210,8 +203,7 @@ a {
 }
 
 .nav-link.active {
-  padding-left: 12px;
-  box-shadow: inset 3px 0 0 var(--accent);
+  box-shadow: inset 0 -2px 0 var(--accent);
 }
 
 .header-actions {
@@ -252,8 +244,60 @@ a {
 }
 
 .hamburger {
+  display: none;
   flex-direction: column;
   gap: 5px;
+}
+
+/* Without JavaScript the links stay visible under the brand and the script-only controls are removed. */
+html:not(.js) .site-header {
+  position: static;
+}
+
+html:not(.js) #theme-toggle {
+  display: none;
+}
+
+/* With JavaScript, the links collapse into a dropdown on small screens. */
+.js .header-inner {
+  flex-wrap: nowrap;
+  height: var(--header-h);
+}
+
+.js .hamburger {
+  display: inline-flex;
+}
+
+.js .site-nav {
+  display: none;
+  position: absolute;
+  top: var(--header-h);
+  left: 0;
+  right: 0;
+  order: 0;
+  flex-basis: auto;
+  background-color: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.js .site-nav.is-open {
+  display: block;
+}
+
+.js .nav-list {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0;
+  padding: 8px 16px;
+}
+
+.js .nav-link {
+  padding: 10px 4px;
+}
+
+.js .nav-link.active {
+  padding-left: 12px;
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
 .hamburger-bar {
@@ -277,32 +321,45 @@ a {
 }
 
 @media (min-width: 640px) {
-  .hamburger {
+  .js .hamburger {
     display: none;
   }
 
+  .header-inner,
+  .js .header-inner {
+    flex-wrap: nowrap;
+    height: var(--header-h);
+  }
+
   .site-nav,
-  .site-nav.is-open {
+  .js .site-nav,
+  .js .site-nav.is-open {
     position: static;
     display: block;
+    order: 0;
+    flex-basis: auto;
     background: none;
     border: 0;
   }
 
-  .nav-list {
+  .nav-list,
+  .js .nav-list {
     flex-direction: row;
+    flex-wrap: nowrap;
     padding: 0;
     gap: 4px;
   }
 
-  .nav-link {
+  .nav-link,
+  .js .nav-link {
     display: flex;
     align-items: center;
     min-height: var(--header-h);
     padding: 0 12px;
   }
 
-  .nav-link.active {
+  .nav-link.active,
+  .js .nav-link.active {
     padding-left: 12px;
     box-shadow: inset 0 -2px 0 var(--accent);
   }
@@ -445,6 +502,7 @@ a {
 .chart-svg {
   display: block;
   max-width: 100%;
+  height: auto;
 }
 
 .chart-grid {
@@ -912,7 +970,8 @@ a {
   border-radius: 50%;
 }
 
-.timeline time {
+.timeline time,
+.timeline-when {
   display: block;
   color: var(--ink-muted);
   font-family: var(--font-mono);

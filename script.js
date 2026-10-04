@@ -34,6 +34,7 @@
 
     const root = document.documentElement;
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    let userChose = false;
 
     function readSavedTheme() {
       try {
@@ -61,13 +62,14 @@
 
     themeToggleBtn.addEventListener('click', () => {
       const nextTheme = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      userChose = true;
       applyTheme(nextTheme);
       saveTheme(nextTheme);
     });
 
     if (typeof mediaQuery.addEventListener === 'function') {
       mediaQuery.addEventListener('change', (event) => {
-        if (!readSavedTheme()) {
+        if (!userChose && !readSavedTheme()) {
           applyTheme(event.matches ? 'dark' : 'light');
         }
       });
@@ -322,6 +324,6 @@
   }
 
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { PATH_START, PATH_END, parseMonth, chartRatio, readPathEvents, renderPathChart, pickActiveSection };
+    module.exports = { PATH_START, PATH_END, initTheme, parseMonth, chartRatio, readPathEvents, renderPathChart, pickActiveSection };
   }
 })();
