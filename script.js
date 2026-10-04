@@ -1,25 +1,27 @@
 /**
  * John Kenneth Moscosa - Personal Portfolio
  * Vanilla ES6+ Modular Script
- * 
+ *
  * Features:
- * 1. Dark / Light Mode Toggle with system preference detection and localStorage persistence.
- * 2. Accessible Mobile Navigation Toggle with keyboard controls (Escape) and click-outside dismissal.
- * 3. Filterable Projects Gallery (Finished & In-Progress) with ARIA tabs state management.
- * 4. GitHub Contribution Heatmap mock generator with interactive tooltips.
- * 5. Contact Form UI Validation with accessible feedback messages.
- * 6. Active Navigation Link Scroll Spy & smooth scroll handling.
+ * 1. Dark / Light theme toggle with system preference detection and localStorage persistence.
+ * 2. Accessible mobile navigation toggle (Escape and click-outside close).
+ * 3. Active navigation link scroll spy.
+ * 4. "Path to 2027" timeline chart rendered as inline SVG from the #path-list data.
  */
 
 'use strict';
 
+const THEME_STORAGE_KEY = 'jkm_portfolio_theme';
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const PATH_START = new Date(2023, 0, 1);
+const PATH_END = new Date(2027, 8, 1);
+const CHART_MIN_WIDTH = 232;
+
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   initMobileNav();
-  initProjectFilters();
-  initGitHubContributions();
-  initContactForm();
   initScrollSpy();
+  initPathChart();
 });
 
 /* ==========================================================================
@@ -29,37 +31,46 @@ function initTheme() {
   const themeToggleBtn = document.getElementById('theme-toggle');
   if (!themeToggleBtn) return;
 
-  const storageKey = 'jkm_portfolio_theme';
   const root = document.documentElement;
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-  // Determine initial theme: saved preference -> system preference -> default light
-  const savedTheme = localStorage.getItem(storageKey);
-  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const initialTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
-
-  applyTheme(initialTheme);
-
-  // Toggle button event listener
-  themeToggleBtn.addEventListener('click', () => {
-    const currentTheme = root.getAttribute('data-theme') || 'light';
-    const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
-    applyTheme(nextTheme);
-  });
-
-  // Listen for operating system theme changes if user hasn't set an explicit preference
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-    if (!localStorage.getItem(storageKey)) {
-      applyTheme(e.matches ? 'dark' : 'light');
+  function readSavedTheme() {
+    try {
+      return localStorage.getItem(THEME_STORAGE_KEY);
+    } catch (error) {
+      return null;
     }
-  });
+  }
+
+  function saveTheme(theme) {
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch (error) {
+      /* Storage is blocked; the theme still applies for this visit. */
+    }
+  }
 
   function applyTheme(theme) {
     root.setAttribute('data-theme', theme);
-    localStorage.setItem(storageKey, theme);
-
     const isDark = theme === 'dark';
     themeToggleBtn.setAttribute('aria-pressed', String(isDark));
     themeToggleBtn.setAttribute('aria-label', isDark ? 'Switch to light theme' : 'Switch to dark theme');
+  }
+
+  applyTheme(readSavedTheme() || (mediaQuery.matches ? 'dark' : 'light'));
+
+  themeToggleBtn.addEventListener('click', () => {
+    const nextTheme = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    applyTheme(nextTheme);
+    saveTheme(nextTheme);
+  });
+
+  if (typeof mediaQuery.addEventListener === 'function') {
+    mediaQuery.addEventListener('change', (event) => {
+      if (!readSavedTheme()) {
+        applyTheme(event.matches ? 'dark' : 'light');
+      }
+    });
   }
 }
 
@@ -79,20 +90,15 @@ function initMobileNav() {
     siteNav.classList.toggle('is-open', nextState);
   }
 
-  // Hamburger button click
   menuToggleBtn.addEventListener('click', (event) => {
     event.stopPropagation();
     toggleMenu();
   });
 
-  // Close menu when clicking any nav link
   navLinks.forEach((link) => {
-    link.addEventListener('click', () => {
-      toggleMenu(false);
-    });
+    link.addEventListener('click', () => toggleMenu(false));
   });
 
-  // Close menu when clicking outside
   document.addEventListener('click', (event) => {
     if (
       siteNav.classList.contains('is-open') &&
@@ -103,7 +109,6 @@ function initMobileNav() {
     }
   });
 
-  // Close on Escape key press for accessibility
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && siteNav.classList.contains('is-open')) {
       toggleMenu(false);
@@ -113,240 +118,7 @@ function initMobileNav() {
 }
 
 /* ==========================================================================
-   3. Filterable Projects Gallery (Finished & In-Progress)
-   ========================================================================== */
-function initProjectFilters() {
-  const filterButtons = document.querySelectorAll('.project-filters .filter-btn');
-  const projectCards = document.querySelectorAll('.projects-grid .project-card');
-
-  if (!filterButtons.length || !projectCards.length) return;
-
-  filterButtons.forEach((button) => {
-    button.addEventListener('click', () => {
-      const selectedFilter = button.getAttribute('data-filter') || 'all';
-
-      // Update ARIA state and active class on filter buttons
-      filterButtons.forEach((btn) => {
-        const isActive = btn === button;
-        btn.classList.toggle('active', isActive);
-        btn.setAttribute('aria-selected', String(isActive));
-      });
-
-      // Show/Hide project cards
-      projectCards.forEach((card) => {
-        const cardStatus = card.getAttribute('data-status');
-        const shouldShow = selectedFilter === 'all' || cardStatus === selectedFilter;
-
-        if (shouldShow) {
-          card.classList.remove('is-hidden');
-        } else {
-          card.classList.add('is-hidden');
-        }
-      });
-    });
-  });
-}
-
-/* ==========================================================================
-   4. GitHub Contribution Heatmap Mock Generator
-   ========================================================================== */
-function initGitHubContributions() {
-  const gridContainer = document.getElementById('heatmap-grid');
-  const tooltip = document.getElementById('heatmap-tooltip');
-  if (!gridContainer || !tooltip) return;
-
-  const totalWeeks = 24;
-  const daysPerWeek = 7;
-  const totalDays = totalWeeks * daysPerWeek;
-
-  const defaultTooltipText = 'Hover over a tile to view commits';
-  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  
-  // Deterministic mock seed so contribution graph looks consistent and realistic
-  const baseDate = new Date(2026, 8, 30); // Sep 30, 2026
-  const fragment = document.createDocumentFragment();
-
-  // Pattern multipliers to create natural activity clusters & streaks
-  const activityPattern = [
-    0, 2, 4, 3, 5, 1, 0,
-    1, 4, 6, 2, 4, 0, 0,
-    3, 5, 7, 4, 6, 2, 0,
-    0, 1, 3, 2, 4, 1, 0,
-    2, 6, 8, 5, 7, 3, 1,
-    0, 3, 5, 4, 2, 0, 0
-  ];
-
-  for (let i = totalDays - 1; i >= 0; i--) {
-    const dayDate = new Date(baseDate);
-    dayDate.setDate(baseDate.getDate() - i);
-
-    const patternIndex = (totalDays - i) % activityPattern.length;
-    const isWeekend = dayDate.getDay() === 0 || dayDate.getDay() === 6;
-    let count = activityPattern[patternIndex];
-    
-    if (isWeekend && count > 2) {
-      count = Math.floor(count / 2);
-    }
-
-    // Determine contribution level (0 to 4)
-    let level = 0;
-    if (count >= 7) level = 4;
-    else if (count >= 5) level = 3;
-    else if (count >= 3) level = 2;
-    else if (count >= 1) level = 1;
-
-    const cell = document.createElement('div');
-    cell.className = `heatmap-cell level-${level}`;
-    cell.setAttribute('tabindex', '0');
-    cell.setAttribute('role', 'gridcell');
-
-    const formattedDate = `${monthNames[dayDate.getMonth()]} ${dayDate.getDate()}, ${dayDate.getFullYear()}`;
-    const label = count === 0 ? `No contributions on ${formattedDate}` : `${count} contribution${count > 1 ? 's' : ''} on ${formattedDate}`;
-
-    cell.setAttribute('aria-label', label);
-
-    cell.addEventListener('mouseenter', () => {
-      tooltip.textContent = label;
-    });
-
-    cell.addEventListener('focus', () => {
-      tooltip.textContent = label;
-    });
-
-    fragment.appendChild(cell);
-  }
-
-  gridContainer.appendChild(fragment);
-
-  gridContainer.addEventListener('mouseleave', () => {
-    tooltip.textContent = defaultTooltipText;
-  });
-}
-
-/* ==========================================================================
-   5. Contact Form Validation & Feedback UI
-   ========================================================================== */
-function initContactForm() {
-  const contactForm = document.getElementById('contact-form');
-  const formStatus = document.getElementById('form-status');
-  if (!contactForm || !formStatus) return;
-
-  const fields = {
-    name: {
-      input: document.getElementById('name'),
-      error: document.getElementById('name-error'),
-      validate: (val) => val.trim().length >= 2 || 'Please enter at least 2 characters.',
-    },
-    email: {
-      input: document.getElementById('email'),
-      error: document.getElementById('email-error'),
-      validate: (val) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(val.trim()) || 'Please enter a valid email address.';
-      },
-    },
-    subject: {
-      input: document.getElementById('subject'),
-      error: document.getElementById('subject-error'),
-      validate: (val) => val.trim().length >= 3 || 'Subject must be at least 3 characters long.',
-    },
-    message: {
-      input: document.getElementById('message'),
-      error: document.getElementById('message-error'),
-      validate: (val) => val.trim().length >= 10 || 'Please provide at least 10 characters in your message.',
-    },
-  };
-
-  // Real-time error clearing when user edits an invalid field
-  Object.values(fields).forEach(({ input, error }) => {
-    if (!input || !error) return;
-
-    input.addEventListener('input', () => {
-      if (input.classList.contains('is-invalid')) {
-        input.classList.remove('is-invalid');
-        error.textContent = '';
-      }
-    });
-
-    input.addEventListener('blur', () => {
-      validateSingleField(input, error);
-    });
-  });
-
-  function validateSingleField(input, error) {
-    const key = input.id;
-    const fieldConfig = fields[key];
-    if (!fieldConfig) return true;
-
-    const result = fieldConfig.validate(input.value);
-    if (result !== true) {
-      input.classList.add('is-invalid');
-      error.textContent = result;
-      return false;
-    } else {
-      input.classList.remove('is-invalid');
-      error.textContent = '';
-      return true;
-    }
-  }
-
-  // Handle Form Submission
-  contactForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-    formStatus.className = 'form-status';
-    formStatus.textContent = '';
-
-    let isFormValid = true;
-    let firstInvalidInput = null;
-
-    // Validate all fields
-    Object.keys(fields).forEach((key) => {
-      const { input, error } = fields[key];
-      const valid = validateSingleField(input, error);
-      if (!valid) {
-        isFormValid = false;
-        if (!firstInvalidInput) {
-          firstInvalidInput = input;
-        }
-      }
-    });
-
-    if (!isFormValid) {
-      if (firstInvalidInput) {
-        firstInvalidInput.focus();
-      }
-      return;
-    }
-
-    // Simulate sending with accessible visual confirmation
-    const submitBtn = contactForm.querySelector('.btn-submit');
-    const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `<span>Sending...</span>`;
-    }
-
-    setTimeout(() => {
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalBtnText;
-      }
-
-      formStatus.className = 'form-status success';
-      formStatus.textContent = 'Thank you! Your message has been sent successfully.';
-      contactForm.reset();
-
-      // Clear success notification after 6 seconds
-      setTimeout(() => {
-        formStatus.className = 'form-status';
-        formStatus.textContent = '';
-      }, 6000);
-    }, 700);
-  });
-}
-
-/* ==========================================================================
-   6. Active Navigation Link Scroll Spy
+   3. Active Navigation Link Scroll Spy
    ========================================================================== */
 function initScrollSpy() {
   const sections = document.querySelectorAll('main section[id]');
@@ -364,8 +136,7 @@ function initScrollSpy() {
 
       if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
         navLinks.forEach((link) => {
-          const isCurrent = link.getAttribute('href') === `#${sectionId}`;
-          link.classList.toggle('active', isCurrent);
+          link.classList.toggle('active', link.getAttribute('href') === `#${sectionId}`);
         });
       }
     });
@@ -373,4 +144,158 @@ function initScrollSpy() {
 
   window.addEventListener('scroll', updateActiveLink, { passive: true });
   updateActiveLink();
+}
+
+/* ==========================================================================
+   4. Path to 2027 Timeline Chart (inline SVG)
+   ========================================================================== */
+
+/** Turns "YYYY-MM" into the first day of that month, "present" into now, anything else into null. */
+function parseMonth(value, now) {
+  if (value === 'present') return new Date(now);
+  const match = /^(\d{4})-(\d{2})$/.exec(value || '');
+  if (!match) return null;
+  return new Date(Number(match[1]), Number(match[2]) - 1, 1);
+}
+
+/** Position of a date between start (0) and end (1), clamped to that range. */
+function chartRatio(date, start, end) {
+  const ratio = (date - start) / (end - start);
+  return Math.min(1, Math.max(0, ratio));
+}
+
+/** Reads timeline rows from the #path-list items; malformed rows are skipped. */
+function readPathEvents(listEl, now) {
+  const events = [];
+
+  Array.from(listEl.querySelectorAll('li')).forEach((item) => {
+    const kind = item.dataset.kind === 'range' ? 'range' : 'point';
+    const start = parseMonth(item.dataset.start, now);
+    const end = kind === 'range' ? parseMonth(item.dataset.end, now) : null;
+    const title = item.querySelector('strong');
+    const when = item.querySelector('span');
+
+    if (!start || (kind === 'range' && !end) || !title || !when) return;
+
+    events.push({
+      kind,
+      start,
+      end,
+      label: `${title.textContent.trim()}, ${when.textContent.trim()}`,
+    });
+  });
+
+  return events;
+}
+
+function svgEl(name, attributes) {
+  const element = document.createElementNS(SVG_NS, name);
+  Object.keys(attributes).forEach((key) => element.setAttribute(key, attributes[key]));
+  return element;
+}
+
+function renderPathChart(width, events, now, animate) {
+  const pad = 16;
+  const top = 24;
+  const rowHeight = 46;
+  const axisHeight = 28;
+  const plotWidth = width - pad * 2;
+  const gridBottom = top + events.length * rowHeight;
+  const height = gridBottom + axisHeight;
+  const xOf = (date) => pad + chartRatio(date, PATH_START, PATH_END) * plotWidth;
+
+  const classes = ['chart-svg'];
+  if (!animate) classes.push('is-static');
+  if (width < 280) classes.push('is-narrow');
+
+  const svg = svgEl('svg', {
+    class: classes.join(' '),
+    viewBox: `0 0 ${width} ${height}`,
+    width: String(width),
+    height: String(height),
+    'aria-hidden': 'true',
+    focusable: 'false',
+  });
+
+  for (let year = PATH_START.getFullYear(); year <= PATH_END.getFullYear(); year += 1) {
+    const x = xOf(new Date(year, 0, 1));
+    svg.appendChild(svgEl('line', { class: 'chart-grid', x1: x, x2: x, y1: top - 6, y2: gridBottom }));
+    const yearLabel = svgEl('text', { class: 'chart-axis', x: x + 4, y: height - 8 });
+    yearLabel.textContent = String(year);
+    svg.appendChild(yearLabel);
+  }
+
+  events.forEach((event, index) => {
+    const rowTop = top + index * rowHeight;
+    const barY = rowTop + 20;
+    const state = event.start > now ? 'is-future' : 'is-past';
+    const delay = `${index * 90}ms`;
+
+    const label = svgEl('text', { class: 'chart-label', x: pad, y: rowTop + 12 });
+    label.textContent = event.label;
+    svg.appendChild(label);
+
+    if (event.kind === 'range') {
+      const x1 = xOf(event.start);
+      const x2 = Math.max(xOf(event.end), x1 + 4);
+      svg.appendChild(svgEl('rect', {
+        class: `chart-bar ${state}`,
+        x: x1,
+        y: barY,
+        width: x2 - x1,
+        height: 10,
+        rx: 3,
+        style: `animation-delay: ${delay}`,
+      }));
+    } else {
+      const middle = new Date(event.start.getFullYear(), event.start.getMonth(), 15);
+      svg.appendChild(svgEl('circle', {
+        class: `chart-dot ${state}`,
+        cx: xOf(middle),
+        cy: barY + 5,
+        r: 6,
+        style: `animation-delay: ${delay}`,
+      }));
+    }
+  });
+
+  const todayX = xOf(now);
+  svg.appendChild(svgEl('line', { class: 'chart-today', x1: todayX, x2: todayX, y1: top - 6, y2: gridBottom }));
+  const todayLabel = svgEl('text', { class: 'chart-today-label', x: todayX - 4, y: 12, 'text-anchor': 'end' });
+  todayLabel.textContent = 'Today';
+  svg.appendChild(todayLabel);
+
+  return svg;
+}
+
+function initPathChart() {
+  const container = document.getElementById('path-chart');
+  const list = document.getElementById('path-list');
+  if (!container || !list) return;
+
+  const panel = container.closest('.chart-panel');
+  let drawnWidth = 0;
+  let hasAnimated = false;
+
+  function draw() {
+    const width = Math.floor(container.clientWidth);
+    if (width <= 0 || width === drawnWidth) return;
+
+    const now = new Date();
+    const events = readPathEvents(list, now);
+    if (!events.length) return;
+
+    container.replaceChildren(renderPathChart(Math.max(CHART_MIN_WIDTH, width), events, now, !hasAnimated));
+    drawnWidth = width;
+    hasAnimated = true;
+    if (panel) panel.classList.add('has-chart');
+  }
+
+  draw();
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(draw, 120);
+  });
 }
