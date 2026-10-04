@@ -10,6 +10,7 @@
   <!-- Apply the saved or system theme before first paint -->
   <script>
     (function () {
+      document.documentElement.classList.add('js');
       var savedTheme = null;
       try {
         savedTheme = localStorage.getItem('jkm_portfolio_theme');
@@ -38,7 +39,7 @@
 
   <header class="site-header">
     <div class="container header-inner">
-      <a href="#hero" class="brand" aria-label="John Kenneth Moscosa, back to top">JKM</a>
+      <a href="#hero" class="brand" aria-label="JKM, John Kenneth Moscosa, back to top">JKM</a>
 
       <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
         <ul class="nav-list">
@@ -78,6 +79,13 @@
   </header>
 
   <main id="main-content">
+    <!--
+      Content that goes stale, update by hand:
+      - Hero chart list (#path-list): the DICT Hackathon row says "to present" (data-end="present"); give it a real end month when it finishes.
+      - Projects: the thReady status pill ("In progress") and its "Defense in November 2026" line.
+      - Activity: the DICT Hackathon row ("Oct 2026 to present") and the two DataCamp rows ("In progress").
+      - About and key facts: "fourth-year", "Jul 2027" graduation, and "2" DataCamp tracks in progress.
+    -->
     <!-- Hero -->
     <section class="hero" id="hero" aria-labelledby="hero-heading">
       <div class="container hero-grid">
@@ -97,7 +105,7 @@
             <p class="panel-caption">Education, events, and milestones</p>
           </div>
           <div class="path-chart" id="path-chart"></div>
-          <p class="chart-note">Filled marks have happened or are ongoing. Outlined marks are upcoming. The dashed line is today.</p>
+          <p class="chart-note" aria-hidden="true">Filled marks have happened or are ongoing. Outlined marks are upcoming. The dashed line is today.</p>
           <ol class="path-list" id="path-list">
             <li data-kind="range" data-start="2023-01" data-end="2025-01"><strong>Dean's Lister</strong> <span>2023&ndash;2024</span></li>
             <li data-kind="point" data-start="2026-02"><strong>STI Lucena Hackathon</strong> <span>Feb 2026</span></li>
@@ -318,23 +326,23 @@
           </div>
           <ol class="timeline">
             <li>
-              <time>Oct 2026 to present</time>
+              <time datetime="2026-10">Oct 2026 to present</time>
               <p>Participant, DICT Hackathon (Team JDK)</p>
             </li>
             <li>
-              <time>In progress</time>
+              <span class="timeline-when">In progress</span>
               <p>DataCamp: Associate Data Analyst in SQL</p>
             </li>
             <li>
-              <time>In progress</time>
+              <span class="timeline-when">In progress</span>
               <p>DataCamp: Data Analyst in Python</p>
             </li>
             <li>
-              <time>Feb 2026</time>
+              <time datetime="2026-02">Feb 2026</time>
               <p>Participant, STI College Lucena Hackathon</p>
             </li>
             <li>
-              <time>2026</time>
+              <time datetime="2026">2026</time>
               <p>Member, STI Shiba Esports, STI College Lucena</p>
             </li>
           </ol>
@@ -378,6 +386,7 @@
           <li><a href="#about">About</a></li>
           <li><a href="#skills">Skills</a></li>
           <li><a href="#projects">Projects</a></li>
+          <li><a href="#activity">Activity</a></li>
           <li><a href="#contact">Contact</a></li>
           <li><a href="https://github.com/mscskenn" target="_blank" rel="noopener noreferrer">GitHub</a></li>
           <li><a href="https://www.linkedin.com/in/john-kenneth-moscosa" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
