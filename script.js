@@ -1,8 +1,11 @@
 /**
  * John Kenneth Moscosa — Portfolio (editor theme)
- * 1. Scroll spy: highlights the current "file" in the explorer and updates the breadcrumb.
- * 2. Keeps the footer year current.
- * The page works fully without JavaScript; this only adds the live highlights.
+ * 1. Theme toggle: light/dark, remembered in localStorage when available.
+ * 2. Mobile menu: the explorer becomes a dropdown under 640px.
+ * 3. Scroll spy: highlights the current "file" in the explorer and updates the breadcrumb.
+ * 4. Lightbox: enlarges certificate images on the credentials page.
+ * 5. Keeps the footer year current.
+ * The pages work fully without JavaScript; this only adds the extras.
  */
 (function () {
   'use strict';
@@ -11,6 +14,7 @@
     initTheme();
     initMobileNav();
     initScrollSpy();
+    initLightbox();
     const year = document.getElementById('year');
     if (year) year.textContent = String(new Date().getFullYear());
   });
@@ -75,6 +79,34 @@
     });
 
     phone.addEventListener('change', () => setOpen(false));
+  }
+
+  function initLightbox() {
+    const dialog = document.getElementById('lightbox');
+    const img = document.getElementById('lightbox-img');
+    if (!dialog || !img || typeof dialog.showModal !== 'function') return;
+    let opener = null;
+
+    document.querySelectorAll('[data-lightbox]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const thumb = btn.querySelector('img');
+        img.src = btn.dataset.full;
+        img.alt = thumb ? thumb.alt : '';
+        opener = btn;
+        dialog.showModal();
+      });
+    });
+
+    // Clicks on the backdrop land on the dialog element itself (it has no padding).
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    dialog.addEventListener('close', () => {
+      img.removeAttribute('src');
+      if (opener) opener.focus();
+      opener = null;
+    });
   }
 
   function initScrollSpy() {
