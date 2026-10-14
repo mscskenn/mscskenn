@@ -94,8 +94,6 @@
 .theme-toggle[aria-pressed="true"] { border-color: var(--accent); }
 .js .theme-toggle { display: inline-flex; }
 
-#head-muted path { fill: var(--arrow); }
-#head-accent path { fill: var(--accent); }
 
 /* 2. Base ------------------------------------------------------------------ */
 *, *::before, *::after { box-sizing: border-box; }
@@ -394,7 +392,8 @@ h1, h2, h3, p, figure { margin: 0; }
 .breadcrumb-current { color: var(--ink-soft); }
 
 .content {
-  max-width: 1080px;
+  max-width: 1120px;
+  margin-inline: auto;
   padding: 56px clamp(16px, 4vw, 56px) 80px;
   display: flex;
   flex-direction: column;
@@ -734,53 +733,102 @@ section[id], article[id] { scroll-margin-top: 56px; }
   gap: 12px;
 }
 
-.diagram-scroll {
-  overflow-x: auto;
+.diagram {
+  padding: 24px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--code);
-}
-
-.diagram {
-  position: relative;
-  margin: 0 auto;
-  width: 560px;
-  height: 488px;
   font-family: var(--mono);
   font-size: 13px;
   line-height: 20px;
 }
 
-.arrow {
-  position: absolute;
-  overflow: visible;
-  fill: none;
-  stroke: var(--arrow);
-  stroke-width: 2;
-  stroke-linecap: round;
+.flow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 520px;
+  margin: 0 auto;
 }
-.arrow--accent { stroke: var(--accent); }
+
+.flow-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+}
 
 .node {
-  position: absolute;
-  padding: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 64px;
+  padding: 10px 12px;
   text-align: center;
   border-radius: 8px;
   color: var(--ink-soft);
+  overflow-wrap: anywhere;
 }
 .node b { color: var(--ink); }
 .node--team { background: var(--chip); border: 1px dashed var(--line-3); }
-.node--me { padding: 12px 16px; background: var(--accent-soft); border: 1px solid var(--accent); }
+.node--me { background: var(--accent-soft); border: 1px solid var(--accent); }
+.node--api { width: 100%; padding: 14px 16px; }
+.node--db { width: min(100%, 224px); }
 
-.diagram-label {
+/* Arrows are drawn with CSS so they scale with the layout */
+.flow-link {
+  --c: var(--arrow);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 48px;
+}
+.flow-link::before {
+  content: '';
   position: absolute;
-  width: 248px;
+  left: 50%;
+  top: 0;
+  bottom: 4px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--c);
+}
+.flow-link::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  border-right: 2px solid var(--c);
+  border-bottom: 2px solid var(--c);
+  transform: rotate(45deg);
+}
+.flow-link--accent { --c: var(--accent); height: 64px; }
+
+.flow-label {
+  position: relative;
+  z-index: 1;
+  padding: 2px 10px;
+  background: var(--code);
   font-size: 12px;
   line-height: 16px;
+  text-align: center;
   color: var(--muted);
+}
+
+@media (max-width: 639px) {
+  .diagram { padding: 16px; }
+}
+
+/* Narrow phones: team nodes stack their two label words instead of wrapping mid-phrase */
+@media (max-width: 479px) {
+  .node { font-size: 12px; padding: 10px 8px; }
+  .node--team .c-comment span { display: block; }
+  .node--team .dot { display: none; }
 }
 
 .legend {
@@ -975,6 +1023,17 @@ section[id], article[id] { scroll-margin-top: 56px; }
 }
 .status-links a:hover { color: var(--ink); }
 
+
+/* Phone polish ------------------------------------------------------------- */
+@media (max-width: 639px) {
+  .content { gap: 80px; padding-top: 40px; padding-bottom: 56px; }
+  .section { gap: 24px; }
+  .section-head h2, .section-head h1 { font-size: 24px; }
+  .ln { flex-basis: 36px; padding-right: 12px; }
+  .indent { padding-left: 12px; white-space: normal; overflow-wrap: anywhere; }
+  .about-json, .skills-json { font-size: 13px; line-height: 24px; }
+  .about-json { padding-right: 12px; }
+}
 
 /* 14. Credentials ---------------------------------------------------------- */
 .section-head h1 {

@@ -230,17 +230,19 @@
                 <!-- System diagram -->
                 <figure class="diagram-fig">
                   <figcaption class="comment-line comment-line--sm">// how the system fits together</figcaption>
-                  <div class="diagram-scroll">
-                    <div class="diagram" role="img" aria-label="System diagram: the web app and the computer vision module, built by teammates, call a REST API built in Node.js and Express. The API, built by me, handles orders, production planning, material requests, piece-rate pay, auth, sessions and audit logs, and stores data in MySQL using transactions and row-level locks.">
-                      <svg class="arrow" style="left:136px;top:88px" width="8" height="95" viewBox="0 0 8 95" aria-hidden="true"><path d="M 4 0 L 4 91" marker-end="url(#head-muted)"/></svg>
-                      <svg class="arrow" style="left:416px;top:88px" width="8" height="95" viewBox="0 0 8 95" aria-hidden="true"><path d="M 4 0 L 4 91" marker-end="url(#head-muted)"/></svg>
-                      <svg class="arrow arrow--accent" style="left:276px;top:304px" width="8" height="95" viewBox="0 0 8 95" aria-hidden="true"><path d="M 4 0 L 4 91" marker-end="url(#head-accent)"/></svg>
-
-                      <div class="node node--team" style="left:24px;top:24px;width:232px;height:64px" aria-hidden="true"><span><b>Web app</b><br><span class="c-comment">team · frontend</span></span></div>
-                      <div class="node node--team" style="left:304px;top:24px;width:232px;height:64px" aria-hidden="true"><span><b>Computer vision</b><br><span class="c-comment">team · AI module</span></span></div>
-                      <div class="node node--me" style="left:24px;top:184px;width:512px;height:120px" aria-hidden="true"><span><b>REST API</b> <span class="c-comment">· Node.js + Express</span><br>orders · production planning · material requests<br>piece-rate pay · auth &amp; sessions · audit logs</span></div>
-                      <div class="node node--me" style="left:168px;top:400px;width:224px;height:64px" aria-hidden="true"><span><b>MySQL</b><br><span class="c-muted">orders · stock · pay</span></span></div>
-                      <div class="diagram-label" style="left:296px;top:336px" aria-hidden="true">transactions + row-level locks</div>
+                  <div class="diagram" role="img" aria-label="System diagram: the web app and the computer vision module, built by teammates, call a REST API built in Node.js and Express. The API, built by me, handles orders, production planning, material requests, piece-rate pay, auth, sessions and audit logs, and stores data in MySQL using transactions and row-level locks.">
+                    <div class="flow" aria-hidden="true">
+                      <div class="flow-row">
+                        <div class="node node--team"><span><b>Web app</b><br><span class="c-comment"><span>team</span><span class="dot"> · </span><span>frontend</span></span></span></div>
+                        <div class="node node--team"><span><b>Computer vision</b><br><span class="c-comment"><span>team</span><span class="dot"> · </span><span>AI module</span></span></span></div>
+                      </div>
+                      <div class="flow-row">
+                        <div class="flow-link"></div>
+                        <div class="flow-link"></div>
+                      </div>
+                      <div class="node node--me node--api"><span><b>REST API</b> <span class="c-comment">· Node.js + Express</span><br>orders · production planning · material requests · piece-rate pay · auth &amp; sessions · audit logs</span></div>
+                      <div class="flow-link flow-link--accent"><span class="flow-label">transactions + row-level locks</span></div>
+                      <div class="node node--me node--db"><span><b>MySQL</b><br><span class="c-muted">orders · stock · pay</span></span></div>
                     </div>
                   </div>
                   <div class="legend">
@@ -250,8 +252,6 @@
                 </figure>
               </div>
             </article>
-
-  
           </section>
 
           <!-- Skills -->
@@ -430,13 +430,6 @@
     </footer>
   </div>
 
-  <!-- Shared arrowheads for the diagram -->
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-    <defs>
-      <marker id="head-muted" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z"/></marker>
-      <marker id="head-accent" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z"/></marker>
-    </defs>
-  </svg>
 
   <script src="./script.js" defer></script>
 </body>
