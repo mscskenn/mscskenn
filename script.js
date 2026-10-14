@@ -8,10 +8,37 @@
   'use strict';
 
   document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
     initScrollSpy();
     const year = document.getElementById('year');
     if (year) year.textContent = String(new Date().getFullYear());
   });
+
+  function initTheme() {
+    const root = document.documentElement;
+    const btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    const meta = document.querySelector('meta[name="theme-color"]');
+    const colors = { dark: '#0B0E13', light: '#F6F7F9' };
+
+    function apply(theme) {
+      root.setAttribute('data-theme', theme);
+      btn.setAttribute('aria-pressed', String(theme === 'dark'));
+      if (meta) meta.setAttribute('content', colors[theme]);
+    }
+
+    apply(root.getAttribute('data-theme') === 'light' ? 'light' : 'dark');
+
+    btn.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      apply(next);
+      try {
+        localStorage.setItem('theme', next);
+      } catch (e) {
+        // Storage blocked: the choice still holds for this visit.
+      }
+    });
+  }
 
   function initScrollSpy() {
     const links = Array.from(document.querySelectorAll('.explorer-link[href^="#"]'));

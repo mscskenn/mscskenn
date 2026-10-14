@@ -31,6 +31,7 @@
   --arrow: #5A6475;
 
   --key: #8AB4F8;
+  --key-hover: #C3D7FB;
   --str: #7CD4A4;
 
   --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
@@ -38,6 +39,60 @@
 
   color-scheme: dark;
 }
+
+:root[data-theme="light"] {
+  --accent: #8A5000;
+  --accent-soft: rgba(138, 80, 0, 0.10);
+
+  --bg: #F6F7F9;
+  --bg-side: #EDEFF3;
+  --pane: #FFFFFF;
+  --code: #F0F2F6;
+  --term: #E8EBF0;
+  --chip: #E9ECF1;
+  --hover: #E2E6ED;
+
+  --line: #D5DAE3;
+  --line-2: #C6CCD8;
+  --line-3: #A9B1C0;
+
+  --ink: #0F172A;
+  --ink-soft: #1F2937;
+  --ink-body: #374151;
+  --muted: #4B5563;
+  --comment: #5B6473;
+  --gutter: #8A93A3;
+  --arrow: #6B7587;
+
+  --key: #1D4ED8;
+  --key-hover: #1E3A8A;
+  --str: #166534;
+
+  color-scheme: light;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--line-3);
+  border-radius: 6px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 160ms ease;
+}
+.icon-btn:hover { border-color: var(--accent); }
+
+.theme-toggle { display: none; }
+.js .theme-toggle { display: inline-flex; }
+
+#head-muted path { fill: var(--arrow); }
+#head-accent path { fill: var(--accent); }
 
 /* 2. Base ------------------------------------------------------------------ */
 *, *::before, *::after { box-sizing: border-box; }
@@ -57,7 +112,7 @@ body {
 }
 
 a { color: var(--key); }
-a:hover { color: #C3D7FB; }
+a:hover { color: var(--key-hover); }
 
 img { display: block; max-width: 100%; height: auto; }
 
