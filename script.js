@@ -78,7 +78,9 @@
       setOpen(false);
     });
 
-    phone.addEventListener('change', () => setOpen(false));
+    const onPhoneChange = () => setOpen(false);
+    if (phone.addEventListener) phone.addEventListener('change', onPhoneChange);
+    else phone.addListener(onPhoneChange);
   }
 
   function initLightbox() {

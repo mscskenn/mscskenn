@@ -91,6 +91,7 @@
 .icon-btn:hover { border-color: var(--accent); }
 
 .theme-toggle { display: none; }
+.theme-toggle[aria-pressed="true"] { border-color: var(--accent); }
 .js .theme-toggle { display: inline-flex; }
 
 #head-muted path { fill: var(--arrow); }
@@ -964,6 +965,17 @@ section[id], article[id] { scroll-margin-top: 56px; }
 }
 .status-spacer { flex: 1; }
 
+.status-links { display: flex; flex-wrap: wrap; align-items: stretch; }
+.status-links a {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.status-links a:hover { color: var(--ink); }
+
+
 /* 14. Credentials ---------------------------------------------------------- */
 .section-head h1 {
   font-family: var(--mono);
@@ -1037,7 +1049,7 @@ section[id], article[id] { scroll-margin-top: 56px; }
   color: var(--ink);
 }
 .lightbox::backdrop { background: rgba(0, 0, 0, 0.78); }
-.lightbox-img { width: 100%; height: auto; max-height: 90vh; object-fit: contain; }
+.lightbox-img { width: 100%; height: auto; max-height: calc(100vh - 2em - 8px); object-fit: contain; }
 .lightbox-close {
   position: absolute;
   top: 8px;
@@ -1047,6 +1059,7 @@ section[id], article[id] { scroll-margin-top: 56px; }
 
 @media (max-width: 639px) {
   .card-body { padding: 20px; }
+  .log-link, .status-links a, .btn-resume { min-height: 44px; }
 }
 
 /* 13. Motion --------------------------------------------------------------- */
