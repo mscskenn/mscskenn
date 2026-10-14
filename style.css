@@ -40,6 +40,8 @@
   color-scheme: dark;
 }
 
+:root { --bar-h: 61px; }
+
 :root[data-theme="light"] {
   --accent: #8A5000;
   --accent-soft: rgba(138, 80, 0, 0.10);
@@ -229,12 +231,15 @@ h1, h2, h3, p, figure { margin: 0; }
 }
 
 .explorer {
-  flex: 1 1 240px;
-  border-right: 1px solid var(--line);
+  flex: 1 1 100%;
+  order: 2;
+  border-top: 1px solid var(--line);
   background: var(--bg-side);
   font-family: var(--mono);
   font-size: 13px;
 }
+
+.menu-toggle { display: none; }
 
 .explorer-inner { padding: 20px 12px 32px; }
 
@@ -300,8 +305,16 @@ h1, h2, h3, p, figure { margin: 0; }
   flex: none;
 }
 
-/* Desktop: explorer stays in view while the editor scrolls */
-@media (min-width: 761px) {
+/* Tablet and desktop: explorer beside the editor, sticky while scrolling */
+@media (min-width: 640px) {
+  .workspace { flex-wrap: nowrap; }
+  .explorer {
+    flex: 0 0 240px;
+    order: 0;
+    border-top: 0;
+    border-right: 1px solid var(--line);
+  }
+  .editor { flex: 1 1 0; }
   .explorer-inner {
     position: sticky;
     top: 0;
@@ -310,18 +323,54 @@ h1, h2, h3, p, figure { margin: 0; }
   }
 }
 
-/* Phone: content first, explorer becomes the site map at the bottom */
-@media (max-width: 760px) {
-  .explorer {
-    order: 2;
-    border-right: 0;
-    border-top: 1px solid var(--line);
+/* Phone: with JavaScript the explorer is a dropdown opened by the hamburger */
+@media (max-width: 639px) {
+  .js .titlebar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    flex-wrap: nowrap;
+    min-height: var(--bar-h);
   }
+  .js .menu-toggle { display: inline-flex; }
+  .js .titlebar-nav > a { display: none; }
+  .js .titlebar-nav { flex-wrap: nowrap; margin-left: auto; }
+  .js .titlebar .icon-btn { padding: 0 10px; }
+  .js .btn-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .js .breadcrumb { top: var(--bar-h); }
+  .js section[id], .js article[id] { scroll-margin-top: 112px; }
+  .js .explorer {
+    display: none;
+    position: fixed;
+    top: var(--bar-h);
+    left: 0;
+    right: 0;
+    z-index: 30;
+    order: 0;
+    max-height: calc(100vh - var(--bar-h));
+    overflow-y: auto;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line-2);
+  }
+  .js .explorer.is-open { display: block; }
+}
+
+/* Very small phones: the brand mark alone, so the title bar never overflows */
+@media (max-width: 479px) {
+  .js .brand-text { display: none; }
 }
 
 /* 5. Editor + sections ----------------------------------------------------- */
 .editor {
-  flex: 999 1 560px;
+  flex: 1 1 100%;
   min-width: 0;
 }
 

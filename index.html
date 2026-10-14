@@ -44,7 +44,7 @@
     <header class="titlebar">
       <a href="#readme" class="brand" aria-label="John Kenneth Moscosa, back to top">
         <span class="brand-mark">JK</span>
-        <span><span class="accent">kenn</span><span class="c-comment">@</span>portfolio<span class="c-comment">:</span><span class="c-key">~/mscskenn</span></span>
+        <span class="brand-text"><span class="accent">kenn</span><span class="c-comment">@</span>portfolio<span class="c-comment">:</span><span class="c-key">~/mscskenn</span></span>
       </a>
       <nav class="titlebar-nav" aria-label="Profiles">
         <a href="https://github.com/mscskenn" target="_blank" rel="noopener noreferrer">github</a>
@@ -58,12 +58,16 @@
           <span class="btn-label">Dark theme</span>
         </button>
       </nav>
+      <button type="button" class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="explorer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <span class="btn-label">Menu</span>
+      </button>
     </header>
 
     <div class="workspace">
 
       <!-- Explorer (navigation) -->
-      <aside class="explorer">
+      <aside class="explorer" id="explorer">
         <div class="explorer-inner">
           <p class="explorer-label">EXPLORER</p>
           <nav class="explorer-nav" aria-label="Sections">

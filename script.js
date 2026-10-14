@@ -9,6 +9,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     initTheme();
+    initMobileNav();
     initScrollSpy();
     const year = document.getElementById('year');
     if (year) year.textContent = String(new Date().getFullYear());
@@ -38,6 +39,42 @@
         // Storage blocked: the choice still holds for this visit.
       }
     });
+  }
+
+  function initMobileNav() {
+    const btn = document.getElementById('menu-toggle');
+    const panel = document.getElementById('explorer');
+    if (!btn || !panel) return;
+    const phone = window.matchMedia('(max-width: 639px)');
+
+    function setOpen(open, returnFocus) {
+      panel.classList.toggle('is-open', open);
+      btn.setAttribute('aria-expanded', String(open));
+      if (open) {
+        const first = panel.querySelector('.explorer-link');
+        if (first) first.focus();
+      } else if (returnFocus) {
+        btn.focus();
+      }
+    }
+
+    btn.addEventListener('click', () => setOpen(!panel.classList.contains('is-open')));
+
+    panel.addEventListener('click', (event) => {
+      if (phone.matches && event.target.closest('a')) setOpen(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && panel.classList.contains('is-open')) setOpen(false, true);
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!panel.classList.contains('is-open')) return;
+      if (panel.contains(event.target) || btn.contains(event.target)) return;
+      setOpen(false);
+    });
+
+    phone.addEventListener('change', () => setOpen(false));
   }
 
   function initScrollSpy() {
