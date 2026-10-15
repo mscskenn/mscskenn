@@ -17,6 +17,7 @@
     initLightbox();
     initReveal();
     initProgress();
+    initTimeline();
     const year = document.getElementById('year');
     if (year) year.textContent = String(new Date().getFullYear());
   });
@@ -175,6 +176,14 @@
     }, { passive: true });
     window.addEventListener('resize', update);
     update();
+  }
+
+  function initTimeline() {
+    if (!motionAllowed()) return;
+    const log = document.querySelector('.log');
+    if (!log) return;
+    log.classList.add('log--draw');
+    observeOnce([log], (el) => el.classList.add('is-visible'), { threshold: 0.05 });
   }
 
   function initScrollSpy() {

@@ -883,11 +883,20 @@ section[id], article[id] { scroll-margin-top: 56px; }
 .log {
   list-style: none;
   margin: 0 0 0 7px;
-  padding: 0 0 0 28px;
-  border-left: 2px solid var(--line);
+  padding: 0 0 0 30px;
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 22px;
+}
+.log::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--line);
 }
 
 .log-item {
@@ -1176,6 +1185,20 @@ section[id], article[id] { scroll-margin-top: 56px; }
   transform: scaleX(0);
   pointer-events: none;
 }
+
+/* Changelog timeline: the line draws downward, the HEAD marker pulses once */
+.log--draw::before {
+  transform: scaleY(0);
+  transform-origin: top center;
+  transition: transform 1100ms ease;
+}
+.log--draw.is-visible::before { transform: none; }
+
+@keyframes head-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.5); }
+}
+.log--draw.is-visible .log-head-dot { animation: head-pulse 900ms ease 900ms 1; }
 
 @media print {
   .reveal, .reveal .log-dot { opacity: 1 !important; transform: none !important; transition: none !important; }
