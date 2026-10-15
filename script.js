@@ -19,6 +19,7 @@
     initProgress();
     initTimeline();
     initTerminal();
+    initDiagramFlow();
     const year = document.getElementById('year');
     if (year) year.textContent = String(new Date().getFullYear());
   });
@@ -242,6 +243,14 @@
     // If anything stalls (throttled tab, an error), still end on the complete text.
     const failsafe = window.setTimeout(showAll, 9000);
     observeOnce([body], () => { play().catch(showAll); }, { threshold: 0.4 });
+  }
+
+  function initDiagramFlow() {
+    if (!motionAllowed()) return;
+    const diagram = document.querySelector('.diagram');
+    if (!diagram) return;
+    diagram.classList.add('diagram--flow');
+    observeOnce([diagram], (el) => el.classList.add('is-visible'), { threshold: 0.35 });
   }
 
   function initScrollSpy() {

@@ -1203,6 +1203,42 @@ section[id], article[id] { scroll-margin-top: 56px; }
 /* Terminal: rows stay in the layout (no shift) until they are typed in */
 .term-hidden { visibility: hidden; }
 
+/* Diagram flow: arrows draw top to bottom, then a dot travels into MySQL three times */
+.flow-dot {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.diagram--flow .flow-link::before {
+  transform: scaleY(0);
+  transform-origin: top center;
+  transition: transform 600ms ease;
+}
+.diagram--flow .flow-link::after {
+  opacity: 0;
+  transition: opacity 200ms ease 500ms;
+}
+.diagram--flow .flow-link--accent::before { transition-delay: 700ms; }
+.diagram--flow .flow-link--accent::after { transition-delay: 1200ms; }
+
+.diagram--flow.is-visible .flow-link::before { transform: none; }
+.diagram--flow.is-visible .flow-link::after { opacity: 1; }
+
+@keyframes flow-dot {
+  0% { transform: translateY(0); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translateY(52px); opacity: 0; }
+}
+.diagram--flow.is-visible .flow-dot { animation: flow-dot 1400ms ease-in 1500ms 3; }
+
 @media print {
   .reveal, .reveal .log-dot { opacity: 1 !important; transform: none !important; transition: none !important; }
   .scroll-progress { display: none; }
