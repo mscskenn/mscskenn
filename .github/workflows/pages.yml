@@ -1,0 +1,53 @@
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # The resume, photo and certificates live in a private repo and are copied in at deploy time.
+      - name: Fetch private assets
+        env:
+          ASSETS_DEPLOY_KEY: ${{ secrets.ASSETS_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$ASSETS_DEPLOY_KEY" > ~/.ssh/assets_key
+          chmod 600 ~/.ssh/assets_key
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          GIT_SSH_COMMAND="ssh -i ~/.ssh/assets_key -o IdentitiesOnly=yes" \
+            git clone --depth 1 git@github.com:mscskenn/portfolio-assets.git "$RUNNER_TEMP/assets"
+          rm -rf "$RUNNER_TEMP/assets/.git"
+          rm -f ~/.ssh/assets_key
+
+      - name: Stage site
+        run: |
+          mkdir _site
+          cp index.html credentials.html style.css script.js _site/
+          cp -r "$RUNNER_TEMP/assets" _site/assets
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
