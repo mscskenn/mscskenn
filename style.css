@@ -1033,6 +1033,17 @@ section[id], article[id] { scroll-margin-top: 56px; }
   .indent { padding-left: 12px; white-space: normal; overflow-wrap: anywhere; }
   .about-json, .skills-json { font-size: 13px; line-height: 24px; }
   .about-json { padding-right: 12px; }
+
+  /* Centered composition: hero copy, buttons and photo sit on the page's center line */
+  .hero { gap: 40px; }
+  .hero-copy { text-align: center; }
+  .hero-lede { margin-inline: auto; }
+  .actions { flex-direction: column; align-items: stretch; }
+  .actions .btn, .actions .btn-text { justify-content: center; }
+  .about-row { flex-direction: column; align-items: stretch; }
+  .photo { align-self: center; align-items: center; }
+  .photo img { width: min(240px, 70vw); height: min(240px, 70vw); }
+  .contact-lede { margin-inline: auto; text-align: center; }
 }
 
 /* 14. Credentials ---------------------------------------------------------- */
