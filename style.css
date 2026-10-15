@@ -1242,5 +1242,8 @@ section[id], article[id] { scroll-margin-top: 56px; }
 @media print {
   .reveal, .reveal .log-dot { opacity: 1 !important; transform: none !important; transition: none !important; }
   .scroll-progress { display: none; }
+  .log--draw::before, .diagram--flow .flow-link::before { transform: none !important; }
+  .diagram--flow .flow-link::after { opacity: 1 !important; }
+  .term-hidden { visibility: visible !important; }
 }
 

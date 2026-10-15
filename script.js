@@ -132,7 +132,7 @@
         io.unobserve(entry.target);
         onSeen(entry.target);
       });
-    }, options || { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+    }, options || { threshold: 0, rootMargin: '0px 0px -6% 0px' });
     elements.forEach((el) => io.observe(el));
   }
 
@@ -185,7 +185,7 @@
     const log = document.querySelector('.log');
     if (!log) return;
     log.classList.add('log--draw');
-    observeOnce([log], (el) => el.classList.add('is-visible'), { threshold: 0.05 });
+    observeOnce([log], (el) => el.classList.add('is-visible'), { threshold: 0 });
   }
 
   function initTerminal() {
@@ -202,8 +202,13 @@
     const target = Number(count.dataset.count);
     const rest = rows.slice(1);
     const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
+    let done = false;
+    let failsafe = 0;
 
+    // Final state. Once reached, the typing sequence stops touching the text.
     function showAll() {
+      done = true;
+      window.clearTimeout(failsafe);
       rest.forEach((row) => row.classList.remove('term-hidden'));
       cmdNode.textContent = ' ' + command;
       count.textContent = String(target);
@@ -214,6 +219,7 @@
         const start = performance.now();
         const duration = 900;
         (function tick(now) {
+          if (done) { resolve(); return; }
           const t = Math.min(1, (now - start) / duration);
           count.textContent = String(Math.round(target * (1 - Math.pow(1 - t, 3))));
           if (t < 1) window.requestAnimationFrame(tick);
@@ -224,25 +230,28 @@
 
     async function play() {
       for (let i = 1; i <= command.length; i += 1) {
+        if (done) return;
         cmdNode.textContent = ' ' + command.slice(0, i);
         await wait(70);
       }
       await wait(250);
       for (const row of rest) {
+        if (done) return;
         row.classList.remove('term-hidden');
         if (row.contains(count)) await countUp();
         else await wait(row.classList.contains('spacer') ? 80 : 300);
       }
-      window.clearTimeout(failsafe);
       showAll();
     }
 
     rest.forEach((row) => row.classList.add('term-hidden'));
     cmdNode.textContent = ' ';
     count.textContent = '0';
-    // If anything stalls (throttled tab, an error), still end on the complete text.
-    const failsafe = window.setTimeout(showAll, 9000);
-    observeOnce([body], () => { play().catch(showAll); }, { threshold: 0.4 });
+    observeOnce([body], () => {
+      // The failsafe starts with the sequence, so it can never cut in before typing begins.
+      failsafe = window.setTimeout(showAll, 9000);
+      play().catch(showAll);
+    }, { threshold: 0, rootMargin: '0px 0px -12% 0px' });
   }
 
   function initDiagramFlow() {
@@ -250,7 +259,7 @@
     const diagram = document.querySelector('.diagram');
     if (!diagram) return;
     diagram.classList.add('diagram--flow');
-    observeOnce([diagram], (el) => el.classList.add('is-visible'), { threshold: 0.35 });
+    observeOnce([diagram], (el) => el.classList.add('is-visible'), { threshold: 0, rootMargin: '0px 0px -12% 0px' });
   }
 
   function initScrollSpy() {
