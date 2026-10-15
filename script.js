@@ -15,6 +15,11 @@
     initMobileNav();
     initScrollSpy();
     initLightbox();
+    initReveal();
+    initProgress();
+    initTimeline();
+    initTerminal();
+    initDiagramFlow();
     const year = document.getElementById('year');
     if (year) year.textContent = String(new Date().getFullYear());
   });
@@ -109,6 +114,152 @@
       if (opener) opener.focus();
       opener = null;
     });
+  }
+
+  const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
+
+  // Effects only run when the visitor allows motion and the browser can observe scrolling.
+  function motionAllowed() {
+    const reduced = window.matchMedia && window.matchMedia(REDUCED_MOTION).matches;
+    return !reduced && 'IntersectionObserver' in window;
+  }
+
+  // Calls onSeen(el) once, the first time each element scrolls into view.
+  function observeOnce(elements, onSeen, options) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        io.unobserve(entry.target);
+        onSeen(entry.target);
+      });
+    }, options || { threshold: 0, rootMargin: '0px 0px -6% 0px' });
+    elements.forEach((el) => io.observe(el));
+  }
+
+  function initReveal() {
+    if (!motionAllowed()) return;
+    const selector = '.section-head, .cert-lede, .about-row, .prose, .card, .skill-group, '
+      + '.log-item, .log-head, .contact-lede, .shell, #contact .actions';
+    const els = Array.from(document.querySelectorAll(selector));
+    els.forEach((el) => {
+      const peers = Array.from(el.parentElement.children).filter((c) => c.matches(selector));
+      el.style.setProperty('--i', String(Math.min(peers.indexOf(el), 6)));
+      el.classList.add('reveal');
+    });
+    observeOnce(els, (el) => {
+      el.classList.add('is-visible');
+      // Once the transition is over, drop the helper classes so hover styles are untouched.
+      window.setTimeout(() => {
+        el.classList.remove('reveal', 'is-visible');
+        el.style.removeProperty('--i');
+      }, 1400);
+    });
+  }
+
+  function initProgress() {
+    if (!motionAllowed()) return;
+    const bar = document.createElement('div');
+    bar.className = 'scroll-progress';
+    bar.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(bar);
+    let ticking = false;
+
+    function update() {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+      bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(update);
+    }, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  }
+
+  function initTimeline() {
+    if (!motionAllowed()) return;
+    const log = document.querySelector('.log');
+    if (!log) return;
+    log.classList.add('log--draw');
+    observeOnce([log], (el) => el.classList.add('is-visible'), { threshold: 0 });
+  }
+
+  function initTerminal() {
+    const body = document.querySelector('.terminal-body');
+    if (!body || !motionAllowed()) return;
+    const rows = Array.from(body.children);
+    const count = body.querySelector('[data-count]');
+    const cmdNode = rows.length
+      ? Array.from(rows[0].childNodes).find((n) => n.nodeType === 3 && n.textContent.trim())
+      : null;
+    if (!count || !cmdNode) return;
+
+    const command = cmdNode.textContent.trim();
+    const target = Number(count.dataset.count);
+    const rest = rows.slice(1);
+    const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
+    let done = false;
+    let failsafe = 0;
+
+    // Final state. Once reached, the typing sequence stops touching the text.
+    function showAll() {
+      done = true;
+      window.clearTimeout(failsafe);
+      rest.forEach((row) => row.classList.remove('term-hidden'));
+      cmdNode.textContent = ' ' + command;
+      count.textContent = String(target);
+    }
+
+    function countUp() {
+      return new Promise((resolve) => {
+        const start = performance.now();
+        const duration = 900;
+        (function tick(now) {
+          if (done) { resolve(); return; }
+          const t = Math.min(1, (now - start) / duration);
+          count.textContent = String(Math.round(target * (1 - Math.pow(1 - t, 3))));
+          if (t < 1) window.requestAnimationFrame(tick);
+          else resolve();
+        })(start);
+      });
+    }
+
+    async function play() {
+      for (let i = 1; i <= command.length; i += 1) {
+        if (done) return;
+        cmdNode.textContent = ' ' + command.slice(0, i);
+        await wait(70);
+      }
+      await wait(250);
+      for (const row of rest) {
+        if (done) return;
+        row.classList.remove('term-hidden');
+        if (row.contains(count)) await countUp();
+        else await wait(row.classList.contains('spacer') ? 80 : 300);
+      }
+      showAll();
+    }
+
+    rest.forEach((row) => row.classList.add('term-hidden'));
+    cmdNode.textContent = ' ';
+    count.textContent = '0';
+    observeOnce([body], () => {
+      // The failsafe starts with the sequence, so it can never cut in before typing begins.
+      failsafe = window.setTimeout(showAll, 9000);
+      play().catch(showAll);
+    }, { threshold: 0, rootMargin: '0px 0px -12% 0px' });
+  }
+
+  function initDiagramFlow() {
+    if (!motionAllowed()) return;
+    const diagram = document.querySelector('.diagram');
+    if (!diagram) return;
+    diagram.classList.add('diagram--flow');
+    observeOnce([diagram], (el) => el.classList.add('is-visible'), { threshold: 0, rootMargin: '0px 0px -12% 0px' });
   }
 
   function initScrollSpy() {

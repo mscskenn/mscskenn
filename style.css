@@ -2,7 +2,7 @@
    John Kenneth Moscosa — Portfolio (editor theme)
    1. Tokens  2. Base  3. Title bar  4. Explorer  5. Editor + sections
    6. Hero  7. About  8. Projects + diagram  9. Skills  10. Changelog
-   11. Contact  12. Status bar  13. Motion  14. Credentials
+   11. Contact  12. Status bar  13. Motion  14. Credentials  15. Effects
    ========================================================================== */
 
 /* 1. Tokens ---------------------------------------------------------------- */
@@ -883,11 +883,20 @@ section[id], article[id] { scroll-margin-top: 56px; }
 .log {
   list-style: none;
   margin: 0 0 0 7px;
-  padding: 0 0 0 28px;
-  border-left: 2px solid var(--line);
+  padding: 0 0 0 30px;
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 22px;
+}
+.log::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--line);
 }
 
 .log-item {
@@ -1143,3 +1152,98 @@ section[id], article[id] { scroll-margin-top: 56px; }
     transition: none !important;
   }
 }
+
+/* 15. Effects -------------------------------------------------------------- */
+/* Scroll reveal: classes are added by script.js only when motion is allowed */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 520ms ease, transform 520ms ease;
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+.reveal .log-dot { transform: scale(0); }
+.reveal.is-visible .log-dot {
+  transform: none;
+  transition: transform 360ms cubic-bezier(0.3, 1.6, 0.5, 1);
+  transition-delay: calc(var(--i, 0) * 70ms + 200ms);
+}
+
+/* Scroll progress line */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 60;
+  background: var(--accent);
+  transform-origin: left center;
+  transform: scaleX(0);
+  pointer-events: none;
+}
+
+/* Changelog timeline: the line draws downward, the HEAD marker pulses once */
+.log--draw::before {
+  transform: scaleY(0);
+  transform-origin: top center;
+  transition: transform 1100ms ease;
+}
+.log--draw.is-visible::before { transform: none; }
+
+@keyframes head-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.5); }
+}
+.log--draw.is-visible .log-head-dot { animation: head-pulse 900ms ease 900ms 1; }
+
+/* Terminal: rows stay in the layout (no shift) until they are typed in */
+.term-hidden { visibility: hidden; }
+
+/* Diagram flow: arrows draw top to bottom, then a dot travels into MySQL three times */
+.flow-dot {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.diagram--flow .flow-link::before {
+  transform: scaleY(0);
+  transform-origin: top center;
+  transition: transform 600ms ease;
+}
+.diagram--flow .flow-link::after {
+  opacity: 0;
+  transition: opacity 200ms ease 500ms;
+}
+.diagram--flow .flow-link--accent::before { transition-delay: 700ms; }
+.diagram--flow .flow-link--accent::after { transition-delay: 1200ms; }
+
+.diagram--flow.is-visible .flow-link::before { transform: none; }
+.diagram--flow.is-visible .flow-link::after { opacity: 1; }
+
+@keyframes flow-dot {
+  0% { transform: translateY(0); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translateY(52px); opacity: 0; }
+}
+.diagram--flow.is-visible .flow-dot { animation: flow-dot 1400ms ease-in 1500ms 3; }
+
+@media print {
+  .reveal, .reveal .log-dot { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .scroll-progress { display: none; }
+  .log--draw::before, .diagram--flow .flow-link::before { transform: none !important; }
+  .diagram--flow .flow-link::after { opacity: 1 !important; }
+  .term-hidden { visibility: visible !important; }
+}
+
