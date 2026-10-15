@@ -1200,6 +1200,9 @@ section[id], article[id] { scroll-margin-top: 56px; }
 }
 .log--draw.is-visible .log-head-dot { animation: head-pulse 900ms ease 900ms 1; }
 
+/* Terminal: rows stay in the layout (no shift) until they are typed in */
+.term-hidden { visibility: hidden; }
+
 @media print {
   .reveal, .reveal .log-dot { opacity: 1 !important; transform: none !important; transition: none !important; }
   .scroll-progress { display: none; }

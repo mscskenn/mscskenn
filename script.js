@@ -18,6 +18,7 @@
     initReveal();
     initProgress();
     initTimeline();
+    initTerminal();
     const year = document.getElementById('year');
     if (year) year.textContent = String(new Date().getFullYear());
   });
@@ -184,6 +185,63 @@
     if (!log) return;
     log.classList.add('log--draw');
     observeOnce([log], (el) => el.classList.add('is-visible'), { threshold: 0.05 });
+  }
+
+  function initTerminal() {
+    const body = document.querySelector('.terminal-body');
+    if (!body || !motionAllowed()) return;
+    const rows = Array.from(body.children);
+    const count = body.querySelector('[data-count]');
+    const cmdNode = rows.length
+      ? Array.from(rows[0].childNodes).find((n) => n.nodeType === 3 && n.textContent.trim())
+      : null;
+    if (!count || !cmdNode) return;
+
+    const command = cmdNode.textContent.trim();
+    const target = Number(count.dataset.count);
+    const rest = rows.slice(1);
+    const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
+
+    function showAll() {
+      rest.forEach((row) => row.classList.remove('term-hidden'));
+      cmdNode.textContent = ' ' + command;
+      count.textContent = String(target);
+    }
+
+    function countUp() {
+      return new Promise((resolve) => {
+        const start = performance.now();
+        const duration = 900;
+        (function tick(now) {
+          const t = Math.min(1, (now - start) / duration);
+          count.textContent = String(Math.round(target * (1 - Math.pow(1 - t, 3))));
+          if (t < 1) window.requestAnimationFrame(tick);
+          else resolve();
+        })(start);
+      });
+    }
+
+    async function play() {
+      for (let i = 1; i <= command.length; i += 1) {
+        cmdNode.textContent = ' ' + command.slice(0, i);
+        await wait(70);
+      }
+      await wait(250);
+      for (const row of rest) {
+        row.classList.remove('term-hidden');
+        if (row.contains(count)) await countUp();
+        else await wait(row.classList.contains('spacer') ? 80 : 300);
+      }
+      window.clearTimeout(failsafe);
+      showAll();
+    }
+
+    rest.forEach((row) => row.classList.add('term-hidden'));
+    cmdNode.textContent = ' ';
+    count.textContent = '0';
+    // If anything stalls (throttled tab, an error), still end on the complete text.
+    const failsafe = window.setTimeout(showAll, 9000);
+    observeOnce([body], () => { play().catch(showAll); }, { threshold: 0.4 });
   }
 
   function initScrollSpy() {
