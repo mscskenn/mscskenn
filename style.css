@@ -2,7 +2,7 @@
    John Kenneth Moscosa — Portfolio (editor theme)
    1. Tokens  2. Base  3. Title bar  4. Explorer  5. Editor + sections
    6. Hero  7. About  8. Projects + diagram  9. Skills  10. Changelog
-   11. Contact  12. Status bar  13. Motion  14. Credentials
+   11. Contact  12. Status bar  13. Motion  14. Credentials  15. Effects
    ========================================================================== */
 
 /* 1. Tokens ---------------------------------------------------------------- */
@@ -1143,3 +1143,42 @@ section[id], article[id] { scroll-margin-top: 56px; }
     transition: none !important;
   }
 }
+
+/* 15. Effects -------------------------------------------------------------- */
+/* Scroll reveal: classes are added by script.js only when motion is allowed */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 520ms ease, transform 520ms ease;
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+.reveal .log-dot { transform: scale(0); }
+.reveal.is-visible .log-dot {
+  transform: none;
+  transition: transform 360ms cubic-bezier(0.3, 1.6, 0.5, 1);
+  transition-delay: calc(var(--i, 0) * 70ms + 200ms);
+}
+
+/* Scroll progress line */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 60;
+  background: var(--accent);
+  transform-origin: left center;
+  transform: scaleX(0);
+  pointer-events: none;
+}
+
+@media print {
+  .reveal, .reveal .log-dot { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .scroll-progress { display: none; }
+}
+

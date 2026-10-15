@@ -15,6 +15,8 @@
     initMobileNav();
     initScrollSpy();
     initLightbox();
+    initReveal();
+    initProgress();
     const year = document.getElementById('year');
     if (year) year.textContent = String(new Date().getFullYear());
   });
@@ -109,6 +111,70 @@
       if (opener) opener.focus();
       opener = null;
     });
+  }
+
+  const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
+
+  // Effects only run when the visitor allows motion and the browser can observe scrolling.
+  function motionAllowed() {
+    const reduced = window.matchMedia && window.matchMedia(REDUCED_MOTION).matches;
+    return !reduced && 'IntersectionObserver' in window;
+  }
+
+  // Calls onSeen(el) once, the first time each element scrolls into view.
+  function observeOnce(elements, onSeen, options) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        io.unobserve(entry.target);
+        onSeen(entry.target);
+      });
+    }, options || { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+    elements.forEach((el) => io.observe(el));
+  }
+
+  function initReveal() {
+    if (!motionAllowed()) return;
+    const selector = '.section-head, .cert-lede, .about-row, .prose, .card, .skill-group, '
+      + '.log-item, .log-head, .contact-lede, .shell, #contact .actions';
+    const els = Array.from(document.querySelectorAll(selector));
+    els.forEach((el) => {
+      const peers = Array.from(el.parentElement.children).filter((c) => c.matches(selector));
+      el.style.setProperty('--i', String(Math.min(peers.indexOf(el), 6)));
+      el.classList.add('reveal');
+    });
+    observeOnce(els, (el) => {
+      el.classList.add('is-visible');
+      // Once the transition is over, drop the helper classes so hover styles are untouched.
+      window.setTimeout(() => {
+        el.classList.remove('reveal', 'is-visible');
+        el.style.removeProperty('--i');
+      }, 1400);
+    });
+  }
+
+  function initProgress() {
+    if (!motionAllowed()) return;
+    const bar = document.createElement('div');
+    bar.className = 'scroll-progress';
+    bar.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(bar);
+    let ticking = false;
+
+    function update() {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+      bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(update);
+    }, { passive: true });
+    window.addEventListener('resize', update);
+    update();
   }
 
   function initScrollSpy() {
