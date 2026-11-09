@@ -2,4 +2,7 @@ RelevantSkills-main/
 bryl-minimal-design-main/
 docs/
 AGENTS.md
-assets/
+# Private assets (resume, photo, certificates) come from mscskenn/portfolio-assets at deploy time.
+assets/*
+# The room illustration's cut-out is public and ships with the site.
+!assets/room/

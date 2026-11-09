@@ -1,436 +1,673 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>John Kenneth Moscosa — Data Analyst &amp; Backend Developer</title>
-  <meta name="description" content="Portfolio of John Kenneth Moscosa, a Computer Science student and backend and database developer open to data analyst, backend and web developer roles, and OJT.">
-  <meta name="author" content="John Kenneth Moscosa">
-  <meta name="theme-color" content="#0B0E13">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>John Kenneth Moscosa — Backend dev, aspiring data engineer</title>
+<meta name="description" content="Fourth-year CS student. I build backends with an AI pair programmer, think out loud, fill whiteboards with ideas, and get way too excited about a clean schema. Looking for an OJT in web, backend or data.">
+<meta name="author" content="John Kenneth Moscosa">
+<meta name="theme-color" content="#0B0C0F">
+<meta name="color-scheme" content="dark">
 
-  <!-- Link preview (LinkedIn, Messenger, etc.) -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="John Kenneth Moscosa — Data Analyst &amp; Backend Developer">
-  <meta property="og:description" content="Backend and database developer of thReady (880+ automated tests). Open to data analyst, backend and web developer roles, and OJT.">
-  <meta property="og:url" content="https://mscskenn.github.io/mscskenn/">
-  <meta property="og:image" content="https://mscskenn.github.io/mscskenn/assets/images/profile.jpg">
-  <meta name="twitter:card" content="summary">
+<meta property="og:type" content="website">
+<meta property="og:title" content="John Kenneth Moscosa — Backend dev, aspiring data engineer">
+<meta property="og:description" content="Backend dev who won't stop talking about how he wants to be a data engineer.">
+<meta property="og:url" content="https://mscskenn.github.io/mscskenn/">
+<meta property="og:image" content="https://mscskenn.github.io/mscskenn/assets/images/profile.jpg">
+<meta name="twitter:card" content="summary">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23F0B35B'/%3E%3Ctext x='16' y='21' font-family='monospace' font-size='12' font-weight='700' text-anchor='middle' fill='%230B0E13'%3EJK%3C/text%3E%3C/svg%3E">
-  <script>
-    (function () {
-      var root = document.documentElement;
-      var theme = null;
-      root.classList.add('js');
-      try { theme = localStorage.getItem('theme'); } catch (e) { theme = null; }
-      if (theme !== 'light' && theme !== 'dark') {
-        theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-      }
-      root.setAttribute('data-theme', theme);
-    })();
-  </script>
-  <link rel="stylesheet" href="./style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%231E2128'/%3E%3Ctext x='16' y='20.5' font-family='monospace' font-size='12' font-weight='500' text-anchor='middle' fill='%23E6E8EC'%3EJK%3C/text%3E%3Ccircle cx='26' cy='26' r='4.5' fill='%233DDC97' stroke='%230B0C0F' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&amp;family=Caveat:wght@500;700&amp;family=DM+Mono:wght@300;400;500&amp;family=DM+Sans:opsz,wght@9..40,400..700&amp;display=swap" rel="stylesheet">
+<script>
+  (function () {
+    var r = document.documentElement;
+    r.classList.add('js');
+    try { if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) r.classList.add('reduced'); } catch (e) {}
+  })();
+</script>
+<link rel="stylesheet" href="style.css">
+<script src="script.js" defer></script>
 </head>
 <body>
-  <a href="#main-content" class="skip-link">Skip to main content</a>
+<a class="skip-link" href="#me">Skip to content</a>
 
-  <div class="app">
+<header class="topbar" id="topbar">
+  <button type="button" class="brand" data-go="home" aria-label="John Kenneth Moscosa, home">
+    <span class="brand-mark" aria-hidden="true">JK<span class="brand-dot"></span></span>
+    <span class="brand-name">kenn</span>
+  </button>
+  <nav class="sql-nav" aria-label="Sections">
+    <span aria-hidden="true"><span class="kw">SELECT</span> * <span class="kw">FROM</span> kenn <span class="kw">WHERE</span> section <span class="kw">IN</span> (</span>
+    <a href="#me" data-go="me" data-nav="me" aria-label="About me">'me'</a>
+    <a href="#projects" data-go="projects" data-nav="projects" aria-label="Projects">'projects'</a>
+    <a href="#skills" data-go="skills" data-nav="skills" aria-label="Skills">'skills'</a>
+    <a href="#certs" data-go="certs" data-nav="certs" aria-label="Certifications">'certs'</a>
+    <a href="#log" data-go="log" data-nav="log" aria-label="Activity log">'log'</a>
+    <a href="#contact" data-go="contact" data-nav="contact" aria-label="Contact">'contact'</a>
+    <span aria-hidden="true">);</span>
+  </nav>
+  <a class="pill pill-resume" href="assets/resume.pdf" download>Résumé <span aria-hidden="true" class="accent">↓</span></a>
+</header>
 
-    <!-- Title bar -->
-    <header class="titlebar">
-      <a href="#readme" class="brand" aria-label="John Kenneth Moscosa, back to top">
-        <span class="brand-mark">JK</span>
-        <span class="brand-text"><span class="accent">kenn</span><span class="c-comment">@</span>portfolio<span class="c-comment">:</span><span class="c-key">~/mscskenn</span></span>
-      </a>
-      <nav class="titlebar-nav" aria-label="Profiles">
-        <a href="https://github.com/mscskenn" target="_blank" rel="noopener noreferrer">github</a>
-        <a href="https://www.linkedin.com/in/john-kenneth-moscosa" target="_blank" rel="noopener noreferrer">linkedin</a>
-        <a href="./assets/resume.pdf" class="btn-resume" download>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
-          resume.pdf
-        </a>
-        <button type="button" class="icon-btn theme-toggle" id="theme-toggle" aria-pressed="true">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-          <span class="btn-label">Dark theme</span>
-        </button>
-      </nav>
-      <button type="button" class="icon-btn menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="explorer">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-        <span class="btn-label">Menu</span>
-      </button>
-    </header>
+<button type="button" class="skip-intro" id="skipIntro" data-go="home">skip intro <span aria-hidden="true">→</span></button>
 
-    <div class="workspace">
+<main id="main">
 
-      <!-- Explorer (navigation) -->
-      <aside class="explorer" id="explorer">
-        <div class="explorer-inner">
-          <p class="explorer-label">EXPLORER</p>
-          <nav class="explorer-nav" aria-label="Sections">
-            <div class="explorer-root"><span aria-hidden="true">▾</span>mscskenn</div>
-            <a href="#readme" class="explorer-link is-active" data-file="README.md" aria-current="true"><span class="ico c-key" aria-hidden="true">#</span>README.md</a>
-            <a href="#about" class="explorer-link" data-file="about.json"><span class="ico accent" aria-hidden="true">{}</span>about.json</a>
-            <a href="#projects" class="explorer-link" data-file="projects/"><span class="ico c-muted" aria-hidden="true">▾</span>projects/</a>
-            <a href="#thready" class="explorer-link depth-2" data-file="projects › thready.md"><span class="ico c-key" aria-hidden="true">#</span>thready.md</a>
-            <a href="#skills" class="explorer-link" data-file="skills.json"><span class="ico accent" aria-hidden="true">{}</span>skills.json</a>
-            <a href="#changelog" class="explorer-link" data-file="changelog.md"><span class="ico c-key" aria-hidden="true">#</span>changelog.md</a>
-            <a href="./credentials.html" class="explorer-link" data-file="credentials/"><span class="ico c-key" aria-hidden="true">▸</span>credentials/</a>
-            <a href="#contact" class="explorer-link" data-file="contact.sh"><span class="ico c-str" aria-hidden="true">$</span>contact.sh</a>
-          </nav>
+<div class="intro-track" id="introTrack">
+<div class="stage" id="stage">
 
-          <p class="explorer-label explorer-label--gap">OPEN TO</p>
-          <ul class="open-to">
-            <li><span class="dot-green" aria-hidden="true"></span>Data analyst</li>
-            <li><span class="dot-green" aria-hidden="true"></span>Backend developer</li>
-            <li><span class="dot-green" aria-hidden="true"></span>Web developer</li>
-            <li><span class="dot-green" aria-hidden="true"></span>OJT placement</li>
-          </ul>
+  <div class="hero">
+    <div class="hero-copy">
+
+      <div class="name-box" id="nameBox">
+        <div class="name-fx" id="nameFx">
+          <div class="eyebrow" id="eyebrow">
+            <span class="eyebrow-text">Vibecoder · Yapper · Aspiring data engineer</span>
+            <span class="eyebrow-line" id="eyebrowLine" aria-hidden="true"></span>
+          </div>
+          <h1 class="name">
+            <span class="sr-only">John Kenneth Moscosa</span>
+            <span class="typing-dots" id="typingDots" aria-hidden="true"><span></span><span></span><span></span></span>
+            <span class="name-line" aria-hidden="true"><span id="typed1"></span><span class="caret" id="caret1"></span><span class="name-rest" id="rest1">John Kenneth</span></span><span class="name-line name-line-2" aria-hidden="true"><span id="typed2"></span><span class="caret" id="caret2"></span><span class="name-rest" id="rest2">Moscosa</span></span>
+          </h1>
+          <p class="sub" id="sub">Backend dev who won't stop talking about how he wants to be a data engineer.</p>
         </div>
-      </aside>
+      </div>
 
-      <!-- Editor -->
-      <main id="main-content" class="editor">
-
-        <div class="breadcrumb" aria-hidden="true">
-          <span>mscskenn</span><span>›</span><span class="breadcrumb-current" id="breadcrumb-current">README.md</span>
-        </div>
-
-        <div class="content">
-
-          <!-- README / hero -->
-          <section id="readme" class="hero" aria-labelledby="hero-name">
-            <div class="hero-copy">
-              <p class="comment-line">// hello, world — I'm</p>
-              <h1 id="hero-name" class="hero-name">John Kenneth<br>Moscosa<span class="accent caret">_</span></h1>
-              <p class="hero-roles"><span class="accent">&gt;</span> data analyst <span class="c-comment">·</span> backend developer <span class="c-comment">·</span> web developer</p>
-              <p class="hero-lede">Fourth-year Computer Science student at STI College Lucena. I build the backend and database of a production management system, and I'm learning SQL and Python to turn data like that into answers.</p>
-              <div class="actions">
-                <a href="#projects" class="btn btn-primary">./see-my-work</a>
-                <a href="./assets/resume.pdf" class="btn btn-outline" download>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
-                  Download resume
-                </a>
-                <a href="mailto:moscosajohnkenneth1@gmail.com" class="btn-text">email me</a>
-              </div>
-            </div>
-
-            <figure class="terminal">
-              <div class="pane-bar"><span>TERMINAL</span><span>thready/backend</span></div>
-              <div class="terminal-body">
-                <div><span class="accent">$</span> npm test</div>
-                <div class="spacer"></div>
-                <div><span class="c-str">✓</span> orders &amp; production planning</div>
-                <div><span class="c-str">✓</span> material requests &amp; stock checks</div>
-                <div><span class="c-str">✓</span> weekly piece-rate pay records</div>
-                <div><span class="c-str">✓</span> auth, sessions &amp; audit logs</div>
-                <div class="spacer"></div>
-                <div><span class="term-key">Tests</span><span class="c-str term-strong"><span data-count="880">880</span>+ passed</span></div>
-                <div><span class="term-key">Runner</span>Vitest + Supertest</div>
-                <div class="spacer"></div>
-                <div><span class="accent">$</span> <span class="cursor" aria-hidden="true"></span></div>
-              </div>
-              <figcaption>The backend test suite of thReady, my group thesis. I wrote most of it.</figcaption>
-            </figure>
-          </section>
-
-          <!-- About -->
-          <section id="about" class="section" aria-labelledby="about-h">
-            <div class="section-head">
-              <span class="section-num">01</span>
-              <h2 id="about-h">about<span class="accent">.json</span></h2>
-              <span class="section-rule" aria-hidden="true"></span>
-            </div>
-
-            <div class="about-row">
-              <figure class="photo">
-                <img src="./assets/images/profile.jpg" alt="John Kenneth Moscosa" width="240" height="240">
-                <figcaption>profile.jpg</figcaption>
-              </figure>
-
-              <div class="code-block about-json">
-                <div class="ln-row"><span class="ln" aria-hidden="true">1</span><span class="c-muted">{</span></div>
-                <div class="ln-row"><span class="ln" aria-hidden="true">2</span><span class="indent"><span class="c-key">"name"</span><span class="c-muted">: </span><span class="c-str">"John Kenneth Moscosa"</span><span class="c-muted">,</span></span></div>
-                <div class="ln-row"><span class="ln" aria-hidden="true">3</span><span class="indent"><span class="c-key">"program"</span><span class="c-muted">: </span><span class="c-str">"BS Computer Science"</span><span class="c-muted">,</span></span></div>
-                <div class="ln-row"><span class="ln" aria-hidden="true">4</span><span class="indent"><span class="c-key">"school"</span><span class="c-muted">: </span><span class="c-str">"STI College Lucena"</span><span class="c-muted">,</span></span></div>
-                <div class="ln-row"><span class="ln" aria-hidden="true">5</span><span class="indent"><span class="c-key">"year"</span><span class="c-muted">: </span><span class="accent">4</span><span class="c-muted">,</span></span></div>
-                <div class="ln-row"><span class="ln" aria-hidden="true">6</span><span class="indent"><span class="c-key">"graduating"</span><span class="c-muted">: </span><span class="c-str">"2027-07"</span><span class="c-muted">,</span></span></div>
-                <div class="ln-row"><span class="ln" aria-hidden="true">7</span><span class="indent"><span class="c-key">"honors"</span><span class="c-muted">: [</span><span class="c-str">"Dean's Lister 2023–2024"</span><span class="c-muted">],</span></span></div>
-                <div class="ln-row"><span class="ln" aria-hidden="true">8</span><span class="indent"><span class="c-key">"based_in"</span><span class="c-muted">: </span><span class="c-str">"Sariaya, Quezon, PH"</span><span class="c-muted">,</span></span></div>
-                <div class="ln-row"><span class="ln" aria-hidden="true">9</span><span class="indent"><span class="c-key">"goal"</span><span class="c-muted">: </span><span class="c-str">"data analyst → data engineer"</span></span></div>
-                <div class="ln-row"><span class="ln" aria-hidden="true">10</span><span class="c-muted">}</span></div>
-              </div>
-            </div>
-
-            <div class="prose">
-              <p>For our group thesis I'm the backend and database developer of thReady, an AI-enhanced production management system for a garment manufacturer.</p>
-              <p>Working with orders, inventory and pay records every day made me want to analyze that data, not only store it. I'm aiming for a data analyst role first, with data engineering as my long-term goal, and I'm open to backend and web developer roles too.</p>
-            </div>
-          </section>
-
-          <!-- Projects -->
-          <section id="projects" class="section" aria-labelledby="projects-h">
-            <div class="section-head">
-              <span class="section-num">02</span>
-              <h2 id="projects-h">projects<span class="accent">/</span></h2>
-              <span class="section-rule" aria-hidden="true"></span>
-            </div>
-
-            <article id="thready" class="card" aria-labelledby="thready-h">
-              <div class="card-bar">
-                <span>projects/thready.md</span>
-                <span class="pill pill-accent"><span class="pill-dot" aria-hidden="true"></span>in progress · defense Nov 2026</span>
-              </div>
-
-              <div class="card-body thready-body">
-                <div class="thready-text">
-                  <div>
-                    <h3 id="thready-h" class="card-title">thReady</h3>
-                    <p class="card-sub">AI-enhanced production management system for a garment manufacturer</p>
-                    <p class="card-meta">group thesis · backend &amp; database developer</p>
-                  </div>
-
-                  <dl class="case">
-                    <div>
-                      <dt>## problem</dt>
-                      <dd>The manufacturer tracks orders, inventory and output by hand.</dd>
-                    </div>
-                    <div>
-                      <dt>## my part</dt>
-                      <dd>My teammates lead the frontend and computer vision. I own the backend and the database.</dd>
-                    </div>
-                    <div>
-                      <dt>## what I built</dt>
-                      <dd>
-                        <ul>
-                          <li>API modules for orders and production planning, material requests, and weekly piece-rate pay records.</li>
-                          <li>Stock-checked material approvals and order-to-production workflows using MySQL transactions and row-level locking.</li>
-                          <li>Hardened authentication and sessions, with single-session locking and audit log protections.</li>
-                        </ul>
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>## result so far</dt>
-                      <dd>A backend suite of <strong class="c-str">880+ automated tests</strong> with Vitest and Supertest, most of them written by me.</dd>
-                    </div>
-                  </dl>
-
-                  <ul class="tags" aria-label="Technologies">
-                    <li>Node.js</li>
-                    <li>Express</li>
-                    <li>MySQL</li>
-                    <li>Vitest</li>
-                    <li>Supertest</li>
-                  </ul>
-                </div>
-
-                <!-- System diagram -->
-                <figure class="diagram-fig">
-                  <figcaption class="comment-line comment-line--sm">// how the system fits together</figcaption>
-                  <div class="diagram" role="img" aria-label="System diagram: the web app and the computer vision module, built by teammates, call a REST API built in Node.js and Express. The API, built by me, handles orders, production planning, material requests, piece-rate pay, auth, sessions and audit logs, and stores data in MySQL using transactions and row-level locks.">
-                    <div class="flow" aria-hidden="true">
-                      <div class="flow-row">
-                        <div class="node node--team"><span><b>Web app</b><br><span class="c-comment"><span>team</span><span class="dot"> · </span><span>frontend</span></span></span></div>
-                        <div class="node node--team"><span><b>Computer vision</b><br><span class="c-comment"><span>team</span><span class="dot"> · </span><span>AI module</span></span></span></div>
-                      </div>
-                      <div class="flow-row">
-                        <div class="flow-link"></div>
-                        <div class="flow-link"></div>
-                      </div>
-                      <div class="node node--me node--api"><span><b>REST API</b> <span class="c-comment">· Node.js + Express</span><br>orders · production planning · material requests · piece-rate pay · auth &amp; sessions · audit logs</span></div>
-                      <div class="flow-link flow-link--accent"><span class="flow-dot" aria-hidden="true"></span><span class="flow-label">transactions + row-level locks</span></div>
-                      <div class="node node--me node--db"><span><b>MySQL</b><br><span class="c-muted">orders · stock · pay</span></span></div>
-                    </div>
-                  </div>
-                  <div class="legend">
-                    <span><span class="swatch swatch--me" aria-hidden="true"></span>built by me</span>
-                    <span><span class="swatch swatch--team" aria-hidden="true"></span>built by teammates</span>
-                  </div>
-                </figure>
-              </div>
-            </article>
-          </section>
-
-          <!-- Skills -->
-          <section id="skills" class="section" aria-labelledby="skills-h">
-            <div class="section-head">
-              <span class="section-num">03</span>
-              <h2 id="skills-h">skills<span class="accent">.json</span></h2>
-              <span class="section-rule" aria-hidden="true"></span>
-            </div>
-
-            <div class="code-block skills-json">
-              <div class="ln-row"><span class="ln" aria-hidden="true">1</span><span class="c-muted">{</span></div>
-
-              <div class="ln-row ln-row--group"><span class="ln" aria-hidden="true">2</span>
-                <div class="skill-group">
-                  <div><span class="c-key">"used_in_thready"</span><span class="c-muted">: [</span> <span class="c-comment">// in production code, every day</span></div>
-                  <ul class="chips" aria-label="Used in thReady">
-                    <li class="chip chip--accent">Node.js</li>
-                    <li class="chip chip--accent">Express</li>
-                    <li class="chip chip--accent">MySQL</li>
-                    <li class="chip chip--accent">SQL transactions &amp; row locks</li>
-                    <li class="chip chip--accent">Vitest</li>
-                    <li class="chip chip--accent">Supertest</li>
-                  </ul>
-                  <div class="c-muted">],</div>
-                </div>
-              </div>
-
-              <div class="ln-row ln-row--group"><span class="ln" aria-hidden="true">3</span>
-                <div class="skill-group">
-                  <div><span class="c-key">"data"</span><span class="c-muted">: [</span> <span class="c-comment">// learning now · 2 SQL certificates</span></div>
-                  <ul class="chips" aria-label="Data skills">
-                    <li class="chip chip--green">SQL</li>
-                    <li class="chip chip--green">Python</li>
-                  </ul>
-                  <div class="c-muted">],</div>
-                </div>
-              </div>
-
-              <div class="ln-row ln-row--group"><span class="ln" aria-hidden="true">4</span>
-                <div class="skill-group">
-                  <div><span class="c-key">"also_worked_with"</span><span class="c-muted">: [</span></div>
-                  <ul class="chips" aria-label="Also worked with">
-                    <li class="chip">JavaScript</li>
-                    <li class="chip">TypeScript</li>
-                    <li class="chip">PostgreSQL</li>
-                    <li class="chip">REST APIs</li>
-                    <li class="chip">JWT auth</li>
-                    <li class="chip">Role-based access</li>
-                    <li class="chip">Rate limiting</li>
-                    <li class="chip">React</li>
-                    <li class="chip">Next.js</li>
-                    <li class="chip">Tailwind CSS</li>
-                    <li class="chip">Docker</li>
-                    <li class="chip">Git &amp; GitHub</li>
-                    <li class="chip">Java</li>
-                    <li class="chip">C#</li>
-                  </ul>
-                  <div class="c-muted">]</div>
-                </div>
-              </div>
-
-              <div class="ln-row"><span class="ln" aria-hidden="true">5</span><span class="c-muted">}</span></div>
-            </div>
-          </section>
-
-          <!-- Changelog -->
-          <section id="changelog" class="section" aria-labelledby="changelog-h">
-            <div class="section-head">
-              <span class="section-num">04</span>
-              <h2 id="changelog-h">changelog<span class="accent">.md</span></h2>
-              <span class="section-rule" aria-hidden="true"></span>
-            </div>
-
-            <!-- Update by hand: move rows across the HEAD line as things happen. -->
-            <ol class="log">
-              <li class="log-item">
-                <span class="log-dot log-dot--planned" aria-hidden="true"></span>
-                <span class="log-date">2027-07</span>
-                <span class="log-text c-soft">Graduation — BS Computer Science, STI College Lucena</span>
-                <span class="log-tag c-muted">planned</span>
-              </li>
-              <li class="log-item">
-                <span class="log-dot log-dot--planned" aria-hidden="true"></span>
-                <span class="log-date">2026-11</span>
-                <span class="log-text c-soft">Thesis defense — thReady</span>
-                <span class="log-tag c-muted">planned</span>
-              </li>
-              <li class="log-head">
-                <span class="log-head-dot" aria-hidden="true"></span>
-                <span>HEAD → today</span>
-                <span class="log-head-rule" aria-hidden="true"></span>
-              </li>
-              <li class="log-item">
-                <span class="log-dot log-dot--green" aria-hidden="true"></span>
-                <span class="log-date">2026-10</span>
-                <span class="log-text">DICT Hackathon — participant, Team JDK</span>
-                <span class="log-tag c-str">ongoing</span>
-              </li>
-              <li class="log-item">
-                <span class="log-dot log-dot--green" aria-hidden="true"></span>
-                <span class="log-date">now</span>
-                <span class="log-text">DataCamp tracks — Associate Data Analyst in SQL · Data Analyst in Python</span>
-                <span class="log-tag c-str">in progress</span>
-              </li>
-              <li class="log-item">
-                <span class="log-dot log-dot--accent" aria-hidden="true"></span>
-                <span class="log-date">2026-08</span>
-                <span class="log-text">Certificate — Intermediate SQL, DataCamp</span>
-                <a href="https://www.datacamp.com/completed/statement-of-accomplishment/course/e7520ea6bd1463e66aa02a2590be819c66f81271" class="log-link" target="_blank" rel="noopener noreferrer">view credential ↗</a>
-              </li>
-              <li class="log-item">
-                <span class="log-dot log-dot--accent" aria-hidden="true"></span>
-                <span class="log-date">2026-08</span>
-                <span class="log-text">Certificate — Introduction to SQL, DataCamp</span>
-                <a href="https://www.datacamp.com/completed/statement-of-accomplishment/course/c5226c01e41cffcfdd1634bdaf100ad9efa7776d" class="log-link" target="_blank" rel="noopener noreferrer">view credential ↗</a>
-              </li>
-              <li class="log-item">
-                <span class="log-dot log-dot--past" aria-hidden="true"></span>
-                <span class="log-date">2026-02</span>
-                <span class="log-text">STI College Lucena Hackathon — participant</span>
-              </li>
-              <li class="log-item">
-                <span class="log-dot log-dot--past" aria-hidden="true"></span>
-                <span class="log-date">2023–24</span>
-                <span class="log-text">Dean's Lister — STI College Lucena</span>
-              </li>
-            </ol>
-          </section>
-
-          <!-- Contact -->
-          <section id="contact" class="section" aria-labelledby="contact-h">
-            <div class="section-head">
-              <span class="section-num">05</span>
-              <h2 id="contact-h">contact<span class="accent">.sh</span></h2>
-              <span class="section-rule" aria-hidden="true"></span>
-            </div>
-
-            <p class="contact-lede">Hiring a data analyst, a developer, or an OJT student<span class="accent">?</span></p>
-
-            <div class="shell">
-              <div class="shell-row"><span class="shell-cmd"><span class="accent">$</span> email</span><a href="mailto:moscosajohnkenneth1@gmail.com">moscosajohnkenneth1@gmail.com</a></div>
-              <div class="shell-row"><span class="shell-cmd"><span class="accent">$</span> github</span><a href="https://github.com/mscskenn" target="_blank" rel="noopener noreferrer">github.com/mscskenn</a></div>
-              <div class="shell-row"><span class="shell-cmd"><span class="accent">$</span> linkedin</span><a href="https://www.linkedin.com/in/john-kenneth-moscosa" target="_blank" rel="noopener noreferrer">linkedin.com/in/john-kenneth-moscosa</a></div>
-              <div class="shell-row"><span class="shell-cmd"><span class="accent">$</span> location</span><span class="c-soft">Sariaya, Quezon, PH · UTC+08:00</span></div>
-            </div>
-
-            <div class="actions">
-              <a href="mailto:moscosajohnkenneth1@gmail.com" class="btn btn-primary">Email me</a>
-              <a href="./assets/resume.pdf" class="btn btn-outline" download>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
-                Download resume
-              </a>
-            </div>
-          </section>
-
-        </div>
-      </main>
+      <p class="lede" id="lede">Fourth-year CS student. I build backends with an AI pair programmer, think out loud, fill whiteboards with ideas, and get way too excited about a clean schema. Looking for an OJT in web, backend or data.</p>
+      <div class="actions" id="actions">
+        <a class="btn btn-primary" href="#projects" data-go="projects">See my projects <span aria-hidden="true">→</span></a>
+        <a class="btn btn-ghost" href="assets/resume.pdf" download>Résumé <span aria-hidden="true">↓</span></a>
+      </div>
     </div>
 
-    <!-- Status bar -->
-    <footer class="statusbar">
-      <span class="status-open"><span class="status-open-dot" aria-hidden="true"></span>open to work</span>
-      <span class="status-item">main</span>
-      <span class="status-item"><span class="c-str">✓</span>&nbsp;thReady · 880+ tests passing</span>
-      <nav class="status-links" aria-label="Footer">
-        <a href="#readme">home</a>
-        <a href="./credentials.html">credentials</a>
-        <a href="https://github.com/mscskenn" target="_blank" rel="noopener noreferrer">github</a>
-        <a href="https://www.linkedin.com/in/john-kenneth-moscosa" target="_blank" rel="noopener noreferrer">linkedin</a>
-        <a href="./assets/resume.pdf" download>resume</a>
-      </nav>
-      <span class="status-spacer"></span>
-      <span class="status-item">Sariaya, PH · UTC+08:00</span>
-      <span class="status-item">©&nbsp;<span id="year">2026</span>&nbsp;John Kenneth Moscosa</span>
-    </footer>
+    <div class="hero-illus" id="roomWrap">
+      <div class="room room-box" id="room">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 500" role="img" aria-label="Isometric drawing of Kenn's room at night: Kenn in a navy tank top and grey shorts at his desk, typing and murmuring ideas at his computer, his chair on a mat, whiteboards, a cabinet with his motorcycle helmet, a curtained window letting in a breeze, an electric fan, and his bed." style="display: block; overflow: visible">
+<defs>
+<radialGradient id="kennScreenGlow"><stop offset="0" stop-color="#7FB6FF" stop-opacity="0.22"></stop><stop offset="1" stop-color="#7FB6FF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="kennSkinG" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#E8BC9A"></stop><stop offset="0.6" stop-color="#D9A988"></stop><stop offset="1" stop-color="#C4936F"></stop></radialGradient>
+<linearGradient id="kennTankG" x1="0" y1="0" x2="1" y2="0.3"><stop offset="0" stop-color="#F2F3F6"></stop><stop offset="0.7" stop-color="#E1E4E9"></stop><stop offset="1" stop-color="#C9CDD6"></stop></linearGradient>
+<linearGradient id="k6V" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"></stop><stop offset="1" stop-color="#000" stop-opacity="0.4"></stop></linearGradient>
+<linearGradient id="k6T" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.12"></stop><stop offset="0.7" stop-color="#fff" stop-opacity="0"></stop></linearGradient>
+<linearGradient id="k6Wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.03"></stop><stop offset="0.55" stop-color="#000" stop-opacity="0"></stop><stop offset="1" stop-color="#000" stop-opacity="0.4"></stop></linearGradient>
+<linearGradient id="k6Back" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3A3F4A"></stop><stop offset="1" stop-color="#1E2128"></stop></linearGradient>
+<linearGradient id="k6Cush" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#454B57"></stop><stop offset="1" stop-color="#2A2E37"></stop></linearGradient>
+<radialGradient id="k6Helmet" cx="0.35" cy="0.3" r="0.9"><stop offset="0" stop-color="#F4F5F7"></stop><stop offset="0.6" stop-color="#C9CDD6"></stop><stop offset="1" stop-color="#8E939E"></stop></radialGradient>
+<filter id="k6Blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+<filter id="k6Blur2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.6"></feGaussianBlur></filter>
+</defs>
+<path d="M250 196 L509.8 346 L276 481 L16.2 331 Z" fill="#1B1E24"></path>
+<path d="M16.2 331 L276 481 L276 490 L16.2 340 Z" fill="#121418"></path>
+<path d="M509.8 346 L276 481 L276 490 L509.8 355 Z" fill="#0D0E11"></path>
+<path d="M16.2 331 L276 481 L276 490 L16.2 340 Z" fill="url(#k6V)"></path>
+<path d="M509.8 346 L276 481 L276 490 L509.8 355 Z" fill="url(#k6V)"></path>
+<path d="M250 196 L509.8 346 L276 481 L16.2 331 Z" fill="url(#k6T)"></path>
+<path d="M276 211 L42.2 346" fill="none" stroke="#1C1F25" stroke-width="1"></path>
+<path d="M302 226 L68.1 361" fill="none" stroke="#1C1F25" stroke-width="1"></path>
+<path d="M327.9 241 L94.1 376" fill="none" stroke="#1C1F25" stroke-width="1"></path>
+<path d="M353.9 256 L120.1 391" fill="none" stroke="#1C1F25" stroke-width="1"></path>
+<path d="M379.9 271 L146.1 406" fill="none" stroke="#1C1F25" stroke-width="1"></path>
+<path d="M405.9 286 L172.1 421" fill="none" stroke="#1C1F25" stroke-width="1"></path>
+<path d="M431.9 301 L198 436" fill="none" stroke="#1C1F25" stroke-width="1"></path>
+<path d="M457.8 316 L224 451" fill="none" stroke="#1C1F25" stroke-width="1"></path>
+<path d="M483.8 331 L250 466" fill="none" stroke="#1C1F25" stroke-width="1"></path>
+<path d="M242.2 11.5 L250 16 L16.2 151 L8.4 146.5 Z" fill="#23262E"></path>
+<path d="M8.4 146.5 L16.2 151 L16.2 331 L8.4 326.5 Z" fill="#121418"></path>
+<path d="M250 16 L16.2 151 L16.2 331 L250 196 Z" fill="#1A1D23"></path>
+<path d="M8.4 146.5 L16.2 151 L16.2 331 L8.4 326.5 Z" fill="url(#k6V)"></path>
+<path d="M250 16 L16.2 151 L16.2 331 L250 196 Z" fill="url(#k6V)"></path>
+<path d="M242.2 11.5 L250 16 L16.2 151 L8.4 146.5 Z" fill="url(#k6T)"></path>
+<path d="M257.8 11.5 L517.6 161.5 L509.8 166 L250 16 Z" fill="#23262E"></path>
+<path d="M250 16 L509.8 166 L509.8 346 L250 196 Z" fill="#16181E"></path>
+<path d="M517.6 161.5 L509.8 166 L509.8 346 L517.6 341.5 Z" fill="#0D0E11"></path>
+<path d="M250 16 L509.8 166 L509.8 346 L250 196 Z" fill="url(#k6V)"></path>
+<path d="M517.6 161.5 L509.8 166 L509.8 346 L517.6 341.5 Z" fill="url(#k6V)"></path>
+<path d="M257.8 11.5 L517.6 161.5 L509.8 166 L250 16 Z" fill="url(#k6T)"></path>
+<path d="M250.3 16.2 L16.4 151.1 L16.4 331.1 L250.3 196.2 Z" fill="url(#k6Wall)"></path>
+<path d="M249.7 16.2 L509.5 166.1 L509.5 346.1 L249.7 196.2 Z" fill="url(#k6Wall)"></path>
+<path d="M250 196 L509.8 346 L496.8 353.5 L250 211 L29.2 338.5 L16.2 331 Z" fill="#000" opacity="0.5" filter="url(#k6Blur)"></path>
+<path d="M344.6 117.4 L399.1 148.9 L399.1 214.9 L344.6 183.4 Z" fill="#2A2E37"></path>
+<path d="M347.2 121.9 L396.5 150.4 L396.5 210.4 L347.2 181.9 Z" fill="#090D18"></path>
+<circle cx="383.5" cy="154.9" r="7.5" fill="#D9DCE3"></circle><circle cx="380.1" cy="152.5" r="6.6" fill="#090D18"></circle>
+<path d="M352.4 132.4 h0.1 M361.5 158.6 h0.1 M355 175.9 h0.1 M373.1 141.4 h0.1 M390 193.1 h0.1 M377 179.6 h0.1" stroke="#C9CDD6" stroke-width="2" stroke-linecap="round"></path>
+<path d="M371.8 196.1 L371.8 136.1" fill="none" stroke="#2A2E37" stroke-width="2"></path>
+<path d="M347.2 151.9 L396.5 180.4" fill="none" stroke="#2A2E37" stroke-width="2"></path>
+<path d="M342 181.3 L401.7 215.8 L401.7 218.8 L342 184.3 Z" fill="#2A2E37"></path>
+<path d="M330.3 100.2 L413.4 148.1" fill="none" stroke="#3A3F4A" stroke-width="2"></path>
+<path d="M331.6 101.8 L348.5 111.5 L349.8 192.4 L330.3 181.2 Z" fill="#3B4660"></path>
+<path d="M335.8 104.8 L335.8 182.8" fill="none" stroke="#2E374D" stroke-width="1.2"></path>
+<path d="M340 107.3 L340 185.3" fill="none" stroke="#2E374D" stroke-width="1.2"></path>
+<path d="M344.2 109.7 L344.2 187.7" fill="none" stroke="#2E374D" stroke-width="1.2"></path>
+<path d="M395.2 138.5 L412.1 148.3 L405.9 188.5 L394.2 232.8 L382.5 238 L382.5 224.5 L389 192.2 Z" fill="#45526F"></path>
+<path d="M401.7 142.9 L392.9 190 L382.5 230.5" fill="none" stroke="#3B4660" stroke-width="1.2"></path>
+<path d="M406.9 145.9 L396.8 193.8 L389 235.8" fill="none" stroke="#3B4660" stroke-width="1.2"></path>
+<g data-reveal="board">
+<path d="M241.2 70.9 L186.6 102.4 L186.6 165.4 L241.2 133.9 Z" fill="#3A3F4A"></path>
+<path d="M238.6 75.4 L189.2 103.9 L189.2 160.9 L238.6 132.4 Z" fill="#1C2027"></path>
+<path d="M180.1 112.1 L133.3 139.1 L133.3 187.1 L180.1 160.2 Z" fill="#3A3F4A"></path>
+<path d="M177.5 116.6 L135.9 140.6 L135.9 182.6 L177.5 158.6 Z" fill="#1C2027"></path>
+<path d="M213.9 118.2 L229.5 89.7" fill="none" stroke="#3DDC97" data-accent="stroke" stroke-width="1.2" stroke-linecap="round"></path>
+<path d="M213.9 118.2 L198.3 107.7" fill="none" stroke="#3DDC97" data-accent="stroke" stroke-width="1.2" stroke-linecap="round"></path>
+<path d="M213.9 118.2 L230.8 126.4" fill="none" stroke="#3DDC97" data-accent="stroke" stroke-width="1.2" stroke-linecap="round"></path>
+<path d="M213.9 118.2 L197 144.4" fill="none" stroke="#3DDC97" data-accent="stroke" stroke-width="1.2" stroke-linecap="round"></path>
+<path d="M204.5 123.6 L205 120.9 L206.3 117.9 L208.4 115 L211 112.4 L213.9 110.4 L216.8 109.1 L219.4 108.7 L221.5 109.2 L222.8 110.6 L223.2 112.8 L222.8 115.4 L221.5 118.4 L219.4 121.3 L216.8 123.9 L213.9 126 L211 127.2 L208.4 127.6 L206.3 127.1 L205 125.7 Z" fill="#1C2027" stroke="#3DDC97" data-accent="stroke" stroke-width="1.4"></path>
+<path d="M225.1 85.6 L236 79.3 L236 91.9 L225.1 98.2 Z" fill="#3DDC97" data-accent="fill"></path>
+<path d="M191.3 103.6 L202.2 97.3 L202.2 109.9 L191.3 116.2 Z" fill="#B4B9C4"></path>
+<path d="M223.8 125.3 L234.7 119 L234.7 131.7 L223.8 137.9 Z" fill="#8B919E"></path>
+<path d="M190 143.3 L200.9 137.1 L200.9 149.7 L190 155.9 Z" fill="#3DDC97" data-accent="fill"></path>
+<path d="M141.1 145.1 L165.8 130.9" fill="none" stroke="#5E6675" stroke-width="1.4"></path>
+<path d="M138 144.6 L140.6 143.1 L140.6 146.1 L138 147.6 Z" fill="#3DDC97" data-accent="fill"></path>
+<path d="M141.1 155.6 L165.8 141.4" fill="none" stroke="#5E6675" stroke-width="1.4"></path>
+<path d="M138 155 L140.6 153.5 L140.6 156.5 L138 158 Z" fill="#3DDC97" data-accent="fill"></path>
+<path d="M141.1 166.1 L165.8 151.9" fill="none" stroke="#5E6675" stroke-width="1.4"></path>
+<path d="M138 165.5 L140.6 164 L140.6 167 L138 168.5 Z" fill="#3A3F4A"></path>
+<path d="M141.1 173.6 L165.8 159.4" fill="none" stroke="#5E6675" stroke-width="1.4"></path>
+<path d="M138 173 L140.6 171.5 L140.6 174.5 L138 176 Z" fill="#3A3F4A"></path>
+</g>
+<path d="M24.2 158.6 L39.8 152.6 L55.4 147.8 L71 137.7 L86.6 124.1 L102.2 114 L117.8 109.2 L133.3 103.1 L148.9 91.2 L164.5 78 L180.1 70.1 L195.7 65.7 L211.3 57.8 L226.9 44.6 L242.5 32.7 L257.5 32.7 L273.8 44.6 L290.1 58.2 L306.4 67.6 L322.7 72.8 L338.9 79.6 L355.2 91.6 L371.5 105.2 L387.8 114.6 L404.1 119.8 L420.3 126.6 L436.6 138.6 L452.9 152.2 L469.2 161.6 L485.5 166.8 L501.8 173.6" fill="none" stroke="#2E323C" stroke-width="1"></path>
+<g data-reveal="lights"><g class="twinkle-a" fill="#F3E3BF"><circle cx="24.2" cy="158.6" r="2.4"></circle><circle cx="55.4" cy="147.8" r="2.4"></circle><circle cx="86.6" cy="124.1" r="2.4"></circle><circle cx="117.8" cy="109.2" r="2.4"></circle><circle cx="148.9" cy="91.2" r="2.4"></circle><circle cx="180.1" cy="70.1" r="2.4"></circle><circle cx="211.3" cy="57.8" r="2.4"></circle><circle cx="242.5" cy="32.7" r="2.4"></circle><circle cx="273.8" cy="44.6" r="2.4"></circle><circle cx="306.4" cy="67.6" r="2.4"></circle><circle cx="338.9" cy="79.6" r="2.4"></circle><circle cx="371.5" cy="105.2" r="2.4"></circle><circle cx="404.1" cy="119.8" r="2.4"></circle><circle cx="436.6" cy="138.6" r="2.4"></circle><circle cx="469.2" cy="161.6" r="2.4"></circle><circle cx="501.8" cy="173.6" r="2.4"></circle></g><g class="twinkle-b" fill="#F3E3BF"><circle cx="39.8" cy="152.6" r="2.4"></circle><circle cx="71" cy="137.7" r="2.4"></circle><circle cx="102.2" cy="114" r="2.4"></circle><circle cx="133.3" cy="103.1" r="2.4"></circle><circle cx="164.5" cy="78" r="2.4"></circle><circle cx="195.7" cy="65.7" r="2.4"></circle><circle cx="226.9" cy="44.6" r="2.4"></circle><circle cx="257.5" cy="32.7" r="2.4"></circle><circle cx="290.1" cy="58.2" r="2.4"></circle><circle cx="322.7" cy="72.8" r="2.4"></circle><circle cx="355.2" cy="91.6" r="2.4"></circle><circle cx="387.8" cy="114.6" r="2.4"></circle><circle cx="420.3" cy="126.6" r="2.4"></circle><circle cx="452.9" cy="152.2" r="2.4"></circle><circle cx="485.5" cy="166.8" r="2.4"></circle></g></g>
+<path d="M240.9 195.2 L279.9 217.8 L220.1 252.2 L181.2 229.8 Z" fill="#000" opacity="0.55" filter="url(#k6Blur)"></path>
+<path d="M240.9 151.8 L266.9 166.8 L220.1 193.8 L194.1 178.8 Z" fill="#2B2F38"></path>
+<path d="M194.1 178.8 L220.1 193.8 L220.1 244.8 L194.1 229.8 Z" fill="#22252D"></path>
+<path d="M266.9 166.8 L220.1 193.8 L220.1 244.8 L266.9 217.8 Z" fill="#1A1D23"></path>
+<path d="M194.1 178.8 L220.1 193.8 L220.1 244.8 L194.1 229.8 Z" fill="url(#k6V)"></path>
+<path d="M266.9 166.8 L220.1 193.8 L220.1 244.8 L266.9 217.8 Z" fill="url(#k6V)"></path>
+<path d="M240.9 151.8 L266.9 166.8 L220.1 193.8 L194.1 178.8 Z" fill="url(#k6T)"></path>
+<path d="M194.1 178.8 L220.1 193.8 L266.9 166.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linejoin="round"></path>
+<path d="M264.3 202.8 L222.7 226.8" fill="none" stroke="#15171C" stroke-width="1.2"></path>
+<path d="M264.3 186.3 L222.7 210.3" fill="none" stroke="#15171C" stroke-width="1.2"></path>
+<path d="M264.3 172.8 L222.7 196.8" fill="none" stroke="#15171C" stroke-width="1.2"></path>
+<path d="M246.6 205 l-6 3.4" stroke="#8B919E" stroke-width="1.6" stroke-linecap="round"></path>
+<path d="M246.6 189.7 l-6 3.4" stroke="#8B919E" stroke-width="1.6" stroke-linecap="round"></path>
+<ellipse cx="230.5" cy="174.2" rx="15" ry="5" fill="#0C0D10" opacity="0.5"></ellipse>
+<path d="M215.5 166.2 a15 14 0 0 1 30 0 l0 4 q-15 7 -30 0 z" fill="url(#k6Helmet)"></path>
+<ellipse cx="224.5" cy="157.2" rx="5" ry="2.6" fill="#FFFFFF" opacity="0.55" transform="rotate(-25 224.5 157.2)"></ellipse>
+<path d="M222.5 158.2 a15 14 0 0 1 22 -11" fill="none" stroke="#3DDC97" data-accent="stroke" stroke-width="3"></path>
+<path d="M231.5 164.2 q8 -9 18 -6 l0 9 q-9 3 -18 1 z" fill="#1A1D23"></path>
+<path d="M435.8 295.8 L518.9 343.8 L392.9 416.5 L309.8 368.5 Z" fill="#000" opacity="0.6" filter="url(#k6Blur)"></path>
+<path d="M435.8 244.8 L503.3 283.8 L498.1 286.8 L430.6 247.8 Z" fill="#3A3029"></path>
+<path d="M430.6 247.8 L498.1 286.8 L498.1 346.8 L430.6 307.8 Z" fill="#2E2620"></path>
+<path d="M503.3 283.8 L498.1 286.8 L498.1 346.8 L503.3 343.8 Z" fill="#241E19"></path>
+<path d="M430.6 247.8 L498.1 286.8 L498.1 346.8 L430.6 307.8 Z" fill="url(#k6V)"></path>
+<path d="M503.3 283.8 L498.1 286.8 L498.1 346.8 L503.3 343.8 Z" fill="url(#k6V)"></path>
+<path d="M435.8 244.8 L503.3 283.8 L498.1 286.8 L430.6 247.8 Z" fill="url(#k6T)"></path>
+<path d="M430.6 247.8 L498.1 286.8 L503.3 283.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linejoin="round"></path>
+<path d="M430.6 292.8 L498.1 331.8 L392.9 392.5 L325.3 353.5 Z" fill="#3A3029"></path>
+<path d="M325.3 353.5 L392.9 392.5 L392.9 407.5 L325.3 368.5 Z" fill="#2E2620"></path>
+<path d="M498.1 331.8 L392.9 392.5 L392.9 407.5 L498.1 346.8 Z" fill="#241E19"></path>
+<path d="M325.3 353.5 L392.9 392.5 L392.9 407.5 L325.3 368.5 Z" fill="url(#k6V)"></path>
+<path d="M498.1 331.8 L392.9 392.5 L392.9 407.5 L498.1 346.8 Z" fill="url(#k6V)"></path>
+<path d="M430.6 292.8 L498.1 331.8 L392.9 392.5 L325.3 353.5 Z" fill="url(#k6T)"></path>
+<path d="M325.3 353.5 L392.9 392.5 L498.1 331.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linejoin="round"></path>
+<path d="M430.6 279.2 L495.5 316.8 L392.9 376 L327.9 338.5 Z" fill="#C9CDD6"></path>
+<path d="M327.9 338.5 L392.9 376 L392.9 391 L327.9 353.5 Z" fill="#A9AEB8"></path>
+<path d="M495.5 316.8 L392.9 376 L392.9 391 L495.5 331.8 Z" fill="#8E939E"></path>
+<path d="M327.9 338.5 L392.9 376 L392.9 391 L327.9 353.5 Z" fill="url(#k6V)"></path>
+<path d="M495.5 316.8 L392.9 376 L392.9 391 L495.5 331.8 Z" fill="url(#k6V)"></path>
+<path d="M430.6 279.2 L495.5 316.8 L392.9 376 L327.9 338.5 Z" fill="url(#k6T)"></path>
+<path d="M327.9 338.5 L392.9 376 L495.5 316.8" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linejoin="round"></path>
+<path d="M434.5 277.6 L483.8 306.1 L463 318.1 L413.7 289.6 Z" fill="#E3E5EA"></path>
+<path d="M413.7 289.6 L463 318.1 L463 326.5 L413.7 298 Z" fill="#C2C6CF"></path>
+<path d="M483.8 306.1 L463 318.1 L463 326.5 L483.8 314.5 Z" fill="#A9AEB8"></path>
+<path d="M413.7 289.6 L463 318.1 L463 326.5 L413.7 298 Z" fill="url(#k6V)"></path>
+<path d="M483.8 306.1 L463 318.1 L463 326.5 L483.8 314.5 Z" fill="url(#k6V)"></path>
+<path d="M434.5 277.6 L483.8 306.1 L463 318.1 L413.7 289.6 Z" fill="url(#k6T)"></path>
+<path d="M413.7 289.6 L463 318.1 L483.8 306.1" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linejoin="round"></path>
+<path d="M391.6 296.6 L459.1 335.6 L392.9 373.9 L325.3 334.9 Z" fill="#33415C"></path>
+<path d="M325.3 334.9 L392.9 373.9 L392.9 385 L325.3 346 Z" fill="#2A3550"></path>
+<path d="M459.1 335.6 L392.9 373.9 L392.9 385 L459.1 346.8 Z" fill="#222B42"></path>
+<path d="M325.3 334.9 L392.9 373.9 L392.9 385 L325.3 346 Z" fill="url(#k6V)"></path>
+<path d="M459.1 335.6 L392.9 373.9 L392.9 385 L459.1 346.8 Z" fill="url(#k6V)"></path>
+<path d="M391.6 296.6 L459.1 335.6 L392.9 373.9 L325.3 334.9 Z" fill="url(#k6T)"></path>
+<path d="M325.3 334.9 L392.9 373.9 L459.1 335.6" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linejoin="round"></path>
+<path d="M376 307.1 L441 344.6" fill="none" stroke="#2A3550" stroke-width="1.4"></path>
+<g data-reveal="notes">
+<path d="M365.8 154.6 c -20 18, -40 -6, -62 14 s -40 -4, -64 16" fill="none" stroke="#9FB4D9" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="7 9" class="breeze" opacity="0.55"></path>
+<path d="M375.8 168.6 c -20 18, -40 -6, -62 14 s -40 -4, -64 16" fill="none" stroke="#9FB4D9" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="7 9" class="breeze" opacity="0.4"></path>
+<path d="M369.8 182.6 c -20 18, -40 -6, -62 14 s -40 -4, -64 16" fill="none" stroke="#9FB4D9" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="7 9" class="breeze" opacity="0.3"></path>
+</g>
+<path d="M164.3 296.9 L231.8 335.9 L172.1 370.4 L104.5 331.4 Z" fill="#262A32"></path>
+<path d="M104.5 331.4 L172.1 370.4 L172.1 371.5 L104.5 332.5 Z" fill="#1E2128"></path>
+<path d="M231.8 335.9 L172.1 370.4 L172.1 371.5 L231.8 337 Z" fill="#1A1D23"></path>
+<path d="M164.3 296.9 L231.8 335.9 L172.1 370.4 L104.5 331.4 Z" fill="url(#k6T)"></path>
+<path d="M164.3 301.4 L224 335.9 L172.1 365.9 L112.3 331.4 L164.3 301.4" fill="none" stroke="#30343E" stroke-width="1"></path>
+<path d="M156.5 311.5 L198 335.5 L156.5 359.5 L114.9 335.5 Z" fill="#000" opacity="0.55" filter="url(#k6Blur)"></path>
+<circle cx="140.4" cy="343.9" r="2.6" fill="#2A2E37"></circle>
+<circle cx="136.2" cy="328.6" r="2.6" fill="#2A2E37"></circle>
+<circle cx="160" cy="321.6" r="2.6" fill="#2A2E37"></circle>
+<circle cx="179" cy="332.5" r="2.6" fill="#2A2E37"></circle>
+<circle cx="166.8" cy="346.3" r="2.6" fill="#2A2E37"></circle>
+<path d="M156.5 331.9 L140.4 342.4 M156.5 331.9 L136.2 327.1 M156.5 331.9 L160 320.1 M156.5 331.9 L179 331 M156.5 331.9 L166.8 344.8" stroke="#1E2128" stroke-width="4.2" stroke-linecap="round"></path>
+<path d="M153.2 304 L153.2 332.5 A3.3 1.9 0 0 0 159.8 332.5 L159.8 304 A3.3 1.9 0 0 1 153.2 304 Z" fill="#1A1D23"></path>
+<ellipse cx="156.5" cy="304" rx="3.3" ry="1.9" fill="#1E2128"></ellipse>
+<path d="M171 280.3 L174.1 282.1 L171 283.9 L167.9 282.1 Z" fill="#1E2128"></path>
+<path d="M167.9 282.1 L171 283.9 L171 298.9 L167.9 297.1 Z" fill="#1A1D23"></path>
+<path d="M174.1 282.1 L171 283.9 L171 298.9 L174.1 297.1 Z" fill="#15171C"></path>
+<path d="M167.9 282.1 L171 283.9 L171 298.9 L167.9 297.1 Z" fill="url(#k6V)"></path>
+<path d="M174.1 282.1 L171 283.9 L171 298.9 L174.1 297.1 Z" fill="url(#k6V)"></path>
+<path d="M171 280.3 L174.1 282.1 L171 283.9 L167.9 282.1 Z" fill="url(#k6T)"></path>
+<path d="M160.9 225 L189.5 241.5 L185.3 243.9 L156.7 227.4 Z" fill="#2A2E37"></path>
+<path d="M156.7 227.4 L185.3 243.9 L185.3 291.9 L156.7 275.4 Z" fill="#22252D"></path>
+<path d="M189.5 241.5 L185.3 243.9 L185.3 291.9 L189.5 289.5 Z" fill="#1A1D23"></path>
+<path d="M156.7 227.4 L185.3 243.9 L185.3 291.9 L156.7 275.4 Z" fill="url(#k6V)"></path>
+<path d="M189.5 241.5 L185.3 243.9 L185.3 291.9 L189.5 289.5 Z" fill="url(#k6V)"></path>
+<path d="M160.9 225 L189.5 241.5 L185.3 243.9 L156.7 227.4 Z" fill="url(#k6T)"></path>
+<path d="M156.7 227.4 L185.3 243.9 L189.5 241.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linejoin="round"></path>
+<path d="M158.5 265.9 L183.5 280.3" fill="none" stroke="#22252D" stroke-width="1.2"></path>
+<path d="M158.5 255.4 L183.5 269.8" fill="none" stroke="#22252D" stroke-width="1.2"></path>
+<path d="M158.5 244.9 L183.5 259.3" fill="none" stroke="#22252D" stroke-width="1.2"></path>
+<path d="M158.5 235.9 L183.5 250.3" fill="none" stroke="#22252D" stroke-width="1.2"></path>
+<path d="M155.2 282.2 L186.3 300.2 L157.8 316.8 L126.6 298.8 Z" fill="#343944"></path>
+<path d="M126.6 298.8 L157.8 316.8 L157.8 322.8 L126.6 304.8 Z" fill="#2A2E37"></path>
+<path d="M186.3 300.2 L157.8 316.8 L157.8 322.8 L186.3 306.2 Z" fill="#22252D"></path>
+<path d="M155.2 282.2 L186.3 300.2 L157.8 316.8 L126.6 298.8 Z" fill="url(#k6T)"></path>
+<path d="M126.6 298.8 L157.8 316.8 L186.3 300.2" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linejoin="round"></path>
+<path d="M61.6 303.2 L170.8 366.2 L121.4 394.8 L12.3 331.8 Z" fill="#000" opacity="0.45" filter="url(#k6Blur)"></path>
+<path d="M60.3 256 L64 258.1 L60.3 260.2 L56.7 258.1 Z" fill="#22252D"></path>
+<path d="M56.7 258.1 L60.3 260.2 L60.3 314.2 L56.7 312.1 Z" fill="#1A1D23"></path>
+<path d="M64 258.1 L60.3 260.2 L60.3 314.2 L64 312.1 Z" fill="#15171C"></path>
+<path d="M56.7 258.1 L60.3 260.2 L60.3 314.2 L56.7 312.1 Z" fill="url(#k6V)"></path>
+<path d="M64 258.1 L60.3 260.2 L60.3 314.2 L64 312.1 Z" fill="url(#k6V)"></path>
+<path d="M60.3 256 L64 258.1 L60.3 260.2 L56.7 258.1 Z" fill="url(#k6T)"></path>
+<path d="M56.7 258.1 L60.3 260.2 L64 258.1" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linejoin="round"></path>
+<path d="M155.4 310.9 L159.1 313 L155.4 315.1 L151.8 313 Z" fill="#22252D"></path>
+<path d="M151.8 313 L155.4 315.1 L155.4 369.1 L151.8 367 Z" fill="#1A1D23"></path>
+<path d="M159.1 313 L155.4 315.1 L155.4 369.1 L159.1 367 Z" fill="#15171C"></path>
+<path d="M151.8 313 L155.4 315.1 L155.4 369.1 L151.8 367 Z" fill="url(#k6V)"></path>
+<path d="M159.1 313 L155.4 315.1 L155.4 369.1 L159.1 367 Z" fill="url(#k6V)"></path>
+<path d="M155.4 310.9 L159.1 313 L155.4 315.1 L151.8 313 Z" fill="url(#k6T)"></path>
+<path d="M151.8 313 L155.4 315.1 L159.1 313" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linejoin="round"></path>
+<path d="M25.8 276 L124.5 333 L121.4 334.8 L22.7 277.8 Z" fill="#262A32"></path>
+<path d="M22.7 277.8 L121.4 334.8 L121.4 381.2 L22.7 324.2 Z" fill="#20232A"></path>
+<path d="M124.5 333 L121.4 334.8 L121.4 381.2 L124.5 379.5 Z" fill="#1A1D23"></path>
+<path d="M22.7 277.8 L121.4 334.8 L121.4 381.2 L22.7 324.2 Z" fill="url(#k6V)"></path>
+<path d="M124.5 333 L121.4 334.8 L121.4 381.2 L124.5 379.5 Z" fill="url(#k6V)"></path>
+<path d="M25.8 276 L124.5 333 L121.4 334.8 L22.7 277.8 Z" fill="url(#k6T)"></path>
+<path d="M22.7 277.8 L121.4 334.8 L124.5 333" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linejoin="round"></path>
+<path d="M152.1 313.4 L155.2 315.2 L121.4 334.8 L118.3 333 Z" fill="#262A32"></path>
+<path d="M118.3 333 L121.4 334.8 L121.4 388.8 L118.3 387 Z" fill="#20232A"></path>
+<path d="M155.2 315.2 L121.4 334.8 L121.4 388.8 L155.2 369.2 Z" fill="#1A1D23"></path>
+<path d="M118.3 333 L121.4 334.8 L121.4 388.8 L118.3 387 Z" fill="url(#k6V)"></path>
+<path d="M155.2 315.2 L121.4 334.8 L121.4 388.8 L155.2 369.2 Z" fill="url(#k6V)"></path>
+<path d="M152.1 313.4 L155.2 315.2 L121.4 334.8 L118.3 333 Z" fill="url(#k6T)"></path>
+<path d="M118.3 333 L121.4 334.8 L155.2 315.2" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linejoin="round"></path>
+<path d="M61.6 251.7 L160.4 308.6 L121.4 331.1 L22.7 274.1 Z" fill="#2B2F38"></path>
+<path d="M22.7 274.1 L121.4 331.1 L121.4 334.8 L22.7 277.8 Z" fill="#22252D"></path>
+<path d="M160.4 308.6 L121.4 331.1 L121.4 334.8 L160.4 312.2 Z" fill="#1A1D23"></path>
+<path d="M61.6 251.7 L160.4 308.6 L121.4 331.1 L22.7 274.1 Z" fill="url(#k6T)"></path>
+<path d="M22.7 274.1 L121.4 331.1 L160.4 308.6" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linejoin="round"></path>
+<ellipse cx="94.1" cy="256" rx="62" ry="40" fill="url(#kennScreenGlow)" data-reveal="glow"></ellipse>
+<path d="M73.5 284.1 L60 289.1 L60 290.6 L73.5 285.6 Z" fill="#181A20"></path>
+<path d="M60 289.1 L47.2 277.7 L47.2 279.2 L60 290.6 Z" fill="#121418"></path>
+<path d="M60.7 272.7 L73.5 284.1 L60 289.1 L47.2 277.7 Z" fill="#1E2128"></path>
+<path d="M60.7 272.7 L73.5 284.1 L60 289.1 L47.2 277.7 Z" fill="url(#k6T)"></path>
+<path d="M63.9 269.9 L59.6 271.6 L59.6 283 L63.9 281.3 Z" fill="#181A20"></path>
+<path d="M63.9 269.9 L59.6 271.6 L59.6 283 L63.9 281.3 Z" fill="url(#k6V)"></path>
+<path d="M59.6 271.6 L56.8 269.1 L56.8 280.5 L59.6 283 Z" fill="#121418"></path>
+<path d="M59.6 271.6 L56.8 269.1 L56.8 280.5 L59.6 283 Z" fill="url(#k6V)"></path>
+<path d="M61.1 267.4 L63.9 269.9 L59.6 271.6 L56.8 269.1 Z" fill="#1E2128"></path>
+<path d="M61.1 267.4 L63.9 269.9 L59.6 271.6 L56.8 269.1 Z" fill="url(#k6T)"></path>
+<path d="M79.5 246.9 L75.2 248.5 L75.2 286 L79.5 284.4 Z" fill="#16181D"></path>
+<path d="M79.5 246.9 L75.2 248.5 L75.2 286 L79.5 284.4 Z" fill="url(#k6V)"></path>
+<path d="M75.2 248.5 L43.2 220.1 L43.2 257.6 L75.2 286 Z" fill="#1B1E24"></path>
+<path d="M75.2 248.5 L43.2 220.1 L43.2 257.6 L75.2 286 Z" fill="url(#k6V)"></path>
+<path d="M47.5 218.5 L79.5 246.9 L75.2 248.5 L43.2 220.1 Z" fill="#1E2128"></path>
+<path d="M47.5 218.5 L79.5 246.9 L75.2 248.5 L43.2 220.1 Z" fill="url(#k6T)"></path>
+<path d="M78 247.7 L78 285.2" stroke="#7FB6FF" stroke-width="1.6" stroke-linecap="round" opacity="0.55" data-reveal="screen"></path>
+<circle cx="58.3" cy="251.2" r="2" fill="#2E323C"></circle>
+<path d="M31.5 271.1 L31.5 274.4 A6.2 3.6 0 0 0 44 274.4 L44 271.1 A6.2 3.6 0 0 1 31.5 271.1 Z" fill="#1A1D23"></path>
+<ellipse cx="37.7" cy="271.1" rx="6.2" ry="3.6" fill="#2B2F38"></ellipse>
+<path d="M31.5 266.9 L31.5 270.2 A6.2 3.6 0 0 0 44 270.2 L44 266.9 A6.2 3.6 0 0 1 31.5 266.9 Z" fill="#1A1D23"></path>
+<ellipse cx="37.7" cy="266.9" rx="6.2" ry="3.6" fill="#2B2F38"></ellipse>
+<path d="M31.5 262.7 L31.5 266 A6.2 3.6 0 0 0 44 266 L44 262.7 A6.2 3.6 0 0 1 31.5 262.7 Z" fill="#1A1D23"></path>
+<ellipse cx="37.7" cy="262.7" rx="6.2" ry="3.6" fill="#2B2F38"></ellipse>
+<circle cx="37.7" cy="276.5" r="1.3" fill="#3DDC97" data-accent="fill"></circle>
+<circle cx="37.7" cy="272.3" r="1.3" fill="#3DDC97" data-accent="fill"></circle>
+<circle cx="37.7" cy="268.1" r="1.3" fill="#3DDC97" data-accent="fill"></circle>
+<path d="M92.8 274.1 L131.8 296.6 L121.4 302.6 L82.4 280.1 Z" fill="#2A2E37"></path>
+<path d="M82.4 280.1 L121.4 302.6 L121.4 304.1 L82.4 281.6 Z" fill="#1E2128"></path>
+<path d="M131.8 296.6 L121.4 302.6 L121.4 304.1 L131.8 298.1 Z" fill="#1A1D23"></path>
+<path d="M92.8 274.1 L131.8 296.6 L121.4 302.6 L82.4 280.1 Z" fill="url(#k6T)"></path>
+<path d="M82.4 280.1 L121.4 302.6 L131.8 296.6" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linejoin="round"></path>
+<path d="M93.1 275.9 L98.3 279" fill="none" stroke="#3A3F4A" stroke-width="1"></path>
+<path d="M100.6 280.3 L105.8 283.3" fill="none" stroke="#3A3F4A" stroke-width="1"></path>
+<path d="M108.1 284.6 L113.3 287.6" fill="none" stroke="#3A3F4A" stroke-width="1"></path>
+<path d="M115.7 289 L120.9 292" fill="none" stroke="#3A3F4A" stroke-width="1"></path>
+<path d="M123.2 293.4 L128.4 296.4" fill="none" stroke="#3A3F4A" stroke-width="1"></path>
+<path d="M137 302.4 L141.4 304.9 L134.9 308.7 L130.5 306.1 Z" fill="#2A2E37"></path>
+<path d="M130.5 306.1 L134.9 308.7 L134.9 310.5 L130.5 307.9 Z" fill="#1E2128"></path>
+<path d="M141.4 304.9 L134.9 308.7 L134.9 310.5 L141.4 306.7 Z" fill="#1A1D23"></path>
+<path d="M137 302.4 L141.4 304.9 L134.9 308.7 L130.5 306.1 Z" fill="url(#k6T)"></path>
+<path d="M130.5 306.1 L134.9 308.7 L141.4 304.9" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linejoin="round"></path>
+<path d="M114.2 313.6 L114.2 322 A5.9 3.4 0 0 0 126 322 L126 313.6 A5.9 3.4 0 0 1 114.2 313.6 Z" fill="#B4B9C4"></path>
+<ellipse cx="120.1" cy="313.6" rx="5.9" ry="3.4" fill="#2B1F18"></ellipse>
+<ellipse cx="142.3" cy="286.5" rx="26" ry="7" fill="#000" opacity="0.35" filter="url(#k6Blur2)"></ellipse>
+<image href="assets/room/kenn-mini.webp" x="79.8" y="204" width="85.8" height="105.8" preserveAspectRatio="none"></image>
+<g fill="none" stroke="#9FB4D9" stroke-width="1.1" stroke-linecap="round" transform="translate(128.8 237.8)">
+<path d="M0 -2.6 q -2 2.6 0 5.2" class="murmur-arc-a"></path>
+<path d="M-3 -4.4 q -3.2 4.4 0 8.8" class="murmur-arc-b"></path>
+</g>
+<g data-reveal="screen" font-family="DM Mono, monospace" font-size="7" text-anchor="middle" pointer-events="none">
+<g class="murmur" data-i="0"><text x="0" y="0" fill="#B4B9C4">what if…</text></g>
+<g class="murmur" data-i="1"><text x="0" y="0" fill="#3DDC97" data-accent="fill">JOIN?</text></g>
+<g class="murmur" data-i="2"><text x="0" y="0" fill="#B4B9C4">hmm…</text></g>
+</g>
+<path d="M155.2 370.1 L175.7 382 L142.2 401.4 L121.7 389.5 Z" fill="#000" opacity="0.5" filter="url(#k6Blur)"></path>
+<path d="M155.2 334.8 L169.5 343 L142.2 358.8 L127.9 350.5 Z" fill="#1E2128"></path>
+<path d="M127.9 350.5 L142.2 358.8 L142.2 397.8 L127.9 389.5 Z" fill="#181A20"></path>
+<path d="M169.5 343 L142.2 358.8 L142.2 397.8 L169.5 382 Z" fill="#121418"></path>
+<path d="M127.9 350.5 L142.2 358.8 L142.2 397.8 L127.9 389.5 Z" fill="url(#k6V)"></path>
+<path d="M169.5 343 L142.2 358.8 L142.2 397.8 L169.5 382 Z" fill="url(#k6V)"></path>
+<path d="M155.2 334.8 L169.5 343 L142.2 358.8 L127.9 350.5 Z" fill="url(#k6T)"></path>
+<path d="M127.9 350.5 L142.2 358.8 L169.5 343" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linejoin="round"></path>
+<circle cx="163" cy="352.8" r="2" fill="#3DDC97" data-accent="fill"></circle>
+<path d="M165.6 370.8 L147.4 381.3" fill="none" stroke="#2A2E37" stroke-width="1.2"></path>
+<path d="M165.6 364.8 L147.4 375.3" fill="none" stroke="#2A2E37" stroke-width="1.2"></path>
+<ellipse cx="192.8" cy="400" rx="20" ry="8" fill="#000" opacity="0.55" filter="url(#k6Blur)"></ellipse>
+<path d="M178.9 397.6 L178.9 400 A14 8.1 0 0 0 206.8 400 L206.8 397.6 A14 8.1 0 0 1 178.9 397.6 Z" fill="#1A1D23"></path>
+<ellipse cx="192.8" cy="397.6" rx="14" ry="8.1" fill="#2A2E37"></ellipse>
+<path d="M192.8 334.3 L194.9 335.5 L192.8 336.7 L190.8 335.5 Z" fill="#B4B9C4"></path>
+<path d="M190.8 335.5 L192.8 336.7 L192.8 398.8 L190.8 397.6 Z" fill="#8B919E"></path>
+<path d="M194.9 335.5 L192.8 336.7 L192.8 398.8 L194.9 397.6 Z" fill="#6B7280"></path>
+<path d="M190.8 335.5 L192.8 336.7 L192.8 398.8 L190.8 397.6 Z" fill="url(#k6V)"></path>
+<path d="M194.9 335.5 L192.8 336.7 L192.8 398.8 L194.9 397.6 Z" fill="url(#k6V)"></path>
+<path d="M192.8 334.3 L194.9 335.5 L192.8 336.7 L190.8 335.5 Z" fill="url(#k6T)"></path>
+<path d="M190.8 335.5 L192.8 336.7 L194.9 335.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linejoin="round"></path>
+<g transform="matrix(0.9 -0.5 0 1 193.4 323.8)">
+<circle r="17" fill="#15171C" fill-opacity="0.35" stroke="#B4B9C4" stroke-width="1.4"></circle>
+<g class="fan-blades"><path d="M0 0 C 4 -6, 12 -10, 13 -3 C 13 1, 6 2, 0 0 Z M0 0 C 6 4, 3 13, -3 12 C -6 10, -3 4, 0 0 Z M0 0 C -8 1, -12 -7, -7 -11 C -3 -12, -1 -5, 0 0 Z" fill="#8B919E"></path></g>
+<circle r="3" fill="#D5D8DF"></circle>
+<path d="M-17 0 H17 M0 -17 V17" stroke="#B4B9C4" stroke-width="0.6" opacity="0.6"></path>
+</g>
+<path d="M171.4 317.8 c -10 -4, -18 6, -30 2" fill="none" stroke="#9FB4D9" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="5 6" opacity="0.45" class="breeze"></path>
+</svg>
+        <div class="room-notes" id="roomNotes" aria-hidden="true">
+          <div class="note note-tl">ideas live here<br><span class="note-sub">(whiteboards + my riding helmet)</span>
+            <svg width="70" height="40" viewBox="0 0 70 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4 C 24 6, 46 14, 62 34"></path><path d="M54 33 L62 34 L62 26"></path></svg>
+          </div>
+          <div class="note note-tr">free aircon<br><span class="note-sub">(open window + the fan)</span>
+            <svg width="56" height="40" viewBox="0 0 56 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M50 4 C 40 10, 26 20, 10 34"></path><path d="M10 26 L10 34 L18 34"></path></svg>
+          </div>
+          <div class="note note-bl">
+            <svg width="50" height="44" viewBox="0 0 50 44" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 40 C 14 30, 22 18, 30 6"></path><path d="M23 9 L30 6 L32 14"></path></svg>
+            me, vibecoding<br><span class="note-sub">(murmuring ideas at my AI)</span>
+          </div>
+          <div class="note note-br">
+            <svg width="50" height="44" viewBox="0 0 50 44" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M44 40 C 40 28, 34 16, 24 6"></path><path d="M24 14 L24 6 L31 8"></path></svg>
+            bed<br><span class="note-sub">(open after 2am)</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <div class="strip" id="strip">
+    <span class="strip-label">Into</span>
+    <button type="button" class="chip" data-go="me"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9l-4 3 4 3"></path><path d="M16 9l4 3-4 3"></path><path d="M13.5 5l-3 14"></path></svg>vibecoding</button>
+    <button type="button" class="chip" data-go="me"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"></path></svg>yapping</button>
+    <button type="button" class="chip" data-go="me"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"></path><path d="M10 21h4"></path><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"></path></svg>brainstorming</button>
+    <button type="button" class="chip" data-go="me"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"></ellipse><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"></path><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"></path></svg>databases</button>
+  </div>
 
-  <script src="./script.js" defer></script>
+  <div class="cue" id="cue">
+    <span>scroll — I'll keep talking</span>
+    <span class="cue-arrow" id="cueArrow" aria-hidden="true">↓</span>
+  </div>
+  <div class="cue-url" id="cueUrl">
+    <span class="online-dot" aria-hidden="true"></span>
+    <span>online · mscskenn.github.io</span>
+  </div>
+
+</div>
+</div>
+
+<div class="sections">
+
+<section id="me" aria-labelledby="me-h" tabindex="-1">
+  <p class="query"><span class="kw">SELECT</span> * <span class="kw">FROM</span> kenn <span class="kw">WHERE</span> section = <span class="accent">'me'</span>;</p>
+  <h2 id="me-h" class="h2 h2-me">Hi, I'm Kenn. Here's the real-life version.</h2>
+  <div class="hobbies">
+
+    <article class="card hobby hobby-vibe">
+      <div class="mini-chat" aria-hidden="true">
+        <span class="bubble bubble-in">help me write this migration</span>
+        <span class="bubble bubble-out">here's a draft ↓</span>
+        <span class="bubble bubble-in">*reads every line* ✓</span>
+      </div>
+      <h3 class="h3-card">Vibecoding</h3>
+      <p>I build with an AI pair programmer — Claude, Gemini, Antigravity, Codex — and review every line before it ships.</p>
+    </article>
+
+    <article class="card hobby hobby-yap">
+      <p class="quote-mark" aria-hidden="true">“</p>
+      <h3 class="h3-card">Yapping</h3>
+      <p>I think out loud. It makes me good at standups, demos and explaining backends to non-backend people — and it's how I led our thesis team from kickoff to defense.</p>
+    </article>
+
+    <article class="card hobby hobby-note">
+      <span class="tape" aria-hidden="true"></span>
+      <h3 class="h3-hand">Brainstorming</h3>
+      <p>Whiteboards, sticky notes and "okay, but what if—". The messy first hour of a project is my favourite hour.</p>
+      <p class="hand-flow" aria-hidden="true">idea → sketch → schema → ship</p>
+    </article>
+
+    <article class="card hobby hobby-db">
+      <table class="mini-table" aria-label="Things I love about databases">
+        <thead><tr><th>thing</th><th>feeling</th></tr></thead>
+        <tbody>
+          <tr><td>transactions</td><td>love</td></tr>
+          <tr><td>row-level locks</td><td>love</td></tr>
+          <tr><td>a clean schema</td><td>love, love</td></tr>
+        </tbody>
+      </table>
+      <h3 class="h3-card">Databases</h3>
+      <p>The part of the stack I'd talk about all day. Ask me about MySQL transactions at your own risk.</p>
+    </article>
+  </div>
+  <p class="swipe-hint mobile-only" aria-hidden="true">swipe for more →</p>
+
+  <div class="edu">
+    <p class="label">Education</p>
+    <p class="edu-body"><b>BS Computer Science</b> · STI College Lucena · graduating July 2027 · <span class="accent">Dean's Lister 2023–2024</span><span class="desktop-only"><br><span class="edu-course">Coursework: Data Structures &amp; Algorithms, Database Management Systems, Advanced Web Programming, OOP, Information Security, Systems Analysis &amp; Design</span></span></p>
+  </div>
+</section>
+
+<section id="projects" aria-labelledby="projects-h" tabindex="-1">
+  <p class="query"><span class="kw">SELECT</span> * <span class="kw">FROM</span> kenn.projects <span class="kw">ORDER BY</span> pride <span class="kw">DESC</span>;</p>
+  <h2 id="projects-h" class="h2">Projects.</h2>
+  <p class="intro-p">Things I've built — the big one first.</p>
+
+  <article class="featured" aria-labelledby="thready-h">
+    <div class="featured-top">
+      <p class="label">Project 01 · Featured</p>
+    </div>
+    <h3 id="thready-h" class="h3-proj">thReady <span class="h3-proj-tail">— a brainstorm that shipped.</span></h3>
+    <div class="featured-meta">
+      <span class="badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>Defended · Nov 2026</span>
+      <span class="mono-meta">group thesis · thesis lead · backend &amp; database</span>
+    </div>
+    <p class="featured-desc">An AI-enhanced production management system for a garment manufacturer. I led the team and owned everything behind the screens: the APIs, the database and the tests.</p>
+
+    <div class="featured-body">
+      <div class="featured-col featured-col-a">
+        <div class="notes-grid">
+          <div class="sticky"><span class="tape tape-l" aria-hidden="true"></span><p class="sticky-h">the problem</p><p class="sticky-p">Orders, inventory and output were tracked by hand.</p></div>
+          <div class="sticky"><span class="tape tape-r" aria-hidden="true"></span><p class="sticky-h">my part</p><p class="sticky-p">Led the team. Owned the backend and database.</p></div>
+        </div>
+        <div class="card card-pad">
+          <h3 class="h3-small">What I built</h3>
+          <ul class="built collapsible" id="builtList">
+            <li><span class="dot" aria-hidden="true"></span><span>Led the thesis team through development and defense — tasks, progress and teammates.</span></li>
+            <li><span class="dot" aria-hidden="true"></span><span>Built the backend and MySQL database for garment orders, inventory and production.</span></li>
+            <li><span class="dot" aria-hidden="true"></span><span>Wrote Express APIs for orders, production plans, material requests and weekly piece-rate pay.</span></li>
+            <li class="more"><span class="dot" aria-hidden="true"></span><span>Stock-checked approvals and order-to-production workflows with MySQL transactions and row-level locking.</span></li>
+            <li class="more"><span class="dot" aria-hidden="true"></span><span>Hardened auth and sessions with single-session locking and audit-log protections.</span></li>
+          </ul>
+          <button type="button" class="more-btn mobile-only" aria-expanded="false" aria-controls="builtList" data-more="Show 2 more" data-less="Show less">Show 2 more</button>
+        </div>
+      </div>
+
+      <div class="featured-col featured-col-b">
+        <div class="card card-pad stat">
+          <p class="stat-num">880+</p>
+          <p class="stat-text">backend tests with Vitest and Supertest — most of them mine.</p>
+        </div>
+        <figure class="flow">
+          <figcaption>-- the tables I basically live in</figcaption>
+          <div role="img" aria-label="Backend modules I built: orders, production plans, material requests, weekly pay, sessions and audit logs, in MySQL, served by Node.js and Express." class="flow-rows">
+            <div aria-hidden="true" class="flow-row"><span class="tbl tbl-accent">orders</span><span class="arrow">→</span><span class="tbl">production_plans</span><span class="arrow">→</span><span class="tbl">material_requests</span></div>
+            <div aria-hidden="true" class="flow-row"><span class="tbl">weekly_pay</span><span class="tbl">sessions</span><span class="arrow">→</span><span class="tbl">audit_logs</span></div>
+            <p aria-hidden="true" class="flow-stack">Node.js · Express · MySQL · Next.js (team)</p>
+          </div>
+        </figure>
+      </div>
+    </div>
+  </article>
+
+  <div class="proj-grid">
+    <article class="card card-pad proj" aria-labelledby="portfolio-h">
+      <p class="label">Project 02</p>
+      <h3 id="portfolio-h" class="h3-proj2">This portfolio</h3>
+      <p class="proj-p">Designed and vibecoded with AI as my pair programmer: a typed-name intro, a SQL query for navigation, and a layout built for phones first.</p>
+      <ul aria-label="Highlights" class="tags">
+        <li>vibecoding</li>
+        <li>scroll animation</li>
+        <li>mobile-first</li>
+      </ul>
+      <p class="hand-cta">you're looking at it ↑</p>
+    </article>
+    <article class="card-pad proj-slot" aria-label="Next project slot">
+      <p class="label">Project 03</p>
+      <p class="slot-text">[ Your next build goes here — e.g. what Team JDK made at the DICT Hackathon, or a SQL project from DataCamp ]</p>
+    </article>
+  </div>
+</section>
+
+<section id="skills" aria-labelledby="skills-h" tabindex="-1">
+  <p class="query"><span class="kw">SELECT</span> category, tools <span class="kw">FROM</span> kenn.skills;</p>
+  <h2 id="skills-h" class="h2 h2-gap">Query results.</h2>
+  <div class="results desktop-only">
+    <table>
+      <thead><tr><th scope="col" class="col-cat">category</th><th scope="col">tools</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">backend</th><td>Node.js, Express, MySQL, REST APIs, JWT auth, role-based access, rate limiting</td></tr>
+        <tr><th scope="row">languages</th><td>JavaScript, TypeScript, Python, SQL</td></tr>
+        <tr><th scope="row">testing_tools</th><td>Vitest, Supertest, Docker, Git, GitHub</td></tr>
+        <tr><th scope="row">frontend</th><td>Next.js, React, Tailwind CSS</td></tr>
+        <tr><th scope="row">vibecoding</th><td>Claude, Gemini, Antigravity, Codex</td></tr>
+        <tr><th scope="row" class="accent">learning_now</th><td>SQL for data engineering — two DataCamp tracks</td></tr>
+      </tbody>
+    </table>
+    <p class="results-foot">6 rows returned · and counting</p>
+  </div>
+  <dl class="results-m mobile-only">
+    <div><dt>backend</dt><dd>Node.js, Express, MySQL, REST APIs, JWT auth, role-based access, rate limiting</dd></div>
+    <div><dt>languages</dt><dd>JavaScript, TypeScript, Python, SQL</dd></div>
+    <div><dt>testing_tools</dt><dd>Vitest, Supertest, Docker, Git, GitHub</dd></div>
+    <div><dt>frontend</dt><dd>Next.js, React, Tailwind CSS</dd></div>
+    <div><dt>vibecoding</dt><dd>Claude, Gemini, Antigravity, Codex</dd></div>
+    <div><dt class="accent">learning_now</dt><dd>SQL for data engineering — two DataCamp tracks</dd></div>
+  </dl>
+</section>
+
+<section id="certs" aria-labelledby="certs-h" tabindex="-1">
+  <p class="query"><span class="kw">SELECT</span> * <span class="kw">FROM</span> kenn.certs <span class="kw">WHERE</span> status = <span class="accent">'earned'</span>;</p>
+  <h2 id="certs-h" class="h2">Certifications.</h2>
+  <p class="intro-p">Two SQL courses down, two data engineering tracks in progress.</p>
+  <div class="cert-grid">
+    <article class="card card-pad cert">
+      <span class="cert-ring" aria-hidden="true"></span>
+      <div class="cert-top">
+        <p class="label label-tight">DataCamp · Statement of accomplishment</p>
+        <span class="badge badge-sm"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>Earned</span>
+      </div>
+      <h3 class="cert-title">Introduction to SQL</h3>
+      <dl class="cert-meta">
+        <div><dt>Completed</dt><dd>Aug 29, 2026</dd></div>
+        <div><dt>CPE credits</dt><dd>1.2</dd></div>
+        <div class="span-all"><dt>Credential ID</dt><dd class="cred-id">SQLI0021600307924</dd></div>
+      </dl>
+      <a class="pill pill-cred" href="https://www.datacamp.com/completed/statement-of-accomplishment/course/c5226c01e41cffcfdd1634bdaf100ad9efa7776d" aria-label="View credential: Introduction to SQL on DataCamp">View credential <span aria-hidden="true" class="accent">↗</span></a>
+    </article>
+    <article class="card card-pad cert">
+      <span class="cert-ring" aria-hidden="true"></span>
+      <div class="cert-top">
+        <p class="label label-tight">DataCamp · Statement of accomplishment</p>
+        <span class="badge badge-sm"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>Earned</span>
+      </div>
+      <h3 class="cert-title">Intermediate SQL</h3>
+      <dl class="cert-meta">
+        <div><dt>Completed</dt><dd>Aug 29, 2026</dd></div>
+        <div><dt>CPE credits</dt><dd>2.8</dd></div>
+        <div class="span-all"><dt>Credential ID</dt><dd class="cred-id">ISQL0011778070225</dd></div>
+      </dl>
+      <a class="pill pill-cred" href="https://www.datacamp.com/completed/statement-of-accomplishment/course/e7520ea6bd1463e66aa02a2590be819c66f81271" aria-label="View credential: Intermediate SQL on DataCamp">View credential <span aria-hidden="true" class="accent">↗</span></a>
+    </article>
+  </div>
+  <div class="in-progress">
+    <p class="label">In progress</p>
+    <span class="track"><span class="spinner" aria-hidden="true"></span>Associate Data Engineer in SQL · DataCamp</span>
+    <span class="track"><span class="spinner" aria-hidden="true"></span>Data Engineer in SQL · DataCamp</span>
+  </div>
+</section>
+
+<section id="log" aria-labelledby="log-h" tabindex="-1">
+  <p class="query"><span class="kw">SELECT</span> * <span class="kw">FROM</span> kenn.log <span class="kw">ORDER BY</span> date <span class="kw">DESC</span>;</p>
+  <h2 id="log-h" class="h2 h2-gap">Recent yaps.</h2>
+  <ol class="yaps collapsible" id="logList">
+    <li class="yap is-hot"><span class="avatar" aria-hidden="true">JK</span><div class="yap-bubble"><p class="yap-text">Working through two DataCamp tracks — Associate Data Engineer in SQL and Data Engineer in SQL. Intro and Intermediate SQL are done ✓</p><p class="yap-date">now</p></div></li>
+    <li class="yap is-hot"><span class="avatar" aria-hidden="true">JK</span><div class="yap-bubble"><p class="yap-text">Defended our thesis, thReady. Backend, database and 880+ tests — shipped.</p><p class="yap-date">Nov 2026</p></div></li>
+    <li class="yap"><span class="avatar" aria-hidden="true">JK</span><div class="yap-bubble"><p class="yap-text">Competed in the 15th I.T. Skills Olympics — Database Programming, at University of Makati.</p><p class="yap-date">Nov 2026</p></div></li>
+    <li class="yap"><span class="avatar" aria-hidden="true">JK</span><div class="yap-bubble"><p class="yap-text">DICT Hackathon with Team JDK.</p><p class="yap-date">Oct 2026</p></div></li>
+    <li class="yap more"><span class="avatar" aria-hidden="true">JK</span><div class="yap-bubble"><p class="yap-text">STI College Lucena Hackathon.</p><p class="yap-date">Feb 2026</p></div></li>
+    <li class="yap more"><span class="avatar" aria-hidden="true">JK</span><div class="yap-bubble"><p class="yap-text">Joined STI Shiba Esports.</p><p class="yap-date">2026</p></div></li>
+    <li class="yap more"><span class="avatar" aria-hidden="true">JK</span><div class="yap-bubble"><p class="yap-text">Made Dean's Lister at STI College Lucena.</p><p class="yap-date">2023–24</p></div></li>
+  </ol>
+  <button type="button" class="more-btn more-btn-log mobile-only" aria-expanded="false" aria-controls="logList" data-more="Show 3 older" data-less="Show less">Show 3 older</button>
+</section>
+
+<section id="contact" aria-labelledby="contact-h" tabindex="-1">
+  <p class="query"><span class="kw">INSERT INTO</span> kenn.inbox <span class="kw">VALUES</span> (<span class="accent">'you'</span>);</p>
+  <h2 id="contact-h" class="h2-contact">Let's yap<span class="accent">.</span></h2>
+  <p class="contact-p">Have an OJT slot, a role, or a database question? I'm in Sariaya, Quezon — open to on-site, hybrid or remote.</p>
+  <div class="composer">
+    <label for="kenn-msg">to: moscosajohnkenneth1@gmail.com</label>
+    <textarea id="kenn-msg" rows="3" placeholder="Hi Kenn, we have an OJT slot for…"></textarea>
+    <div class="composer-actions">
+      <button type="button" class="copy-btn" id="copyEmail">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a1 1 0 0 1 1-1h10"></path></svg>
+        <span aria-live="polite" id="copyLabel">Copy email</span>
+      </button>
+      <a class="send-btn" id="sendMail" href="mailto:moscosajohnkenneth1@gmail.com?subject=Hi%20Kenn%20%E2%80%94%20from%20your%20portfolio">Send
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l16-8-6 16-3-7z"></path></svg></a>
+    </div>
+  </div>
+  <div class="contact-links">
+    <a href="https://github.com/mscskenn">GitHub <span aria-hidden="true" class="accent">↗</span></a>
+    <a href="https://www.linkedin.com/in/john-kenneth-moscosa">LinkedIn <span aria-hidden="true" class="accent">↗</span></a>
+    <a href="assets/resume.pdf" download>Résumé <span aria-hidden="true" class="accent">↓</span></a>
+  </div>
+</section>
+
+</div>
+</main>
+
+<footer class="footer">
+  <span>© 2026 John Kenneth Moscosa · built while yapping</span>
+  <span><span id="localTime"></span> in Sariaya, PH</span>
+  <button type="button" class="to-top desktop-only" data-go="top">back to top ↑</button>
+</footer>
+
+<nav class="tabbar" id="tabbar" aria-label="Sections">
+  <a href="#me" data-go="me" data-nav="me"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M4 21c0-4 3.6-7 8-7s8 3 8 7"></path></svg><span>Me</span></a>
+  <a href="#projects" data-go="projects" data-nav="projects"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h6l2 2h10v11H3z M3 10h18"></path></svg><span>Projects</span></a>
+  <a href="#skills" data-go="skills" data-nav="skills"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3z M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6 M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"></path></svg><span>Skills</span></a>
+  <a href="#certs" data-go="certs" data-nav="certs"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15a6 6 0 1 0 0-12 6 6 0 0 0 0 12z M8.5 13.5L7 21l5-3 5 3-1.5-7.5"></path></svg><span>Certs</span></a>
+  <a href="#log" data-go="log" data-nav="log"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"></path></svg><span>Log</span></a>
+  <a href="#contact" data-go="contact" data-nav="contact"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l16-8-6 16-3-7z"></path></svg><span>Contact</span></a>
+</nav>
 </body>
 </html>
