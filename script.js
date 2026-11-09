@@ -1,315 +1,437 @@
-/**
- * John Kenneth Moscosa — Portfolio (editor theme)
- * 1. Theme toggle: light/dark, remembered in localStorage when available.
- * 2. Mobile menu: the explorer becomes a dropdown under 640px.
- * 3. Scroll spy: highlights the current "file" in the explorer and updates the breadcrumb.
- * 4. Lightbox: enlarges certificate images on the credentials page.
- * 5. Keeps the footer year current.
- * The pages work fully without JavaScript; this only adds the extras.
- */
+/* John Kenneth Moscosa — portfolio
+   Ported from design/Me2.dc.html (measure, nameFx, fade, seg, out, io).
+   Window scrolling drives the intro: p = scrollY / introDist. */
 (function () {
   'use strict';
 
-  document.addEventListener('DOMContentLoaded', () => {
-    initTheme();
-    initMobileNav();
-    initScrollSpy();
-    initLightbox();
-    initReveal();
-    initProgress();
-    initTimeline();
-    initTerminal();
-    initDiagramFlow();
-    const year = document.getElementById('year');
-    if (year) year.textContent = String(new Date().getFullYear());
+  var doc = document;
+  var root = doc.documentElement;
+  var TOTAL = 19;
+  var L1 = 'John Kenneth', L2 = 'Moscosa';
+  var SECS = ['me', 'projects', 'skills', 'certs', 'log', 'contact'];
+  var EMAIL = 'moscosajohnkenneth1@gmail.com';
+
+  var reduced = false;
+  try { reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
+  var coarse = false;
+  try { coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches); } catch (e) {}
+
+  function byId(id) { return doc.getElementById(id); }
+  function all(sel, ctx) { return Array.prototype.slice.call((ctx || doc).querySelectorAll(sel)); }
+
+  var el = {
+    track: byId('introTrack'),
+    stage: byId('stage'),
+    nameBox: byId('nameBox'),
+    nameFx: byId('nameFx'),
+    eyebrow: byId('eyebrow'),
+    line: byId('eyebrowLine'),
+    dotsWrap: byId('typingDots'),
+    t1: byId('typed1'), r1: byId('rest1'), c1: byId('caret1'),
+    t2: byId('typed2'), r2: byId('rest2'), c2: byId('caret2'),
+    sub: byId('sub'),
+    lede: byId('lede'),
+    actions: byId('actions'),
+    roomWrap: byId('roomWrap'),
+    room: byId('room'),
+    notes: byId('roomNotes'),
+    strip: byId('strip'),
+    cue: byId('cue'),
+    cueArrow: byId('cueArrow'),
+    cueUrl: byId('cueUrl'),
+    skip: byId('skipIntro'),
+    topbar: byId('topbar'),
+    tabbar: byId('tabbar'),
+    msg: byId('kenn-msg'),
+    send: byId('sendMail'),
+    copyBtn: byId('copyEmail'),
+    copyLabel: byId('copyLabel'),
+    time: byId('localTime')
+  };
+  if (!el.track || !el.stage || !el.nameBox) return;
+
+  el.dots = el.dotsWrap ? all('span', el.dotsWrap) : [];
+  el.reveal = {
+    board: all('[data-reveal="board"]'),
+    notes: all('[data-reveal="notes"]'),
+    lights: all('[data-reveal="lights"]'),
+    glow: all('[data-reveal="glow"]'),
+    screen: all('[data-reveal="screen"]')
+  };
+  var secs = {};
+  SECS.forEach(function (id) { secs[id] = byId(id); });
+  var navLinks = all('[data-nav]');
+
+  var S = {
+    W: 0, H: 0, mobile: false, introDist: 0,
+    box: null,
+    typed: reduced ? TOTAL : 0,
+    p: reduced ? 1 : 0,
+    beat: 0,
+    introIn: reduced,
+    active: null
+  };
+
+  /* ---------- helpers ported from renderVals() ---------- */
+
+  function clamp(v) { return Math.min(1, Math.max(0, v)); }
+  function seg(a, b) { return clamp((S.p - a) / (b - a)); }
+  function out(t) { return 1 - Math.pow(1 - t, 3); }
+  function io(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+
+  // Write a style only when it changed.
+  function css(node, prop, val) {
+    if (!node) return;
+    var key = '_k_' + prop;
+    if (node[key] === val) return;
+    node[key] = val;
+    node.style[prop] = val;
+  }
+  function vis(node, o) { css(node, 'visibility', o < 0.01 ? 'hidden' : 'visible'); }
+  function fade(node, a, b, dy) {
+    var o = out(seg(a, b));
+    css(node, 'opacity', o.toFixed(3));
+    css(node, 'transform', 'translateY(' + ((dy || 16) * (1 - o)).toFixed(1) + 'px)');
+    vis(node, o);
+  }
+  function op(nodes, a, b) {
+    var v = out(seg(a, b)).toFixed(3);
+    for (var i = 0; i < nodes.length; i++) css(nodes[i], 'opacity', v);
+  }
+  function text(node, val) {
+    if (node && node._txt !== val) { node._txt = val; node.textContent = val; }
+  }
+
+  /* ---------- measure ---------- */
+
+  function measure(force) {
+    var W = root.clientWidth || window.innerWidth;
+    var H = window.innerHeight;
+    // On touch devices the URL bar changes innerHeight while scrolling; ignore small height-only changes.
+    if (!force && coarse && S.H && W === S.W && Math.abs(H - S.H) < 160) H = S.H;
+    S.W = W;
+    S.H = H;
+    S.mobile = W < 760;
+    S.introDist = reduced ? 0 : Math.round(H * (S.mobile ? 0.75 : 1.3));
+
+    css(el.stage, 'height', H + 'px');
+    css(el.track, 'height', (H + S.introDist) + 'px');
+    if (el.msg) el.msg.rows = S.mobile ? 2 : 3;
+
+    var sr = el.stage.getBoundingClientRect();
+    var nr = el.nameBox.getBoundingClientRect();
+    S.box = { x: nr.left - sr.left, y: nr.top - sr.top, w: nr.width, h: nr.height };
+
+    readScroll();
+    render();
+  }
+
+  /* ---------- scroll ---------- */
+
+  function scrollTop() { return window.pageYOffset || root.scrollTop || 0; }
+
+  function activeAt(top) {
+    var a = null, y = top + S.H * 0.4;
+    for (var i = 0; i < SECS.length; i++) {
+      var s = secs[SECS[i]];
+      if (s && s.getBoundingClientRect().top + top <= y) a = SECS[i];
+    }
+    if (top + window.innerHeight >= root.scrollHeight - 4) a = 'contact';
+    return a;
+  }
+
+  function readScroll() {
+    var top = scrollTop();
+    S.p = S.introDist ? clamp(top / S.introDist) : 1;
+    if (S.p > 0.03 && S.typed < TOTAL) finishTyping();
+    S.active = activeAt(top);
+  }
+
+  var raf = 0;
+  function frame() { raf = 0; readScroll(); render(); }
+  function schedule() { if (!raf) raf = window.requestAnimationFrame(frame); }
+
+  /* ---------- render ---------- */
+
+  var lastActive;
+  function render() {
+    var mobile = S.mobile, W = S.W, H = S.H;
+    var n = S.typed;
+    var typing = n < TOTAL;
+    var tick = Math.floor(S.beat / 2) % 2 === 0;
+
+    // name: centred and scaled at p = 0, settles into its slot by p = 0.6
+    var box = S.box || { x: 0, y: 0, w: 0, h: 0 };
+    var e = io(seg(0.03, 0.6));
+    var s0 = 1;
+    if (box.w > 0) s0 = mobile ? Math.min(1.06, (W * 0.9) / box.w) : Math.min(1.2, (W * 0.64) / box.w, (H * 0.42) / box.h);
+    var dx = W / 2 - (box.x + box.w / 2);
+    var dy = H / 2 - (box.y + box.h / 2);
+    var sc = s0 + (1 - s0) * e;
+    css(el.nameFx, 'transform', 'translate(' + (dx * (1 - e)).toFixed(1) + 'px, ' + (dy * (1 - e)).toFixed(1) + 'px) scale(' + sc.toFixed(4) + ')');
+    css(el.nameFx, 'opacity', box.w > 0 ? '1' : '0');
+
+    // typing
+    var k1 = Math.min(n, 12), k2 = Math.max(0, n - 12);
+    text(el.t1, L1.slice(0, k1)); text(el.r1, L1.slice(k1));
+    text(el.t2, L2.slice(0, k2)); text(el.r2, L2.slice(k2));
+    css(el.c1, 'display', n < 12 ? 'inline-block' : 'none');
+    css(el.c2, 'display', n >= 12 ? 'inline-block' : 'none');
+    var caretO = (typing || tick) ? '1' : '0';
+    css(el.c1, 'opacity', caretO);
+    css(el.c2, 'opacity', caretO);
+
+    // intro chrome
+    css(el.eyebrow, 'opacity', S.introIn ? '1' : '0');
+    css(el.line, 'transform', 'scaleX(' + (S.introIn ? 1 : 0) + ')');
+    css(el.dotsWrap, 'opacity', (S.introIn && n === 0) ? '1' : '0');
+    var phase = S.beat % 3;
+    for (var i = 0; i < el.dots.length; i++) css(el.dots[i], 'opacity', phase === i ? '1' : '0.3');
+    css(el.sub, 'opacity', typing ? '0' : '1');
+    css(el.sub, 'transform', 'translateY(' + (typing ? 8 : 0) + 'px)');
+
+    var cueO = typing ? 0 : (1 - seg(0, 0.1));
+    css(el.cue, 'opacity', cueO.toFixed(3)); vis(el.cue, cueO);
+    var urlO = mobile ? 0 : cueO;
+    css(el.cueUrl, 'opacity', urlO.toFixed(3)); vis(el.cueUrl, urlO);
+    css(el.cueArrow, 'transform', 'translateY(' + (tick ? 6 : 0) + 'px)');
+    var skipO = reduced ? 0 : (1 - seg(0.2, 0.45));
+    css(el.skip, 'opacity', skipO.toFixed(3)); vis(el.skip, skipO);
+
+    // hero fades
+    fade(el.lede, 0.5, 0.78);
+    fade(el.actions, 0.56, 0.84);
+    fade(el.strip, 0.72, 1, 20);
+    var roomO = out(seg(0.22, 0.55));
+    css(el.roomWrap, 'opacity', roomO.toFixed(3));
+    css(el.roomWrap, 'transform', 'translateY(' + (40 * (1 - roomO)).toFixed(1) + 'px) scale(' + (0.95 + 0.05 * roomO).toFixed(4) + ')');
+    vis(el.roomWrap, roomO);
+    if (el.notes) css(el.notes, 'opacity', out(seg(0.9, 1)).toFixed(3));
+    fade(el.topbar, 0.5, 0.82, mobile ? 0 : -12);
+    fade(el.tabbar, 0.5, 0.82, mobile ? 0 : -12);
+
+    // room reveals
+    op(el.reveal.board, 0.36, 0.6);
+    op(el.reveal.glow, 0.48, 0.7);
+    op(el.reveal.lights, 0.52, 0.76);
+    op(el.reveal.screen, 0.58, 0.8);
+    op(el.reveal.notes, 0.6, 0.86);
+
+    // active section
+    if (S.active !== lastActive) {
+      lastActive = S.active;
+      navLinks.forEach(function (a) {
+        var on = a.getAttribute('data-nav') === S.active;
+        a.classList.toggle('is-active', on);
+        if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+      });
+    }
+  }
+
+  /* ---------- typing + beat ---------- */
+
+  var startT, typeT, beatT;
+  function finishTyping() {
+    S.typed = TOTAL;
+    clearTimeout(startT);
+    clearInterval(typeT);
+  }
+
+  function stageVisible() { return scrollTop() < S.introDist + S.H; }
+
+  if (!reduced) {
+    setTimeout(function () { S.introIn = true; schedule(); }, 150);
+    startT = setTimeout(function () {
+      typeT = setInterval(function () {
+        if (S.typed >= TOTAL) { clearInterval(typeT); return; }
+        S.typed += 1;
+        schedule();
+      }, 80);
+    }, 1500);
+    beatT = setInterval(function () {
+      if (doc.hidden || !stageVisible()) return;
+      S.beat += 1;
+      schedule();
+    }, 350);
+  }
+
+  /* ---------- navigation ---------- */
+
+  function sectionTop(id) {
+    var s = secs[id];
+    return s ? s.getBoundingClientRect().top + scrollTop() - (S.mobile ? 56 : 64) : 0;
+  }
+
+  function go(id, instant) {
+    var top = 0;
+    if (id === 'home') top = S.introDist;
+    else if (id !== 'top') top = sectionTop(id);
+    finishTyping();
+    schedule();
+    var behavior = (reduced || instant) ? 'auto' : 'smooth';
+    try { window.scrollTo({ top: top, behavior: behavior }); } catch (e) { window.scrollTo(0, top); }
+
+    try {
+      if (secs[id]) history.replaceState(null, '', '#' + id);
+      else if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    } catch (e) {}
+
+    if (secs[id] && !instant) {
+      try { secs[id].focus({ preventScroll: true }); } catch (e) {}
+    }
+  }
+
+  doc.addEventListener('click', function (ev) {
+    var t = ev.target && ev.target.closest ? ev.target.closest('[data-go]') : null;
+    if (!t) return;
+    if (ev.defaultPrevented || ev.button > 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+    ev.preventDefault();
+    go(t.getAttribute('data-go'));
   });
 
-  function initTheme() {
-    const root = document.documentElement;
-    const btn = document.getElementById('theme-toggle');
-    if (!btn) return;
-    const meta = document.querySelector('meta[name="theme-color"]');
-    const colors = { dark: '#0B0E13', light: '#F6F7F9' };
+  // Skip link: complete typing and focus the first section.
+  var skipLink = doc.querySelector('.skip-link');
+  if (skipLink) skipLink.addEventListener('click', function (ev) { ev.preventDefault(); go('me'); });
 
-    function apply(theme) {
-      root.setAttribute('data-theme', theme);
-      btn.setAttribute('aria-pressed', String(theme === 'dark'));
-      if (meta) meta.setAttribute('content', colors[theme]);
-    }
+  /* ---------- show more toggles ---------- */
 
-    apply(root.getAttribute('data-theme') === 'light' ? 'light' : 'dark');
+  all('.more-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var list = byId(btn.getAttribute('aria-controls'));
+      if (!list) return;
+      var open = !list.classList.contains('is-expanded');
+      list.classList.toggle('is-expanded', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      btn.textContent = btn.getAttribute(open ? 'data-less' : 'data-more');
+      schedule();
+    });
+  });
 
-    btn.addEventListener('click', () => {
-      const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-      apply(next);
+  /* ---------- contact ---------- */
+
+  var SUBJECT = 'Hi Kenn — from your portfolio';
+  function updateMail() {
+    if (!el.send) return;
+    var msg = el.msg ? el.msg.value : '';
+    el.send.href = 'mailto:' + EMAIL + '?subject=' + encodeURIComponent(SUBJECT) + (msg ? '&body=' + encodeURIComponent(msg) : '');
+  }
+  if (el.msg) {
+    el.msg.addEventListener('input', updateMail);
+    el.msg.addEventListener('change', updateMail);
+  }
+  updateMail();
+
+  var copyT;
+  function copied() {
+    text(el.copyLabel, 'Copied!');
+    clearTimeout(copyT);
+    copyT = setTimeout(function () { text(el.copyLabel, 'Copy email'); }, 2000);
+  }
+  function legacyCopy() {
+    var ta = doc.createElement('textarea');
+    ta.value = EMAIL;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '-1000px';
+    ta.style.opacity = '0';
+    doc.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = doc.execCommand('copy'); } catch (e) { ok = false; }
+    doc.body.removeChild(ta);
+    if (ok) copied();
+  }
+  if (el.copyBtn) {
+    el.copyBtn.addEventListener('click', function () {
       try {
-        localStorage.setItem('theme', next);
-      } catch (e) {
-        // Storage blocked: the choice still holds for this visit.
-      }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(EMAIL).then(copied, legacyCopy);
+          return;
+        }
+      } catch (e) {}
+      legacyCopy();
     });
   }
 
-  function initMobileNav() {
-    const btn = document.getElementById('menu-toggle');
-    const panel = document.getElementById('explorer');
-    if (!btn || !panel) return;
-    const phone = window.matchMedia('(max-width: 639px)');
+  /* ---------- local time ---------- */
 
-    function setOpen(open, returnFocus) {
-      panel.classList.toggle('is-open', open);
-      btn.setAttribute('aria-expanded', String(open));
-      if (open) {
-        const first = panel.querySelector('.explorer-link');
-        if (first) first.focus();
-      } else if (returnFocus) {
-        btn.focus();
-      }
+  function updateTime() {
+    if (!el.time) return;
+    var t = '';
+    try { t = new Date().toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: 'numeric', minute: '2-digit' }); } catch (e) { t = ''; }
+    text(el.time, t);
+  }
+  updateTime();
+  setInterval(function () { if (!doc.hidden) updateTime(); }, 30000);
+
+  /* ---------- room loops: pause when hidden or off screen ---------- */
+
+  var roomOnScreen = true;
+  function syncPause() {
+    if (el.room) el.room.classList.toggle('is-paused', doc.hidden || !roomOnScreen);
+  }
+  if ('IntersectionObserver' in window && el.room) {
+    new IntersectionObserver(function (entries) {
+      roomOnScreen = entries[entries.length - 1].isIntersecting;
+      syncPause();
+    }).observe(el.room);
+  }
+  doc.addEventListener('visibilitychange', function () { syncPause(); if (!doc.hidden) { updateTime(); schedule(); } });
+
+  // Murmurs: three words float up from Kenn's mouth and fade, staggered.
+  // (From assets/room-demo.html; the only change is the pause check.)
+  (function () {
+    var WORDS = ['hmm…', 'what if…', 'JOIN?', 'index it', 'okay okay', '{ … }', 'one more col', 'ship it', 'wait—', 'cache?'];
+    var slots = Array.prototype.slice.call(document.querySelectorAll('.room .murmur'));
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var CYC = 9, beat = 0;
+    function place(g, i, t, word) {
+      var x = 106 - t * 8 + (i === 1 ? -4 : 0), y = 229 - t * 38;
+      var o = Math.min(1, Math.min(1, t / 0.2) * (1 - t) * 1.15);
+      g.style.transition = t === 0 ? 'none' : 'transform 350ms linear, opacity 350ms linear';
+      g.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+      g.style.opacity = o;
+      if (word) g.querySelector('text').textContent = word;
     }
-
-    btn.addEventListener('click', () => setOpen(!panel.classList.contains('is-open')));
-
-    panel.addEventListener('click', (event) => {
-      if (phone.matches && event.target.closest('a')) setOpen(false);
-    });
-
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && panel.classList.contains('is-open')) setOpen(false, true);
-    });
-
-    document.addEventListener('click', (event) => {
-      if (!panel.classList.contains('is-open')) return;
-      if (panel.contains(event.target) || btn.contains(event.target)) return;
-      setOpen(false);
-    });
-
-    const onPhoneChange = () => setOpen(false);
-    if (phone.addEventListener) phone.addEventListener('change', onPhoneChange);
-    else phone.addListener(onPhoneChange);
-  }
-
-  function initLightbox() {
-    const dialog = document.getElementById('lightbox');
-    const img = document.getElementById('lightbox-img');
-    if (!dialog || !img || typeof dialog.showModal !== 'function') return;
-    let opener = null;
-
-    document.querySelectorAll('[data-lightbox]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const thumb = btn.querySelector('img');
-        img.src = btn.dataset.full;
-        img.alt = thumb ? thumb.alt : '';
-        opener = btn;
-        dialog.showModal();
+    if (reduced) { slots.forEach(function (g, i) { place(g, i, [0.25, 0.55, 0.85][i]); }); return; }
+    setInterval(function () {
+      if (el.room && el.room.classList.contains('is-paused')) return;
+      beat++;
+      slots.forEach(function (g, i) {
+        var k = beat + i * 3;
+        place(g, i, (k % CYC) / CYC, WORDS[(Math.floor(k / CYC) * 3 + i * 4) % WORDS.length]);
       });
-    });
+    }, 350);
+  })();
 
-    // Clicks on the backdrop land on the dialog element itself (it has no padding).
-    dialog.addEventListener('click', (event) => {
-      if (event.target === dialog) dialog.close();
-    });
+  /* ---------- init ---------- */
 
-    dialog.addEventListener('close', () => {
-      img.removeAttribute('src');
-      if (opener) opener.focus();
-      opener = null;
-    });
+  window.addEventListener('scroll', schedule, { passive: true });
+  var resizeRaf = 0;
+  window.addEventListener('resize', function () {
+    if (resizeRaf) return;
+    resizeRaf = window.requestAnimationFrame(function () { resizeRaf = 0; measure(false); });
+  });
+  window.addEventListener('orientationchange', function () { setTimeout(function () { measure(true); }, 150); });
+
+  measure(true);
+
+  // Deep links such as #certs (credentials.html redirects there): land under the top bar.
+  var userScrolled = false;
+  ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(function (t) {
+    window.addEventListener(t, function () { userScrolled = true; }, { passive: true, once: true });
+  });
+  var hash = (location.hash || '').slice(1);
+  function landOnHash() { if (secs[hash] && !userScrolled) go(hash, true); }
+  if (secs[hash]) {
+    if ('scrollRestoration' in history) { try { history.scrollRestoration = 'manual'; } catch (e) {} }
+    landOnHash();
   }
 
-  const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
-
-  // Effects only run when the visitor allows motion and the browser can observe scrolling.
-  function motionAllowed() {
-    const reduced = window.matchMedia && window.matchMedia(REDUCED_MOTION).matches;
-    return !reduced && 'IntersectionObserver' in window;
-  }
-
-  // Calls onSeen(el) once, the first time each element scrolls into view.
-  function observeOnce(elements, onSeen, options) {
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        io.unobserve(entry.target);
-        onSeen(entry.target);
-      });
-    }, options || { threshold: 0, rootMargin: '0px 0px -6% 0px' });
-    elements.forEach((el) => io.observe(el));
-  }
-
-  function initReveal() {
-    if (!motionAllowed()) return;
-    const selector = '.section-head, .cert-lede, .about-row, .prose, .card, .skill-group, '
-      + '.log-item, .log-head, .contact-lede, .shell, #contact .actions';
-    const els = Array.from(document.querySelectorAll(selector));
-    els.forEach((el) => {
-      const peers = Array.from(el.parentElement.children).filter((c) => c.matches(selector));
-      el.style.setProperty('--i', String(Math.min(peers.indexOf(el), 6)));
-      el.classList.add('reveal');
-    });
-    observeOnce(els, (el) => {
-      el.classList.add('is-visible');
-      // Once the transition is over, drop the helper classes so hover styles are untouched.
-      window.setTimeout(() => {
-        el.classList.remove('reveal', 'is-visible');
-        el.style.removeProperty('--i');
-      }, 1400);
-    });
-  }
-
-  function initProgress() {
-    if (!motionAllowed()) return;
-    const bar = document.createElement('div');
-    bar.className = 'scroll-progress';
-    bar.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(bar);
-    let ticking = false;
-
-    function update() {
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
-      bar.style.transform = 'scaleX(' + p.toFixed(4) + ')';
-      ticking = false;
+  try {
+    if (doc.fonts && doc.fonts.ready) {
+      doc.fonts.ready.then(function () { measure(true); landOnHash(); });
     }
-
-    window.addEventListener('scroll', () => {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(update);
-    }, { passive: true });
-    window.addEventListener('resize', update);
-    update();
-  }
-
-  function initTimeline() {
-    if (!motionAllowed()) return;
-    const log = document.querySelector('.log');
-    if (!log) return;
-    log.classList.add('log--draw');
-    observeOnce([log], (el) => el.classList.add('is-visible'), { threshold: 0 });
-  }
-
-  function initTerminal() {
-    const body = document.querySelector('.terminal-body');
-    if (!body || !motionAllowed()) return;
-    const rows = Array.from(body.children);
-    const count = body.querySelector('[data-count]');
-    const cmdNode = rows.length
-      ? Array.from(rows[0].childNodes).find((n) => n.nodeType === 3 && n.textContent.trim())
-      : null;
-    if (!count || !cmdNode) return;
-
-    const command = cmdNode.textContent.trim();
-    const target = Number(count.dataset.count);
-    const rest = rows.slice(1);
-    const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
-    let done = false;
-    let failsafe = 0;
-
-    // Final state. Once reached, the typing sequence stops touching the text.
-    function showAll() {
-      done = true;
-      window.clearTimeout(failsafe);
-      rest.forEach((row) => row.classList.remove('term-hidden'));
-      cmdNode.textContent = ' ' + command;
-      count.textContent = String(target);
-    }
-
-    function countUp() {
-      return new Promise((resolve) => {
-        const start = performance.now();
-        const duration = 900;
-        (function tick(now) {
-          if (done) { resolve(); return; }
-          const t = Math.min(1, (now - start) / duration);
-          count.textContent = String(Math.round(target * (1 - Math.pow(1 - t, 3))));
-          if (t < 1) window.requestAnimationFrame(tick);
-          else resolve();
-        })(start);
-      });
-    }
-
-    async function play() {
-      for (let i = 1; i <= command.length; i += 1) {
-        if (done) return;
-        cmdNode.textContent = ' ' + command.slice(0, i);
-        await wait(70);
-      }
-      await wait(250);
-      for (const row of rest) {
-        if (done) return;
-        row.classList.remove('term-hidden');
-        if (row.contains(count)) await countUp();
-        else await wait(row.classList.contains('spacer') ? 80 : 300);
-      }
-      showAll();
-    }
-
-    rest.forEach((row) => row.classList.add('term-hidden'));
-    cmdNode.textContent = ' ';
-    count.textContent = '0';
-    observeOnce([body], () => {
-      // The failsafe starts with the sequence, so it can never cut in before typing begins.
-      failsafe = window.setTimeout(showAll, 9000);
-      play().catch(showAll);
-    }, { threshold: 0, rootMargin: '0px 0px -12% 0px' });
-  }
-
-  function initDiagramFlow() {
-    if (!motionAllowed()) return;
-    const diagram = document.querySelector('.diagram');
-    if (!diagram) return;
-    diagram.classList.add('diagram--flow');
-    observeOnce([diagram], (el) => el.classList.add('is-visible'), { threshold: 0, rootMargin: '0px 0px -12% 0px' });
-  }
-
-  function initScrollSpy() {
-    const links = Array.from(document.querySelectorAll('.explorer-link[href^="#"]'));
-    const crumb = document.getElementById('breadcrumb-current');
-    if (!links.length) return;
-
-    // Each link points at a section or article; keep only targets that exist.
-    const targets = links
-      .map((link) => ({ link, el: document.querySelector(link.getAttribute('href')) }))
-      .filter((t) => t.el);
-
-    function setActive(active) {
-      targets.forEach(({ link }) => {
-        const on = link === active;
-        link.classList.toggle('is-active', on);
-        if (on) link.setAttribute('aria-current', 'true');
-        else link.removeAttribute('aria-current');
-      });
-      if (crumb && active) crumb.textContent = active.dataset.file || active.textContent.trim();
-    }
-
-    function update() {
-      const probe = window.scrollY + 140;
-      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
-      let current = targets[0];
-
-      if (atBottom) {
-        current = targets[targets.length - 1];
-      } else {
-        // The last target whose top is above the probe line wins, so nested
-        // articles (thready) take over from their parent section.
-        targets.forEach((t) => {
-          const top = t.el.getBoundingClientRect().top + window.scrollY;
-          if (top <= probe) current = t;
-        });
-      }
-      setActive(current.link);
-    }
-
-    let ticking = false;
-    window.addEventListener('scroll', () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        update();
-        ticking = false;
-      });
-    }, { passive: true });
-    window.addEventListener('resize', update);
-    update();
-  }
+  } catch (e) {}
+  window.addEventListener('load', function () { measure(true); landOnHash(); });
 })();
