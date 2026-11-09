@@ -151,6 +151,52 @@
   function frame() { raf = 0; readScroll(); render(); }
   function schedule() { if (!raf) raf = window.requestAnimationFrame(frame); }
 
+  /* ---------- room annotations ----------
+     Each note fades in and its arrow draws on, one after another. The displayed
+     progress eases toward the scroll target over time (never faster than ~2.8s
+     for the whole set), so one flick of the wheel can't make them pop in. */
+
+  var notes = all('.note').map(function (n) { return { el: n, paths: all('path', n) }; });
+  var noteShown = 0, noteTarget = 0, noteRaf = 0, noteLast = 0;
+
+  function applyNotes() {
+    for (var i = 0; i < notes.length; i++) {
+      var n = notes[i];
+      var local = clamp((noteShown - i * 0.12) / 0.64);
+      var o = out(clamp(local / 0.55));
+      css(n.el, 'opacity', o.toFixed(3));
+      css(n.el, 'translate', '0 ' + (8 * (1 - o)).toFixed(2) + 'px');
+      drawPath(n.paths[0], io(clamp((local - 0.2) / 0.6)));
+      drawPath(n.paths[1], out(clamp((local - 0.78) / 0.22)));
+    }
+  }
+
+  // Round line caps would show a dot before a stroke starts, so hide it until then.
+  function drawPath(path, t) {
+    if (!path) return;
+    css(path, 'strokeDashoffset', (1 - t).toFixed(4));
+    css(path, 'opacity', t > 0.005 ? '1' : '0');
+  }
+
+  function noteTick(ts) {
+    var dt = noteLast ? Math.min(64, ts - noteLast) : 16;
+    noteLast = ts;
+    var step = (noteTarget - noteShown) * (1 - Math.exp(-dt / 380));
+    var maxStep = dt / 2800;
+    if (step > maxStep) step = maxStep; else if (step < -maxStep) step = -maxStep;
+    noteShown += step;
+    if (Math.abs(noteTarget - noteShown) < 0.0015) noteShown = noteTarget;
+    applyNotes();
+    if (noteShown !== noteTarget) noteRaf = window.requestAnimationFrame(noteTick);
+    else { noteRaf = 0; noteLast = 0; }
+  }
+
+  function setNoteTarget(t) {
+    if (reduced) { noteShown = noteTarget = 1; applyNotes(); return; }
+    noteTarget = t;
+    if (!noteRaf && noteShown !== noteTarget) noteRaf = window.requestAnimationFrame(noteTick);
+  }
+
   /* ---------- render ---------- */
 
   var lastActive;
@@ -206,7 +252,7 @@
     css(el.roomWrap, 'opacity', roomO.toFixed(3));
     css(el.roomWrap, 'transform', 'translateY(' + (40 * (1 - roomO)).toFixed(1) + 'px) scale(' + (0.95 + 0.05 * roomO).toFixed(4) + ')');
     vis(el.roomWrap, roomO);
-    if (el.notes) css(el.notes, 'opacity', out(seg(0.9, 1)).toFixed(3));
+    if (!mobile) setNoteTarget(seg(0.62, 1));
     fade(el.topbar, 0.5, 0.82, mobile ? 0 : -12);
     fade(el.tabbar, 0.5, 0.82, mobile ? 0 : -12);
 
@@ -287,6 +333,8 @@
     if (ev.defaultPrevented || ev.button > 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
     ev.preventDefault();
     go(t.getAttribute('data-go'));
+    var hobby = t.getAttribute('data-hobby');
+    if (hobby) showHobby(hobby);
   });
 
   // Skip link: complete typing and focus the first section.
@@ -295,17 +343,139 @@
 
   /* ---------- show more toggles ---------- */
 
+  // Labels come from the number of hidden items, so they stay right when items change.
   all('.more-btn').forEach(function (btn) {
+    var list = byId(btn.getAttribute('aria-controls'));
+    if (!list) return;
+    var extras = all('.more', list);
+    if (!extras.length) { btn.hidden = true; return; }
+    function label(open) {
+      return open ? btn.getAttribute('data-less') : btn.getAttribute('data-more').replace('{n}', extras.length);
+    }
+    btn.textContent = label(false);
     btn.addEventListener('click', function () {
-      var list = byId(btn.getAttribute('aria-controls'));
-      if (!list) return;
       var open = !list.classList.contains('is-expanded');
+      var before = btn.getBoundingClientRect().top;
       list.classList.toggle('is-expanded', open);
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      btn.textContent = btn.getAttribute(open ? 'data-less' : 'data-more');
+      btn.textContent = label(open);
+      if (open && !reduced) {
+        extras.forEach(function (li, i) {
+          li.classList.remove('is-revealing');
+          void li.offsetWidth;
+          li.style.animationDelay = (i * 90) + 'ms';
+          li.classList.add('is-revealing');
+        });
+      }
+      // Collapsing removes content above the button: keep the button where the reader's finger is.
+      if (!open) {
+        var after = btn.getBoundingClientRect().top;
+        if (Math.abs(after - before) > 1) window.scrollBy(0, after - before);
+      }
       schedule();
     });
   });
+
+  /* ---------- hobby cards: chips, carousel pager, highlight ---------- */
+
+  var hobbyWrap = doc.querySelector('.hobbies');
+  var pager = byId('hobbyPager');
+  var hint = byId('swipeHint');
+  var pagerBtns = pager ? all('button', pager) : [];
+  var hobbyCards = hobbyWrap ? all('.hobby', hobbyWrap) : [];
+
+  function padLeft() {
+    var v = 0;
+    try { v = parseFloat(window.getComputedStyle(hobbyWrap).paddingLeft) || 0; } catch (e) {}
+    return v;
+  }
+  function scrollCarouselTo(card) {
+    if (!hobbyWrap || !card) return;
+    var left = card.offsetLeft - padLeft();
+    try { hobbyWrap.scrollTo({ left: left, behavior: reduced ? 'auto' : 'smooth' }); } catch (e) { hobbyWrap.scrollLeft = left; }
+  }
+
+  var carRaf = 0;
+  function syncPager() {
+    carRaf = 0;
+    if (!hobbyWrap || !hobbyCards.length) return;
+    var x = hobbyWrap.scrollLeft, pad = padLeft(), best = 0, bestD = Infinity;
+    hobbyCards.forEach(function (card, i) {
+      var d = Math.abs(card.offsetLeft - pad - x);
+      if (d < bestD) { bestD = d; best = i; }
+    });
+    if (x > 4 && x + hobbyWrap.clientWidth >= hobbyWrap.scrollWidth - 4) best = hobbyCards.length - 1;
+    pagerBtns.forEach(function (b, i) {
+      if (i === best) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+    });
+    if (hint) text(hint, best === hobbyCards.length - 1 ? '← swipe back' : 'swipe for more →');
+  }
+  if (hobbyWrap) {
+    hobbyWrap.addEventListener('scroll', function () {
+      if (!carRaf) carRaf = window.requestAnimationFrame(syncPager);
+    }, { passive: true });
+  }
+  pagerBtns.forEach(function (b) {
+    b.addEventListener('click', function () { scrollCarouselTo(byId('hobby-' + b.getAttribute('data-card'))); });
+  });
+
+  var flashT;
+  function showHobby(key) {
+    var card = byId('hobby-' + key);
+    if (!card) return;
+    if (S.mobile) scrollCarouselTo(card);
+    clearTimeout(flashT);
+    flashT = setTimeout(function () {
+      card.classList.remove('is-flash');
+      void card.offsetWidth;
+      card.classList.add('is-flash');
+    }, reduced ? 0 : 600);
+  }
+  hobbyCards.forEach(function (card) {
+    card.addEventListener('animationend', function () { card.classList.remove('is-flash'); });
+  });
+
+  /* ---------- small live touches: chat plays, test count, row count ---------- */
+
+  var rowCount = byId('rowCount');
+  if (rowCount) text(rowCount, String(all('.results tbody tr').length));
+
+  function countUp(node) {
+    var end = parseInt(node.getAttribute('data-count'), 10);
+    var suffix = node.getAttribute('data-suffix') || '';
+    if (!end) return;
+    var t0 = 0, dur = 1400;
+    function tick(ts) {
+      if (!t0) t0 = ts;
+      var k = Math.min(1, (ts - t0) / dur);
+      node.textContent = Math.round(end * out(k)) + suffix;
+      if (k < 1) window.requestAnimationFrame(tick);
+    }
+    window.requestAnimationFrame(tick);
+  }
+
+  function onceVisible(node, fn) {
+    var obs = new IntersectionObserver(function (entries) {
+      for (var i = 0; i < entries.length; i++) {
+        if (entries[i].isIntersecting) { obs.disconnect(); fn(); return; }
+      }
+    }, { threshold: 0.6 });
+    obs.observe(node);
+  }
+
+  if (!reduced && 'IntersectionObserver' in window) {
+    var chat = doc.querySelector('.mini-chat');
+    if (chat) {
+      chat.classList.add('will-play');
+      onceVisible(chat, function () { chat.classList.add('is-in'); });
+    }
+    var counter = byId('testCount');
+    if (counter) {
+      counter.classList.add('will-count');
+      counter.textContent = '0' + (counter.getAttribute('data-suffix') || '');
+      onceVisible(counter, function () { countUp(counter); });
+    }
+  }
 
   /* ---------- contact ---------- */
 

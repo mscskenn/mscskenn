@@ -27,8 +27,8 @@
     try { if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) r.classList.add('reduced'); } catch (e) {}
   })();
 </script>
-<link rel="stylesheet" href="style.css">
-<script src="script.js" defer></script>
+<link rel="stylesheet" href="style.css?v=3">
+<script src="script.js?v=3" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#me">Skip to content</a>
@@ -386,17 +386,17 @@
 </svg>
         <div class="room-notes" id="roomNotes" aria-hidden="true">
           <div class="note note-tl">ideas live here<br><span class="note-sub">(whiteboards + my riding helmet)</span>
-            <svg width="70" height="40" viewBox="0 0 70 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4 C 24 6, 46 14, 62 34"></path><path d="M54 33 L62 34 L62 26"></path></svg>
+            <svg width="70" height="40" viewBox="0 0 70 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M4 4 C 24 6, 46 14, 62 34"></path><path pathLength="1" d="M54 33 L62 34 L62 26"></path></svg>
           </div>
           <div class="note note-tr">free aircon<br><span class="note-sub">(open window + the fan)</span>
-            <svg width="56" height="40" viewBox="0 0 56 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M50 4 C 40 10, 26 20, 10 34"></path><path d="M10 26 L10 34 L18 34"></path></svg>
+            <svg width="56" height="40" viewBox="0 0 56 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M50 4 C 40 10, 26 20, 10 34"></path><path pathLength="1" d="M10 26 L10 34 L18 34"></path></svg>
           </div>
           <div class="note note-bl">
-            <svg width="50" height="44" viewBox="0 0 50 44" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 40 C 14 30, 22 18, 30 6"></path><path d="M23 9 L30 6 L32 14"></path></svg>
+            <svg width="50" height="44" viewBox="0 0 50 44" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M6 40 C 14 30, 22 18, 30 6"></path><path pathLength="1" d="M23 9 L30 6 L32 14"></path></svg>
             me, vibecoding<br><span class="note-sub">(murmuring ideas at my AI)</span>
           </div>
           <div class="note note-br">
-            <svg width="50" height="44" viewBox="0 0 50 44" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M44 40 C 40 28, 34 16, 24 6"></path><path d="M24 14 L24 6 L31 8"></path></svg>
+            <svg width="50" height="44" viewBox="0 0 50 44" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M44 40 C 40 28, 34 16, 24 6"></path><path pathLength="1" d="M24 14 L24 6 L31 8"></path></svg>
             bed<br><span class="note-sub">(open after 2am)</span>
           </div>
         </div>
@@ -406,10 +406,10 @@
 
   <div class="strip" id="strip">
     <span class="strip-label">Into</span>
-    <button type="button" class="chip" data-go="me"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9l-4 3 4 3"></path><path d="M16 9l4 3-4 3"></path><path d="M13.5 5l-3 14"></path></svg>vibecoding</button>
-    <button type="button" class="chip" data-go="me"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"></path></svg>yapping</button>
-    <button type="button" class="chip" data-go="me"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"></path><path d="M10 21h4"></path><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"></path></svg>brainstorming</button>
-    <button type="button" class="chip" data-go="me"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"></ellipse><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"></path><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"></path></svg>databases</button>
+    <button type="button" class="chip" data-go="me" data-hobby="vibe"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9l-4 3 4 3"></path><path d="M16 9l4 3-4 3"></path><path d="M13.5 5l-3 14"></path></svg>vibecoding</button>
+    <button type="button" class="chip" data-go="me" data-hobby="yap"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"></path></svg>yapping</button>
+    <button type="button" class="chip" data-go="me" data-hobby="note"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"></path><path d="M10 21h4"></path><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"></path></svg>brainstorming</button>
+    <button type="button" class="chip" data-go="me" data-hobby="db"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"></ellipse><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6"></path><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"></path></svg>databases</button>
   </div>
 
   <div class="cue" id="cue">
@@ -431,7 +431,7 @@
   <h2 id="me-h" class="h2 h2-me">Hi, I'm Kenn. Here's the real-life version.</h2>
   <div class="hobbies">
 
-    <article class="card hobby hobby-vibe">
+    <article class="card hobby hobby-vibe" id="hobby-vibe">
       <div class="mini-chat" aria-hidden="true">
         <span class="bubble bubble-in">help me write this migration</span>
         <span class="bubble bubble-out">here's a draft ↓</span>
@@ -441,20 +441,20 @@
       <p>I build with an AI pair programmer — Claude, Gemini, Antigravity, Codex — and review every line before it ships.</p>
     </article>
 
-    <article class="card hobby hobby-yap">
+    <article class="card hobby hobby-yap" id="hobby-yap">
       <p class="quote-mark" aria-hidden="true">“</p>
       <h3 class="h3-card">Yapping</h3>
       <p>I think out loud. It makes me good at standups, demos and explaining backends to non-backend people — and it's how I led our thesis team from kickoff to defense.</p>
     </article>
 
-    <article class="card hobby hobby-note">
+    <article class="card hobby hobby-note" id="hobby-note">
       <span class="tape" aria-hidden="true"></span>
       <h3 class="h3-hand">Brainstorming</h3>
       <p>Whiteboards, sticky notes and "okay, but what if—". The messy first hour of a project is my favourite hour.</p>
       <p class="hand-flow" aria-hidden="true">idea → sketch → schema → ship</p>
     </article>
 
-    <article class="card hobby hobby-db">
+    <article class="card hobby hobby-db" id="hobby-db">
       <table class="mini-table" aria-label="Things I love about databases">
         <thead><tr><th>thing</th><th>feeling</th></tr></thead>
         <tbody>
@@ -467,7 +467,15 @@
       <p>The part of the stack I'd talk about all day. Ask me about MySQL transactions at your own risk.</p>
     </article>
   </div>
-  <p class="swipe-hint mobile-only" aria-hidden="true">swipe for more →</p>
+  <div class="carousel-ui mobile-only">
+    <p class="swipe-hint" id="swipeHint" aria-hidden="true">swipe for more →</p>
+    <div class="pager" id="hobbyPager" role="group" aria-label="Hobby cards">
+      <button type="button" data-card="vibe" aria-label="Vibecoding card" aria-current="true"><span></span></button>
+      <button type="button" data-card="yap" aria-label="Yapping card"><span></span></button>
+      <button type="button" data-card="note" aria-label="Brainstorming card"><span></span></button>
+      <button type="button" data-card="db" aria-label="Databases card"><span></span></button>
+    </div>
+  </div>
 
   <div class="edu">
     <p class="label">Education</p>
@@ -506,13 +514,13 @@
             <li class="more"><span class="dot" aria-hidden="true"></span><span>Stock-checked approvals and order-to-production workflows with MySQL transactions and row-level locking.</span></li>
             <li class="more"><span class="dot" aria-hidden="true"></span><span>Hardened auth and sessions with single-session locking and audit-log protections.</span></li>
           </ul>
-          <button type="button" class="more-btn mobile-only" aria-expanded="false" aria-controls="builtList" data-more="Show 2 more" data-less="Show less">Show 2 more</button>
+          <button type="button" class="more-btn mobile-only" aria-expanded="false" aria-controls="builtList" data-more="Show {n} more" data-less="Show less">Show 2 more</button>
         </div>
       </div>
 
       <div class="featured-col featured-col-b">
         <div class="card card-pad stat">
-          <p class="stat-num">880+</p>
+          <p class="stat-num" id="testCount" data-count="880" data-suffix="+">880+</p>
           <p class="stat-text">backend tests with Vitest and Supertest — most of them mine.</p>
         </div>
         <figure class="flow">
@@ -527,7 +535,7 @@
     </div>
   </article>
 
-  <div class="proj-grid">
+  <div class="proj-grid proj-grid-single">
     <article class="card card-pad proj" aria-labelledby="portfolio-h">
       <p class="label">Project 02</p>
       <h3 id="portfolio-h" class="h3-proj2">This portfolio</h3>
@@ -538,10 +546,6 @@
         <li>mobile-first</li>
       </ul>
       <p class="hand-cta">you're looking at it ↑</p>
-    </article>
-    <article class="card-pad proj-slot" aria-label="Next project slot">
-      <p class="label">Project 03</p>
-      <p class="slot-text">[ Your next build goes here — e.g. what Team JDK made at the DICT Hackathon, or a SQL project from DataCamp ]</p>
     </article>
   </div>
 </section>
@@ -561,7 +565,7 @@
         <tr><th scope="row" class="accent">learning_now</th><td>SQL for data engineering — two DataCamp tracks</td></tr>
       </tbody>
     </table>
-    <p class="results-foot">6 rows returned · and counting</p>
+    <p class="results-foot"><span id="rowCount">6</span> rows returned · and counting</p>
   </div>
   <dl class="results-m mobile-only">
     <div><dt>backend</dt><dd>Node.js, Express, MySQL, REST APIs, JWT auth, role-based access, rate limiting</dd></div>
@@ -625,7 +629,7 @@
     <li class="yap more"><span class="avatar" aria-hidden="true">JK</span><div class="yap-bubble"><p class="yap-text">STI College Lucena Hackathon.</p><p class="yap-date">Feb 2026</p></div></li>
     <li class="yap more"><span class="avatar" aria-hidden="true">JK</span><div class="yap-bubble"><p class="yap-text">Joined STI Shiba Esports.</p><p class="yap-date">2026</p></div></li>
   </ol>
-  <button type="button" class="more-btn more-btn-log mobile-only" aria-expanded="false" aria-controls="logList" data-more="Show 2 older" data-less="Show less">Show 2 older</button>
+  <button type="button" class="more-btn more-btn-log mobile-only" aria-expanded="false" aria-controls="logList" data-more="Show {n} older" data-less="Show less">Show 2 older</button>
 </section>
 
 <section id="contact" aria-labelledby="contact-h" tabindex="-1">
