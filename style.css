@@ -125,6 +125,7 @@ section:focus, section:focus-visible { outline: none; }
   font: 13px var(--f-mono); text-decoration: none;
   transition: background-color 200ms ease, color 200ms ease;
 }
+.sql-nav .comma { margin-left: -6px; }
 .sql-nav a:hover { background: rgba(61, 220, 151, 0.1); }
 .sql-nav a.is-active { background: var(--accent); color: var(--bg); }
 
@@ -392,7 +393,7 @@ section {
 .mini-table td:first-child { color: var(--text-soft); }
 .mini-table tr:last-child td { border-bottom: 0; }
 
-.swipe-hint { margin: 10px 0 0; font-family: var(--f-mono); font-size: 11px; color: var(--dim); }
+.swipe-hint { margin: 10px 0 0; font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
 
 .edu {
   margin-top: 20px; padding: 22px 28px; border-radius: 18px;
@@ -577,6 +578,16 @@ section {
 
 /* mobile tab bar */
 .tabbar { display: none; }
+
+/* ---------- narrow desktop: the full SQL query no longer fits the bar ---------- */
+
+@media (min-width: 760px) and (max-width: 1139.98px) {
+  .topbar { padding: 0 20px; }
+  .sql-pre, .sql-post { display: none; }
+  .sql-nav { gap: 4px; }
+  .sql-nav a { padding: 0 7px; }
+  .sql-nav .comma { margin-left: -4px; }
+}
 
 /* ---------- 2-column hobby grid under 1240px ---------- */
 
