@@ -452,13 +452,17 @@
     card.addEventListener('animationend', function () { card.classList.remove('is-flash'); });
   });
 
-  /* ---------- mini Kenn: leans toward a nearby cursor and talks to visitors ----------
-     Mouse: he wakes when the cursor comes within NEAR_PX of the room, leans toward it
-     and says a line every few seconds; he says bye when it leaves.
-     Touch: he greets once after the intro; tapping him gets the next line. */
+  /* ---------- mini Kenn: greets visitors, talks to them, leans toward the cursor ----------
+     Whenever a visitor is in the room view (the intro at least GREET_AT_P along, and the
+     room not yet scrolled BACK_TO_WORK_AT of a screen away), he greets them (again, on
+     every return), holds his waving posture and keeps talking: a new line every
+     LINE_EVERY_MS. When they scroll on, he says bye and goes back to vibecoding.
+     With a mouse he also leans toward a cursor within NEAR_PX of the room.
+     Tapping him (or Tab + Enter) gets the next line right away. */
 
+  var KENN_GREETING = 'oh hey! welcome to my room.';
+  var KENN_WELCOME_BACK = 'oh, welcome back!';
   var KENN_LINES = [
-    'oh hey! welcome to my room.',
     "I'm Kenn. vibecoding, as usual.",
     'psst, my projects are just below ↓',
     "I'm looking for an OJT in web, backend or data.",
@@ -468,8 +472,11 @@
     'my résumé is up in the corner ↗'
   ];
   var KENN_BYE = 'okay, back to my schema…';
-  var NEAR_PX = 140;            // how close the cursor must get to the room
-  var LINE_EVERY_MS = 4500;     // a new line this often while the cursor stays near
+  var GREET_AT_P = 0.5;         // the room view starts once the intro is this far along
+  var BACK_TO_WORK_AT = 0.36;   // ...and ends once the room has scrolled this share of a screen away
+  var REENTER_AT = 0.28;        // coming back up, he greets again once the room is back to here
+  var LINE_EVERY_MS = 4500;     // a new line this often while the visitor is in the room view
+  var NEAR_PX = 140;            // how close the cursor must get to the room for him to lean
   var HEAD = { x: 141.6, y: 219.9 };  // his head, in the room SVG's units
 
   var kenn = {
@@ -480,36 +487,25 @@
   var hasMouse = false;
   try { hasMouse = window.matchMedia('(hover: hover) and (pointer: fine)').matches; } catch (e) {}
 
-  var lineIdx = 0, kennNear = false, kennOn = false, sayT = 0, hideT = 0, nextT = 0, greeted = false, saidAt = 0;
-  var pointer = null, pointerRaf = 0, look = null;  // look: lean toward the cursor, or null
+  var lineIdx = 0, kennOn = false, sayT = 0, hideT = 0, chatT = 0, saidAt = 0;
+  var inRoom = false, visits = 0;
+  var kennNear = false, pointer = null, pointerRaf = 0, look = null;  // look: lean toward the cursor, or null
 
-  // Read the scroll position directly (S.pTarget only updates on the next animation frame).
-  // Is the hero (room) in view with the intro at least minP along? Reads the scroll
-  // position directly (S.pTarget only updates on the next animation frame).
-  function inHero(minP) {
-    var top = scrollTop();
-    var p = S.introDist ? top / S.introDist : 1;
-    return p >= minP && top < S.introDist + S.H * 0.5;
-  }
-  function heroLive() { return inHero(0.98); }
-  function pastHero(share) { return scrollTop() >= S.introDist + S.H * share; }
+  // Where is the visitor? Reads the scroll position directly (S.pTarget lags a frame).
+  function introP() { return S.introDist ? scrollTop() / S.introDist : 1; }
+  function roomAway() { return (scrollTop() - S.introDist) / S.H; }  // share of a screen scrolled past the intro
+  function heroLive() { return introP() >= 0.98 && roomAway() < 0.5; }
 
-  // Greeting posture: he greets once the room is in view and then keeps his waving
-  // posture, wherever the cursor is, until the room has scrolled BACK_TO_WORK_AT of a
-  // screen height past the end of the intro (the same moment on every screen size,
-  // ~21-23% of the page on desktop); after that he's back to vibecoding for the visit.
-  var GREET_AT_P = 0.5;         // greet once the intro is this far along (room mostly faded in)
-  var BACK_TO_WORK_AT = 0.36;   // share of a screen the room scrolls away before he goes back to work
-  var greetPhase = 'before';    // 'before' -> 'waving' -> 'done'
-
-  function say(line, holdMs) {
+  // announce: also tell screen readers (greetings and lines asked for by tapping him,
+  // but not every automatic line, which would be tiring to listen to).
+  function say(line, holdMs, announce) {
     if (!kenn.talk) return;
     clearTimeout(hideT); clearInterval(sayT);
     kennOn = true;
     saidAt = Date.now();
     el.room.classList.add('is-talking');
     kenn.talk.classList.add('is-on');
-    kenn.live.textContent = line;
+    if (announce) kenn.live.textContent = line;
     updatePose();
     if (reduced) { kenn.said.textContent = line; kenn.rest.textContent = ''; }
     else {
@@ -541,6 +537,10 @@
     updatePose();
   }
   function nextLine() { var l = KENN_LINES[lineIdx % KENN_LINES.length]; lineIdx += 1; return l; }
+  function chatter() {
+    clearInterval(chatT);
+    chatT = setInterval(function () { if (!doc.hidden) say(nextLine()); }, LINE_EVERY_MS);
+  }
 
   function hop() {
     if (reduced || !kenn.hop) return;
@@ -577,39 +577,55 @@
     updatePose();
   }
 
-  // He turns to the visitor and waves (swaps to the matched "waving" render) for a moment.
+  // Waving posture (the matched "waving" render): held while the visitor is in the room
+  // view; outside it, a tap gives a brief wave.
   var waveT = 0;
-  function wave(ms) {
-    if (!el.room || greetPhase === 'waving') return;  // already holding the greeting posture
+  function setWaving(on) {
     clearTimeout(waveT);
-    el.room.classList.add('is-waving');
-    waveT = setTimeout(function () { el.room.classList.remove('is-waving'); }, ms || 2000);
+    if (el.room) el.room.classList.toggle('is-waving', on);
   }
-  function stopWave() {
-    if (greetPhase === 'waving') return;
-    clearTimeout(waveT); if (el.room) el.room.classList.remove('is-waving');
+  function briefWave(ms) {
+    if (inRoom || !el.room) return;
+    setWaving(true);
+    waveT = setTimeout(function () { el.room.classList.remove('is-waving'); }, ms);
   }
 
-  function setNear(v, quiet) {
-    if (v === kennNear) return;
-    kennNear = v;
-    clearInterval(nextT);
-    if (v) {
-      wave(2000);
-      say(nextLine());
-      nextT = setInterval(function () { say(nextLine()); }, LINE_EVERY_MS);
-    } else {
-      look = null;
-      if (quiet) { hush(); stopWave(); }
-      else if (kennOn) { wave(1400); say(KENN_BYE, 1600); }
-      updatePose();
+  function enterRoom() {
+    inRoom = true;
+    setWaving(true);
+    hop();
+    say(visits ? KENN_WELCOME_BACK : KENN_GREETING, 0, true);
+    visits += 1;
+    chatter();
+  }
+  function leaveRoom(downward) {
+    inRoom = false;
+    clearInterval(chatT);
+    setWaving(false);
+    if (downward) say(KENN_BYE, 1800); else hush();
+  }
+  var roomRaf = 0;
+  function roomCheck() {
+    roomRaf = 0;
+    var p = introP(), away = roomAway();
+    if (!inRoom) {
+      if (p >= GREET_AT_P && away < REENTER_AT) enterRoom();
+    } else if (p < GREET_AT_P - 0.1) {
+      leaveRoom(false);
+    } else if (away >= BACK_TO_WORK_AT) {
+      leaveRoom(true);
     }
   }
 
+  function setNear(v) {
+    if (v === kennNear) return;
+    kennNear = v;
+    if (!v) { look = null; updatePose(); }
+  }
   function pointerUpdate() {
     pointerRaf = 0;
     if (!kenn.fx || !el.room) return;
-    if (!pointer || !heroLive() || doc.hidden) { setNear(false, !heroLive()); return; }
+    if (!pointer || !heroLive() || doc.hidden) { setNear(false); return; }
     var r = el.room.getBoundingClientRect();
     var dx = Math.max(r.left - pointer.x, 0, pointer.x - r.right);
     var dy = Math.max(r.top - pointer.y, 0, pointer.y - r.bottom);
@@ -636,45 +652,18 @@
     }
     if (kenn.hit) {
       kenn.hit.addEventListener('click', function () {
-        if (hasMouse) pointerUpdate();  // the cursor may have only just arrived: greet first
         hop();
-        wave(1600);
+        briefWave(1600);
         if (kennOn && Date.now() - saidAt < 1000) return;  // he just started a line: don't cut it off
-        say(nextLine(), kennNear ? 0 : 4200);
-        if (kennNear) {
-          clearInterval(nextT);
-          nextT = setInterval(function () { say(nextLine()); }, LINE_EVERY_MS);
-        }
+        say(nextLine(), inRoom ? 0 : 4200, true);
+        if (inRoom) chatter();  // restart the rhythm from this line
       });
     }
-    // Greet every visitor once per visit, as soon as the room is in view (any device), then
-    // hold the greeting posture until the room has scrolled BACK_TO_WORK_AT of a screen away.
-    // If the cursor is already near him, his cursor greeting counts and he doesn't repeat it.
-    var greetRaf = 0;
-    var checkGreet = function () {
-      greetRaf = 0;
-      if (greetPhase === 'waving' && pastHero(BACK_TO_WORK_AT)) {
-        greetPhase = 'done';
-        clearTimeout(waveT);
-        el.room.classList.remove('is-waving');
-      }
-      if (!inHero(GREET_AT_P)) { if (kennOn && !kennNear) hush(); return; }
-      if (greeted) return;
-      greeted = true;
-      greetPhase = 'waving';
-      clearTimeout(waveT);
-      el.room.classList.add('is-waving');
-      setTimeout(function () {
-        if (!inHero(GREET_AT_P) || kennNear || kennOn) return;
-        hop();
-        say(nextLine(), 4200);
-      }, 300);
-    };
     window.addEventListener('scroll', function () {
-      if (!greetRaf) greetRaf = window.requestAnimationFrame(checkGreet);
+      if (!roomRaf) roomRaf = window.requestAnimationFrame(roomCheck);
     }, { passive: true });
-    setTimeout(checkGreet, 1500);  // e.g. reduced motion, or a reload that lands on the hero
-    doc.addEventListener('visibilitychange', function () { if (doc.hidden) setNear(false, true); });
+    setTimeout(roomCheck, 1500);  // e.g. reduced motion, or a reload that lands on the room
+    doc.addEventListener('visibilitychange', function () { if (doc.hidden) setNear(false); });
     if (!reduced) idleLoop();
   }
 
