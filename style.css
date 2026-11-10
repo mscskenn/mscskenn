@@ -281,10 +281,13 @@ section:focus, section:focus-visible { outline: none; }
 .room .kenn-hop.is-hopping { animation: kenn-hop 420ms cubic-bezier(0.3, 0.7, 0.3, 1); }
 @keyframes kenn-hop { 0%, 100% { transform: none; } 40% { transform: translateY(-5px); } }
 .room.is-talking .murmur { visibility: hidden; }
-/* His head is a second copy of the cut-out, clipped to the head and turned around a
-   point just under his chin; the body copy has the head masked out, overlapping the
-   head copy only along the neck so no seam opens when he turns (max ~6°). */
-.room .kenn-head { transform-box: view-box; transform-origin: 139px 237.9px; }
+/* Two matched renders of him: working, and waving at the visitor. The wave fades in on
+   top; the working one hides only once the wave is fully shown (and shows again at
+   once when the wave goes), so his body never turns see-through mid-swap. */
+.room .kenn-pose-wave { opacity: 0; transition: opacity 160ms ease; }
+.room.is-waving .kenn-pose-wave { opacity: 1; }
+.room .kenn-pose-work { transition: visibility 0s; }
+.room.is-waving .kenn-pose-work { visibility: hidden; transition: visibility 0s linear 160ms; }
 /* Idle breathing, from the seat. */
 .room .kenn-breathe {
   transform-box: view-box; transform-origin: 136.4px 301.3px;

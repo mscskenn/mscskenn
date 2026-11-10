@@ -473,7 +473,7 @@
   var HEAD = { x: 141.6, y: 219.9 };  // his head, in the room SVG's units
 
   var kenn = {
-    fig: byId('kennFig'), head: byId('kennHead'), hop: byId('kennHop'), talk: byId('kennTalk'),
+    fig: byId('kennFig'), hop: byId('kennHop'), talk: byId('kennTalk'),
     said: byId('kennSaid'), rest: byId('kennRest'), live: byId('kennLive'), hit: byId('kennHit'),
     fx: doc.querySelector('#room .room-fx')
   };
@@ -481,9 +481,14 @@
   try { hasMouse = window.matchMedia('(hover: hover) and (pointer: fine)').matches; } catch (e) {}
 
   var lineIdx = 0, kennNear = false, kennOn = false, sayT = 0, hideT = 0, nextT = 0, greeted = false, saidAt = 0;
-  var pointer = null, pointerRaf = 0, look = null;
+  var pointer = null, pointerRaf = 0, look = null;  // look: lean toward the cursor, or null
 
-  function heroLive() { return S.pTarget >= 0.98 && scrollTop() < S.introDist + S.H * 0.5; }
+  // Read the scroll position directly (S.pTarget only updates on the next animation frame).
+  function heroLive() {
+    var top = scrollTop();
+    var p = S.introDist ? top / S.introDist : 1;
+    return p >= 0.98 && top < S.introDist + S.H * 0.5;
+  }
 
   function say(line, holdMs) {
     if (!kenn.talk) return;
@@ -531,58 +536,57 @@
   }
   if (kenn.hop) kenn.hop.addEventListener('animationend', function () { kenn.hop.classList.remove('is-hopping'); });
 
-  /* His pose: body lean (pivots at the seat) plus a head turn (tilt + small shift,
-     pivoting under the chin). Values ease toward a target picked by what's going on:
-     looking at a nearby cursor > facing the visitor while talking > idle glances. */
-  var pose = { lean: 0, rot: 0, x: 0, y: 0 }, poseTarget = { lean: 0, rot: 0, x: 0, y: 0 };
-  var poseRaf = 0, poseLast = 0, idlePose = null, idleT = 0;
-  var POSE_FACE_VISITOR = { lean: 0.2, rot: 4, x: 0.7, y: -0.5 };
-  var IDLE_GLANCES = [
-    { lean: 0, rot: 0, x: 0, y: 0 },              // back to typing
-    { lean: -0.08, rot: -2.5, x: -0.4, y: 0.4 },  // at the monitor
-    { lean: 0.05, rot: 1.5, x: 0.2, y: -0.6 },    // up at the whiteboards
-    { lean: 0.12, rot: 3, x: 0.5, y: -0.2 }       // a quick look at the visitor
-  ];
+  /* His pose: a body lean that pivots at the seat, easing toward a target picked by
+     what's going on: a nearby cursor > the visitor while he talks > small idle sways. */
+  var pose = 0, poseTarget = 0, poseRaf = 0, poseLast = 0, idlePose = 0, idleT = 0;
+  var LEAN_TO_VISITOR = 0.2;
+  var IDLE_SWAYS = [0, -0.08, 0.05, 0.12];
 
   function poseTick(ts) {
     var dt = poseLast ? Math.min(64, ts - poseLast) : 16;
     poseLast = ts;
-    var kb = 1 - Math.exp(-dt / 170), kh = 1 - Math.exp(-dt / 120), done = true;
-    ['lean', 'rot', 'x', 'y'].forEach(function (k) {
-      pose[k] += (poseTarget[k] - pose[k]) * (k === 'lean' ? kb : kh);
-      if (Math.abs(poseTarget[k] - pose[k]) < 0.005) pose[k] = poseTarget[k]; else done = false;
-    });
-    css(kenn.fig, 'transform', 'translateX(' + (pose.lean * 4).toFixed(2) + 'px) rotate(' + (pose.lean * 7).toFixed(2) + 'deg)');
-    css(kenn.head, 'transform', 'translate(' + pose.x.toFixed(2) + 'px, ' + pose.y.toFixed(2) + 'px) rotate(' + pose.rot.toFixed(2) + 'deg)');
-    if (!done) poseRaf = window.requestAnimationFrame(poseTick);
+    pose += (poseTarget - pose) * (1 - Math.exp(-dt / 170));
+    if (Math.abs(poseTarget - pose) < 0.004) pose = poseTarget;
+    css(kenn.fig, 'transform', 'translateX(' + (pose * 4).toFixed(2) + 'px) rotate(' + (pose * 7).toFixed(2) + 'deg)');
+    if (pose !== poseTarget) poseRaf = window.requestAnimationFrame(poseTick);
     else { poseRaf = 0; poseLast = 0; }
   }
   function updatePose() {
     if (reduced || !kenn.fig) return;
-    var t = look || (kennOn ? POSE_FACE_VISITOR : (idlePose || IDLE_GLANCES[0]));
-    poseTarget = { lean: t.lean, rot: t.rot, x: t.x, y: t.y };
+    poseTarget = look !== null ? look : (kennOn ? LEAN_TO_VISITOR : idlePose);
     if (!poseRaf) poseRaf = window.requestAnimationFrame(poseTick);
   }
-  // Every few seconds, when nobody is near and he isn't talking, he glances somewhere.
   function idleLoop() {
     clearTimeout(idleT);
     idleT = setTimeout(idleLoop, 2600 + Math.random() * 3000);
-    if (doc.hidden || look || kennOn || scrollTop() > S.introDist + S.H) return;
-    var next = IDLE_GLANCES[Math.floor(Math.random() * IDLE_GLANCES.length)];
-    idlePose = next === idlePose ? IDLE_GLANCES[0] : next;
+    if (doc.hidden || look !== null || kennOn || scrollTop() > S.introDist + S.H) return;
+    var next = IDLE_SWAYS[Math.floor(Math.random() * IDLE_SWAYS.length)];
+    idlePose = next === idlePose ? 0 : next;
     updatePose();
   }
+
+  // He turns to the visitor and waves (swaps to the matched "waving" render) for a moment.
+  var waveT = 0;
+  function wave(ms) {
+    if (!el.room) return;
+    clearTimeout(waveT);
+    el.room.classList.add('is-waving');
+    waveT = setTimeout(function () { el.room.classList.remove('is-waving'); }, ms || 2000);
+  }
+  function stopWave() { clearTimeout(waveT); if (el.room) el.room.classList.remove('is-waving'); }
 
   function setNear(v, quiet) {
     if (v === kennNear) return;
     kennNear = v;
     clearInterval(nextT);
     if (v) {
+      wave(2000);
       say(nextLine());
       nextT = setInterval(function () { say(nextLine()); }, LINE_EVERY_MS);
     } else {
       look = null;
-      if (quiet) hush(); else if (kennOn) say(KENN_BYE, 1600);
+      if (quiet) { hush(); stopWave(); }
+      else if (kennOn) { wave(1400); say(KENN_BYE, 1600); }
       updatePose();
     }
   }
@@ -599,10 +603,8 @@
     if (!near) return;
     var m = kenn.fx.getScreenCTM();
     var hx = m ? m.a * HEAD.x + m.e : r.left + r.width * 0.27;
-    var hy = m ? m.d * HEAD.y + m.f : r.top + r.height * 0.44;
     var nx = Math.max(-1, Math.min(1, (pointer.x - hx) / (r.width * 0.45)));
-    var ny = Math.max(-1, Math.min(1, (pointer.y - hy) / (r.height * 0.45)));
-    look = { lean: nx * 0.9, rot: nx * 5, x: nx * 0.9, y: ny * 0.9 };
+    look = nx * 0.9;
     updatePose();
   }
   function schedulePointer() { if (!pointerRaf) pointerRaf = window.requestAnimationFrame(pointerUpdate); }
@@ -621,6 +623,7 @@
       kenn.hit.addEventListener('click', function () {
         if (hasMouse) pointerUpdate();  // the cursor may have only just arrived: greet first
         hop();
+        wave(1600);
         if (kennOn && Date.now() - saidAt < 1000) return;  // he just started a line: don't cut it off
         say(nextLine(), kennNear ? 0 : 4200);
         if (kennNear) {
@@ -629,16 +632,20 @@
         }
       });
     }
-    // Touch devices have no cursor: greet once when the hero first settles.
-    if (!hasMouse) {
-      var checkGreet = function () {
-        if (greeted || !heroLive()) { if (kennOn && !heroLive()) hush(); return; }
-        greeted = true;
-        setTimeout(function () { if (heroLive()) { hop(); say(nextLine(), 4200); } }, 700);
-      };
-      window.addEventListener('scroll', checkGreet, { passive: true });
-      setTimeout(checkGreet, 1500);  // e.g. reduced motion, where the hero is settled on load
-    }
+    // Greet every visitor once per visit, as soon as the intro has settled (any device).
+    // If the cursor is already near him, his cursor greeting counts and he doesn't repeat it.
+    var checkGreet = function () {
+      if (greeted || !heroLive()) { if (!hasMouse && kennOn && !heroLive()) { hush(); stopWave(); } return; }
+      greeted = true;
+      setTimeout(function () {
+        if (!heroLive() || kennNear || kennOn) return;
+        hop();
+        wave(2400);
+        say(nextLine(), 4200);
+      }, 700);
+    };
+    window.addEventListener('scroll', checkGreet, { passive: true });
+    setTimeout(checkGreet, 1500);  // e.g. reduced motion, or a reload that lands on the hero
     doc.addEventListener('visibilitychange', function () { if (doc.hidden) setNear(false, true); });
     if (!reduced) idleLoop();
   }
