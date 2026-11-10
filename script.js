@@ -492,16 +492,14 @@
     return p >= minP && top < S.introDist + S.H * 0.5;
   }
   function heroLive() { return inHero(0.98); }
-  function pageProgress() {
-    var max = root.scrollHeight - window.innerHeight;
-    return max > 0 ? scrollTop() / max : 0;
-  }
+  function pastHero(share) { return scrollTop() >= S.introDist + S.H * share; }
 
   // Greeting posture: he greets once the room is in view and then keeps his waving
-  // posture, wherever the cursor is, until the visitor has scrolled BACK_TO_WORK_AT of
-  // the page; after that he's back to vibecoding for the rest of the visit.
+  // posture, wherever the cursor is, until the room has scrolled BACK_TO_WORK_AT of a
+  // screen height past the end of the intro (the same moment on every screen size,
+  // ~21-23% of the page on desktop); after that he's back to vibecoding for the visit.
   var GREET_AT_P = 0.5;         // greet once the intro is this far along (room mostly faded in)
-  var BACK_TO_WORK_AT = 0.75;   // share of the page scrolled before he goes back to work
+  var BACK_TO_WORK_AT = 0.36;   // share of a screen the room scrolls away before he goes back to work
   var greetPhase = 'before';    // 'before' -> 'waving' -> 'done'
 
   function say(line, holdMs) {
@@ -650,12 +648,12 @@
       });
     }
     // Greet every visitor once per visit, as soon as the room is in view (any device), then
-    // hold the greeting posture until BACK_TO_WORK_AT of the page has been scrolled.
+    // hold the greeting posture until the room has scrolled BACK_TO_WORK_AT of a screen away.
     // If the cursor is already near him, his cursor greeting counts and he doesn't repeat it.
     var greetRaf = 0;
     var checkGreet = function () {
       greetRaf = 0;
-      if (greetPhase === 'waving' && pageProgress() >= BACK_TO_WORK_AT) {
+      if (greetPhase === 'waving' && pastHero(BACK_TO_WORK_AT)) {
         greetPhase = 'done';
         clearTimeout(waveT);
         el.room.classList.remove('is-waving');
