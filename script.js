@@ -484,11 +484,25 @@
   var pointer = null, pointerRaf = 0, look = null;  // look: lean toward the cursor, or null
 
   // Read the scroll position directly (S.pTarget only updates on the next animation frame).
-  function heroLive() {
+  // Is the hero (room) in view with the intro at least minP along? Reads the scroll
+  // position directly (S.pTarget only updates on the next animation frame).
+  function inHero(minP) {
     var top = scrollTop();
     var p = S.introDist ? top / S.introDist : 1;
-    return p >= 0.98 && top < S.introDist + S.H * 0.5;
+    return p >= minP && top < S.introDist + S.H * 0.5;
   }
+  function heroLive() { return inHero(0.98); }
+  function pageProgress() {
+    var max = root.scrollHeight - window.innerHeight;
+    return max > 0 ? scrollTop() / max : 0;
+  }
+
+  // Greeting posture: he greets once the room is in view and then keeps his waving
+  // posture, wherever the cursor is, until the visitor has scrolled BACK_TO_WORK_AT of
+  // the page; after that he's back to vibecoding for the rest of the visit.
+  var GREET_AT_P = 0.5;         // greet once the intro is this far along (room mostly faded in)
+  var BACK_TO_WORK_AT = 0.75;   // share of the page scrolled before he goes back to work
+  var greetPhase = 'before';    // 'before' -> 'waving' -> 'done'
 
   function say(line, holdMs) {
     if (!kenn.talk) return;
@@ -568,12 +582,15 @@
   // He turns to the visitor and waves (swaps to the matched "waving" render) for a moment.
   var waveT = 0;
   function wave(ms) {
-    if (!el.room) return;
+    if (!el.room || greetPhase === 'waving') return;  // already holding the greeting posture
     clearTimeout(waveT);
     el.room.classList.add('is-waving');
     waveT = setTimeout(function () { el.room.classList.remove('is-waving'); }, ms || 2000);
   }
-  function stopWave() { clearTimeout(waveT); if (el.room) el.room.classList.remove('is-waving'); }
+  function stopWave() {
+    if (greetPhase === 'waving') return;
+    clearTimeout(waveT); if (el.room) el.room.classList.remove('is-waving');
+  }
 
   function setNear(v, quiet) {
     if (v === kennNear) return;
@@ -632,19 +649,32 @@
         }
       });
     }
-    // Greet every visitor once per visit, as soon as the intro has settled (any device).
+    // Greet every visitor once per visit, as soon as the room is in view (any device), then
+    // hold the greeting posture until BACK_TO_WORK_AT of the page has been scrolled.
     // If the cursor is already near him, his cursor greeting counts and he doesn't repeat it.
+    var greetRaf = 0;
     var checkGreet = function () {
-      if (greeted || !heroLive()) { if (!hasMouse && kennOn && !heroLive()) { hush(); stopWave(); } return; }
+      greetRaf = 0;
+      if (greetPhase === 'waving' && pageProgress() >= BACK_TO_WORK_AT) {
+        greetPhase = 'done';
+        clearTimeout(waveT);
+        el.room.classList.remove('is-waving');
+      }
+      if (!inHero(GREET_AT_P)) { if (kennOn && !kennNear) hush(); return; }
+      if (greeted) return;
       greeted = true;
+      greetPhase = 'waving';
+      clearTimeout(waveT);
+      el.room.classList.add('is-waving');
       setTimeout(function () {
-        if (!heroLive() || kennNear || kennOn) return;
+        if (!inHero(GREET_AT_P) || kennNear || kennOn) return;
         hop();
-        wave(2400);
         say(nextLine(), 4200);
-      }, 700);
+      }, 300);
     };
-    window.addEventListener('scroll', checkGreet, { passive: true });
+    window.addEventListener('scroll', function () {
+      if (!greetRaf) greetRaf = window.requestAnimationFrame(checkGreet);
+    }, { passive: true });
     setTimeout(checkGreet, 1500);  // e.g. reduced motion, or a reload that lands on the hero
     doc.addEventListener('visibilitychange', function () { if (doc.hidden) setNear(false, true); });
     if (!reduced) idleLoop();
