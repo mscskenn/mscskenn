@@ -67,6 +67,7 @@
     box: null,
     typed: reduced ? TOTAL : 0,
     p: reduced ? 1 : 0,
+    pTarget: reduced ? 1 : 0,
     beat: 0,
     introIn: reduced,
     active: null
@@ -123,6 +124,7 @@
     S.box = { x: nr.left - sr.left, y: nr.top - sr.top, w: nr.width, h: nr.height };
 
     readScroll();
+    S.p = S.pTarget;
     render();
   }
 
@@ -140,15 +142,30 @@
     return a;
   }
 
+  // S.pTarget follows the scroll position exactly; S.p (what the intro renders)
+  // eases toward it, so a notched mouse wheel glides instead of jumping.
+  var EASE_MS = 90;
+  var snapNext = true;
+
   function readScroll() {
     var top = scrollTop();
-    S.p = S.introDist ? clamp(top / S.introDist) : 1;
-    if (S.p > 0.03 && S.typed < TOTAL) finishTyping();
+    S.pTarget = S.introDist ? clamp(top / S.introDist) : 1;
+    if (S.pTarget > 0.03 && S.typed < TOTAL) finishTyping();
     S.active = activeAt(top);
   }
 
-  var raf = 0;
-  function frame() { raf = 0; readScroll(); render(); }
+  var raf = 0, lastFrame = 0;
+  function frame(ts) {
+    raf = 0;
+    readScroll();
+    var dt = lastFrame ? Math.min(64, ts - lastFrame) : 16;
+    lastFrame = ts;
+    var diff = S.pTarget - S.p;
+    if (reduced || snapNext || Math.abs(diff) < 0.0004) { S.p = S.pTarget; snapNext = false; }
+    else S.p += diff * (1 - Math.exp(-dt / EASE_MS));
+    render();
+    if (S.p !== S.pTarget) schedule(); else lastFrame = 0;
+  }
   function schedule() { if (!raf) raf = window.requestAnimationFrame(frame); }
 
   /* ---------- room annotations ----------

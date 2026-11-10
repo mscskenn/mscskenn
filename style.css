@@ -233,6 +233,10 @@ section:focus, section:focus-visible { outline: none; }
 
 /* ---------- room ---------- */
 
+/* Elements the intro fades/moves every scroll frame get their own layers, so
+   scrolling the intro composites instead of repainting. */
+.hero-illus, .lede, .actions, .strip, .topbar, .tabbar, .cue, .cue-url, .skip-intro { will-change: opacity, transform; }
+
 .hero-illus {
   flex: 0 1 48%; min-width: 0; min-height: 0; max-width: 640px; width: 100%;
   align-self: center; display: flex; align-items: center; justify-content: center;
@@ -241,6 +245,11 @@ section:focus, section:focus-visible { outline: none; }
 
 /* lifted from assets/room-demo.html */
 .room svg { display: block; width: 100%; height: 100%; overflow: visible; }
+/* Performance: everything that moves or fades in lives in .room-fx, a second SVG
+   stacked on top of the static drawing with its own compositor layer. The static
+   drawing (with its blur shadows) then isn't re-rasterised on every animation frame.
+   The split was checked pixel-for-pixel against the single SVG. */
+.room .room-fx { position: absolute; inset: 0; pointer-events: none; will-change: transform; }
 /* accent colour hooks */
 .room [data-accent="fill"] { fill: var(--accent); }
 .room [data-accent="stroke"] { stroke: var(--accent); }
