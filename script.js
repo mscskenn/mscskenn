@@ -483,7 +483,12 @@
   var lineIdx = 0, kennNear = false, kennOn = false, sayT = 0, hideT = 0, nextT = 0, greeted = false, saidAt = 0;
   var pointer = null, pointerRaf = 0, look = null;
 
-  function heroLive() { return S.pTarget >= 0.98 && scrollTop() < S.introDist + S.H * 0.5; }
+  // Read the scroll position directly (S.pTarget only updates on the next animation frame).
+  function heroLive() {
+    var top = scrollTop();
+    var p = S.introDist ? top / S.introDist : 1;
+    return p >= 0.98 && top < S.introDist + S.H * 0.5;
+  }
 
   function say(line, holdMs) {
     if (!kenn.talk) return;
@@ -629,16 +634,19 @@
         }
       });
     }
-    // Touch devices have no cursor: greet once when the hero first settles.
-    if (!hasMouse) {
-      var checkGreet = function () {
-        if (greeted || !heroLive()) { if (kennOn && !heroLive()) hush(); return; }
-        greeted = true;
-        setTimeout(function () { if (heroLive()) { hop(); say(nextLine(), 4200); } }, 700);
-      };
-      window.addEventListener('scroll', checkGreet, { passive: true });
-      setTimeout(checkGreet, 1500);  // e.g. reduced motion, where the hero is settled on load
-    }
+    // Greet every visitor once per visit, as soon as the intro has settled (any device).
+    // If the cursor is already near him, his cursor greeting counts and he doesn't repeat it.
+    var checkGreet = function () {
+      if (greeted || !heroLive()) { if (!hasMouse && kennOn && !heroLive()) hush(); return; }
+      greeted = true;
+      setTimeout(function () {
+        if (!heroLive() || kennNear || kennOn) return;
+        hop();
+        say(nextLine(), 4200);
+      }, 700);
+    };
+    window.addEventListener('scroll', checkGreet, { passive: true });
+    setTimeout(checkGreet, 1500);  // e.g. reduced motion, or a reload that lands on the hero
     doc.addEventListener('visibilitychange', function () { if (doc.hidden) setNear(false, true); });
     if (!reduced) idleLoop();
   }
