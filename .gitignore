@@ -4,5 +4,6 @@ docs/
 AGENTS.md
 # Private assets (resume, photo, certificates) come from mscskenn/portfolio-assets at deploy time.
 assets/*
-# The room illustration's cut-out is public and ships with the site.
+# Public assets that ship with the site: the room illustration's cut-outs and the nav photo.
 !assets/room/
+!assets/brand/

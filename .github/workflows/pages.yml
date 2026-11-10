@@ -42,9 +42,8 @@ jobs:
           mkdir _site
           cp index.html credentials.html style.css script.js _site/
           cp -r "$RUNNER_TEMP/assets" _site/assets
-          # Public assets committed to this repo (the room illustration's cut-out).
-          mkdir -p _site/assets/room
-          cp -r assets/room/. _site/assets/room/
+          # Public assets committed to this repo (room cut-outs, nav photo).
+          cp -r assets/. _site/assets/
 
       - uses: actions/configure-pages@v5
 
