@@ -452,6 +452,163 @@
     card.addEventListener('animationend', function () { card.classList.remove('is-flash'); });
   });
 
+  /* ---------- mini Kenn: leans toward a nearby cursor and talks to visitors ----------
+     Mouse: he wakes when the cursor comes within NEAR_PX of the room, leans toward it
+     and says a line every few seconds; he says bye when it leaves.
+     Touch: he greets once after the intro; tapping him gets the next line. */
+
+  var KENN_LINES = [
+    'oh hey! welcome to my room.',
+    "I'm Kenn. vibecoding, as usual.",
+    'psst, my projects are just below ↓',
+    "I'm looking for an OJT in web, backend or data.",
+    'ask me about MySQL transactions. at your own risk.',
+    'the whiteboards are where ideas get messy.',
+    'free aircon: open window + the fan.',
+    'my résumé is up in the corner ↗'
+  ];
+  var KENN_BYE = 'okay, back to my schema…';
+  var NEAR_PX = 140;            // how close the cursor must get to the room
+  var LINE_EVERY_MS = 4500;     // a new line this often while the cursor stays near
+  var HEAD = { x: 141.6, y: 219.9 };  // his head, in the room SVG's units
+
+  var kenn = {
+    fig: byId('kennFig'), hop: byId('kennHop'), talk: byId('kennTalk'),
+    said: byId('kennSaid'), rest: byId('kennRest'), live: byId('kennLive'), hit: byId('kennHit'),
+    fx: doc.querySelector('#room .room-fx')
+  };
+  var hasMouse = false;
+  try { hasMouse = window.matchMedia('(hover: hover) and (pointer: fine)').matches; } catch (e) {}
+
+  var lineIdx = 0, kennNear = false, kennOn = false, sayT = 0, hideT = 0, nextT = 0, greeted = false, saidAt = 0;
+  var lean = 0, leanTarget = 0, leanRaf = 0, leanLast = 0;
+  var pointer = null, pointerRaf = 0;
+
+  function heroLive() { return S.pTarget >= 0.98 && scrollTop() < S.introDist + S.H * 0.5; }
+
+  function say(line, holdMs) {
+    if (!kenn.talk) return;
+    clearTimeout(hideT); clearInterval(sayT);
+    kennOn = true;
+    saidAt = Date.now();
+    el.room.classList.add('is-talking');
+    kenn.talk.classList.add('is-on');
+    kenn.live.textContent = line;
+    if (reduced) { kenn.said.textContent = line; kenn.rest.textContent = ''; }
+    else {
+      // type it out; the untyped rest stays in place (transparent) so the bubble doesn't resize
+      var i = 0;
+      kenn.said.textContent = ''; kenn.rest.textContent = line;
+      sayT = setInterval(function () {
+        i += 1;
+        kenn.said.textContent = line.slice(0, i); kenn.rest.textContent = line.slice(i);
+        if (i >= line.length) clearInterval(sayT);
+      }, 28);
+    }
+    keepOnScreen();
+    if (holdMs) hideT = setTimeout(hush, holdMs);
+  }
+  // On narrow phones the bubble can run past the right edge: nudge it left.
+  function keepOnScreen() {
+    var bub = kenn.talk.firstElementChild;
+    if (!bub) return;
+    bub.style.transform = '';
+    var over = bub.getBoundingClientRect().right - (root.clientWidth - 16);
+    if (over > 0) bub.style.transform = 'translateX(' + (-Math.ceil(over)) + 'px)';
+  }
+  function hush() {
+    clearTimeout(hideT); clearInterval(sayT);
+    kennOn = false;
+    if (kenn.talk) kenn.talk.classList.remove('is-on');
+    el.room.classList.remove('is-talking');
+  }
+  function nextLine() { var l = KENN_LINES[lineIdx % KENN_LINES.length]; lineIdx += 1; return l; }
+
+  function hop() {
+    if (reduced || !kenn.hop) return;
+    kenn.hop.classList.remove('is-hopping'); void kenn.hop.getBoundingClientRect(); kenn.hop.classList.add('is-hopping');
+  }
+  if (kenn.hop) kenn.hop.addEventListener('animationend', function () { kenn.hop.classList.remove('is-hopping'); });
+
+  function leanTick(ts) {
+    var dt = leanLast ? Math.min(64, ts - leanLast) : 16;
+    leanLast = ts;
+    lean += (leanTarget - lean) * (1 - Math.exp(-dt / 140));
+    if (Math.abs(leanTarget - lean) < 0.002) lean = leanTarget;
+    css(kenn.fig, 'transform', 'translateX(' + (lean * 2.5).toFixed(2) + 'px) rotate(' + (lean * 5).toFixed(2) + 'deg)');
+    if (lean !== leanTarget) leanRaf = window.requestAnimationFrame(leanTick);
+    else { leanRaf = 0; leanLast = 0; }
+  }
+  function setLean(t) {
+    if (reduced) return;
+    leanTarget = t;
+    if (!leanRaf && lean !== leanTarget) leanRaf = window.requestAnimationFrame(leanTick);
+  }
+
+  function setNear(v, quiet) {
+    if (v === kennNear) return;
+    kennNear = v;
+    clearInterval(nextT);
+    if (v) {
+      say(nextLine());
+      nextT = setInterval(function () { say(nextLine()); }, LINE_EVERY_MS);
+    } else {
+      setLean(0);
+      if (quiet) hush(); else if (kennOn) say(KENN_BYE, 1600);
+    }
+  }
+
+  function pointerUpdate() {
+    pointerRaf = 0;
+    if (!kenn.fx || !el.room) return;
+    if (!pointer || !heroLive() || doc.hidden) { setNear(false, !heroLive()); return; }
+    var r = el.room.getBoundingClientRect();
+    var dx = Math.max(r.left - pointer.x, 0, pointer.x - r.right);
+    var dy = Math.max(r.top - pointer.y, 0, pointer.y - r.bottom);
+    var near = Math.sqrt(dx * dx + dy * dy) <= NEAR_PX;
+    setNear(near);
+    if (!near) return;
+    var m = kenn.fx.getScreenCTM();
+    var hx = m ? m.a * HEAD.x + m.e : r.left + r.width * 0.27;
+    setLean(Math.max(-1, Math.min(1, (pointer.x - hx) / 260)));
+  }
+  function schedulePointer() { if (!pointerRaf) pointerRaf = window.requestAnimationFrame(pointerUpdate); }
+
+  if (kenn.fig) {
+    if (hasMouse) {
+      window.addEventListener('pointermove', function (e) {
+        if (e.pointerType && e.pointerType !== 'mouse') return;
+        pointer = { x: e.clientX, y: e.clientY };
+        schedulePointer();
+      }, { passive: true });
+      doc.documentElement.addEventListener('mouseleave', function () { pointer = null; schedulePointer(); });
+      window.addEventListener('scroll', schedulePointer, { passive: true });
+    }
+    if (kenn.hit) {
+      kenn.hit.addEventListener('click', function () {
+        if (hasMouse) pointerUpdate();  // the cursor may have only just arrived: greet first
+        hop();
+        if (kennOn && Date.now() - saidAt < 1000) return;  // he just started a line: don't cut it off
+        say(nextLine(), kennNear ? 0 : 4200);
+        if (kennNear) {
+          clearInterval(nextT);
+          nextT = setInterval(function () { say(nextLine()); }, LINE_EVERY_MS);
+        }
+      });
+    }
+    // Touch devices have no cursor: greet once when the hero first settles.
+    if (!hasMouse) {
+      var checkGreet = function () {
+        if (greeted || !heroLive()) { if (kennOn && !heroLive()) hush(); return; }
+        greeted = true;
+        setTimeout(function () { if (heroLive()) { hop(); say(nextLine(), 4200); } }, 700);
+      };
+      window.addEventListener('scroll', checkGreet, { passive: true });
+      setTimeout(checkGreet, 1500);  // e.g. reduced motion, where the hero is settled on load
+    }
+    doc.addEventListener('visibilitychange', function () { if (doc.hidden) setNear(false, true); });
+  }
+
   /* ---------- small live touches: chat plays, test count, row count ---------- */
 
   var rowCount = byId('rowCount');

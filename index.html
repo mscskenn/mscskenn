@@ -27,8 +27,8 @@
     try { if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) r.classList.add('reduced'); } catch (e) {}
   })();
 </script>
-<link rel="stylesheet" href="style.css?v=4">
-<script src="script.js?v=4" defer></script>
+<link rel="stylesheet" href="style.css?v=5">
+<script src="script.js?v=5" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#me">Skip to content</a>
@@ -315,7 +315,6 @@
 <path d="M114.2 313.6 L114.2 322 A5.9 3.4 0 0 0 126 322 L126 313.6 A5.9 3.4 0 0 1 114.2 313.6 Z" fill="#B4B9C4"></path>
 <ellipse cx="120.1" cy="313.6" rx="5.9" ry="3.4" fill="#2B1F18"></ellipse>
 <ellipse cx="142.3" cy="286.5" rx="26" ry="7" fill="#000" opacity="0.35" filter="url(#k6Blur2)"></ellipse>
-<image href="assets/room/kenn-mini.webp" x="79.8" y="204" width="85.8" height="105.8" preserveAspectRatio="none"></image>
 <path d="M155.2 370.1 L175.7 382 L142.2 401.4 L121.7 389.5 Z" fill="#000" opacity="0.5" filter="url(#k6Blur)"></path>
 <path d="M155.2 334.8 L169.5 343 L142.2 358.8 L127.9 350.5 Z" fill="#1E2128"></path>
 <path d="M127.9 350.5 L142.2 358.8 L142.2 397.8 L127.9 389.5 Z" fill="#181A20"></path>
@@ -369,10 +368,13 @@
 <path d="M369.8 182.6 c -20 18, -40 -6, -62 14 s -40 -4, -64 16" fill="none" stroke="#9FB4D9" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="7 9" class="breeze" opacity="0.3"></path>
 </g>
 <path d="M78 247.7 L78 285.2" stroke="#7FB6FF" stroke-width="1.6" stroke-linecap="round" opacity="0.55" data-reveal="screen"></path>
+<g class="kenn" id="kennFig"><g class="kenn-hop" id="kennHop">
+<image href="assets/room/kenn-mini.webp" x="79.8" y="204" width="85.8" height="105.8" preserveAspectRatio="none"></image>
 <g fill="none" stroke="#9FB4D9" stroke-width="1.1" stroke-linecap="round" transform="translate(128.8 237.8)">
 <path d="M0 -2.6 q -2 2.6 0 5.2" class="murmur-arc-a"></path>
 <path d="M-3 -4.4 q -3.2 4.4 0 8.8" class="murmur-arc-b"></path>
 </g>
+</g></g>
 <g data-reveal="screen" font-family="DM Mono, monospace" font-size="7" text-anchor="middle" pointer-events="none">
 <g class="murmur" data-i="0"><text x="0" y="0" fill="#B4B9C4">what if…</text></g>
 <g class="murmur" data-i="1"><text x="0" y="0" fill="#3DDC97" data-accent="fill">JOIN?</text></g>
@@ -386,6 +388,9 @@
 </g>
 <path d="M171.4 317.8 c -10 -4, -18 6, -30 2" fill="none" stroke="#9FB4D9" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="5 6" opacity="0.45" class="breeze"></path>
 </svg>
+        <div class="kenn-talk" id="kennTalk" aria-hidden="true"><p class="kenn-bubble"><span id="kennSaid"></span><span class="kenn-rest" id="kennRest"></span></p></div>
+        <p class="sr-only" id="kennLive" aria-live="polite"></p>
+        <button type="button" class="kenn-hit" id="kennHit" aria-label="Say hi to mini Kenn"></button>
         <div class="room-notes" id="roomNotes" aria-hidden="true">
           <div class="note note-tl">ideas live here<br><span class="note-sub">(whiteboards + my riding helmet)</span>
             <svg width="70" height="40" viewBox="0 0 70 40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M4 4 C 24 6, 46 14, 62 34"></path><path pathLength="1" d="M54 33 L62 34 L62 26"></path></svg>

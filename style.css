@@ -268,9 +268,47 @@ section:focus, section:focus-visible { outline: none; }
 @media (prefers-reduced-motion: reduce) {
   .room * { animation: none !important; }
   .room .murmur { opacity: 0.8; }
+  .room .kenn-hop.is-hopping { animation: none; }
 }
 /* pause the loops when the tab is hidden or the room is off screen */
 .room.is-paused * { animation-play-state: paused !important; }
+
+/* ---------- mini Kenn: leans toward the cursor and talks to visitors ---------- */
+
+/* He pivots from his seat. Coordinates are in the SVG's units (viewBox 0 0 520 500). */
+.room .kenn { transform-box: view-box; transform-origin: 136.4px 301.3px; }
+.room .kenn-hop { transform-box: view-box; transform-origin: 136.4px 301.3px; }
+.room .kenn-hop.is-hopping { animation: kenn-hop 420ms cubic-bezier(0.3, 0.7, 0.3, 1); }
+@keyframes kenn-hop { 0%, 100% { transform: none; } 40% { transform: translateY(-5px); } }
+.room.is-talking .murmur { visibility: hidden; }
+
+/* Speech bubble: its tail sits just above his head (x 150, y 203 in SVG units). */
+.kenn-talk {
+  position: absolute; left: 28.8%; bottom: 59.4%; z-index: 3;
+  width: max-content; max-width: 240px;
+  pointer-events: none;
+  opacity: 0; transform: translateY(6px) scale(0.96); transform-origin: 0 100%;
+  transition: opacity 220ms ease, transform 280ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  will-change: opacity, transform;
+}
+.kenn-talk.is-on { opacity: 1; transform: none; }
+.kenn-bubble {
+  margin: 0; width: max-content; max-width: 100%;
+  padding: 8px 12px; border-radius: 12px 12px 12px 3px;
+  background: var(--bubble); border: 1px solid var(--line-strong);
+  color: var(--text); font: 12px/1.45 var(--f-mono);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+.kenn-rest { color: transparent; }
+
+/* Invisible tap/click target over him (keyboard: Tab to it, Enter to talk). */
+.kenn-hit {
+  position: absolute; left: 15.3%; top: 40.8%; width: 16.5%; height: 21.2%;
+  min-width: 44px; min-height: 44px; z-index: 2;
+  padding: 0; border: 0; border-radius: 40% 40% 14px 14px;
+  background: transparent; cursor: pointer;
+}
+.kenn-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* hand-written annotations (desktop only) */
 .room-notes {
@@ -659,6 +697,8 @@ section {
   .hero-illus { flex: 1 1 0; }
   .room-box { width: auto; height: 100%; }
   .room-notes { display: none; }
+  .kenn-talk { max-width: 200px; }
+  .kenn-bubble { font-size: 11px; padding: 7px 10px; }
 
   .eyebrow { margin-bottom: 12px; }
   .name { font-size: clamp(28px, 8.5vw, 36px); font-size: round(clamp(28px, 8.5vw, 36px), 1px); }
