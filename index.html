@@ -27,8 +27,8 @@
     try { if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) r.classList.add('reduced'); } catch (e) {}
   })();
 </script>
-<link rel="stylesheet" href="style.css?v=7">
-<script src="script.js?v=7" defer></script>
+<link rel="stylesheet" href="style.css?v=8">
+<script src="script.js?v=8" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#me">Skip to content</a>
@@ -338,10 +338,6 @@
 <path d="M190.8 335.5 L192.8 336.7 L194.9 335.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1" stroke-linejoin="round"></path>
 </svg>
 <svg class="room-fx" viewBox="0 0 520 500" aria-hidden="true" focusable="false">
-<defs>
-<clipPath id="kennHeadClip" clipPathUnits="userSpaceOnUse"><path d="M124.4 208.2 L129.6 201.9 L150.2 201.9 L158.7 209.3 L157.9 222.0 L153.6 230.4 L149.3 236.8 L145.9 241.6 L137.7 241.6 L136.9 238.9 L135.6 237.0 L133.4 235.7 L131.7 234.2 L130.7 232.6 L130.0 225.2 L125.7 220.9 Z"></path></clipPath>
-<mask id="kennBodyMask" maskUnits="userSpaceOnUse" x="70" y="195" width="110" height="125"><rect x="70" y="195" width="110" height="125" fill="#fff"></rect><path d="M124.4 208.2 L129.6 201.9 L150.2 201.9 L158.7 209.3 L157.9 222.0 L153.6 230.4 L151.9 232.6 L131.3 232.6 L130.0 225.2 L125.7 220.9 Z" fill="#000"></path></mask>
-</defs>
 <g data-reveal="board">
 <path d="M241.2 70.9 L186.6 102.4 L186.6 165.4 L241.2 133.9 Z" fill="#3A3F4A"></path>
 <path d="M238.6 75.4 L189.2 103.9 L189.2 160.9 L238.6 132.4 Z" fill="#1C2027"></path>
@@ -374,8 +370,8 @@
 <path d="M78 247.7 L78 285.2" stroke="#7FB6FF" stroke-width="1.6" stroke-linecap="round" opacity="0.55" data-reveal="screen"></path>
 <g class="kenn" id="kennFig"><g class="kenn-hop" id="kennHop">
 <g class="kenn-breathe" id="kennBreathe">
-<image href="assets/room/kenn-mini.webp" x="79.8" y="204" width="85.8" height="105.8" preserveAspectRatio="none" mask="url(#kennBodyMask)"></image>
-<g class="kenn-head" id="kennHead"><image href="assets/room/kenn-mini.webp" x="79.8" y="204" width="85.8" height="105.8" preserveAspectRatio="none" clip-path="url(#kennHeadClip)"></image></g>
+<image class="kenn-pose kenn-pose-work" href="assets/room/kenn-work.webp" x="79.8" y="204" width="85.8" height="105.8" preserveAspectRatio="none"></image>
+<image class="kenn-pose kenn-pose-wave" href="assets/room/kenn-wave.webp" x="79.8" y="204" width="85.8" height="105.8" preserveAspectRatio="none"></image>
 </g>
 <g fill="none" stroke="#9FB4D9" stroke-width="1.1" stroke-linecap="round" transform="translate(128.8 237.8)">
 <path d="M0 -2.6 q -2 2.6 0 5.2" class="murmur-arc-a"></path>
