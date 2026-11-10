@@ -473,7 +473,7 @@
   var HEAD = { x: 141.6, y: 219.9 };  // his head, in the room SVG's units
 
   var kenn = {
-    fig: byId('kennFig'), hop: byId('kennHop'), talk: byId('kennTalk'),
+    fig: byId('kennFig'), head: byId('kennHead'), hop: byId('kennHop'), talk: byId('kennTalk'),
     said: byId('kennSaid'), rest: byId('kennRest'), live: byId('kennLive'), hit: byId('kennHit'),
     fx: doc.querySelector('#room .room-fx')
   };
@@ -481,8 +481,7 @@
   try { hasMouse = window.matchMedia('(hover: hover) and (pointer: fine)').matches; } catch (e) {}
 
   var lineIdx = 0, kennNear = false, kennOn = false, sayT = 0, hideT = 0, nextT = 0, greeted = false, saidAt = 0;
-  var lean = 0, leanTarget = 0, leanRaf = 0, leanLast = 0;
-  var pointer = null, pointerRaf = 0;
+  var pointer = null, pointerRaf = 0, look = null;
 
   function heroLive() { return S.pTarget >= 0.98 && scrollTop() < S.introDist + S.H * 0.5; }
 
@@ -494,6 +493,7 @@
     el.room.classList.add('is-talking');
     kenn.talk.classList.add('is-on');
     kenn.live.textContent = line;
+    updatePose();
     if (reduced) { kenn.said.textContent = line; kenn.rest.textContent = ''; }
     else {
       // type it out; the untyped rest stays in place (transparent) so the bubble doesn't resize
@@ -521,6 +521,7 @@
     kennOn = false;
     if (kenn.talk) kenn.talk.classList.remove('is-on');
     el.room.classList.remove('is-talking');
+    updatePose();
   }
   function nextLine() { var l = KENN_LINES[lineIdx % KENN_LINES.length]; lineIdx += 1; return l; }
 
@@ -530,19 +531,46 @@
   }
   if (kenn.hop) kenn.hop.addEventListener('animationend', function () { kenn.hop.classList.remove('is-hopping'); });
 
-  function leanTick(ts) {
-    var dt = leanLast ? Math.min(64, ts - leanLast) : 16;
-    leanLast = ts;
-    lean += (leanTarget - lean) * (1 - Math.exp(-dt / 140));
-    if (Math.abs(leanTarget - lean) < 0.002) lean = leanTarget;
-    css(kenn.fig, 'transform', 'translateX(' + (lean * 2.5).toFixed(2) + 'px) rotate(' + (lean * 5).toFixed(2) + 'deg)');
-    if (lean !== leanTarget) leanRaf = window.requestAnimationFrame(leanTick);
-    else { leanRaf = 0; leanLast = 0; }
+  /* His pose: body lean (pivots at the seat) plus a head turn (tilt + small shift,
+     pivoting under the chin). Values ease toward a target picked by what's going on:
+     looking at a nearby cursor > facing the visitor while talking > idle glances. */
+  var pose = { lean: 0, rot: 0, x: 0, y: 0 }, poseTarget = { lean: 0, rot: 0, x: 0, y: 0 };
+  var poseRaf = 0, poseLast = 0, idlePose = null, idleT = 0;
+  var POSE_FACE_VISITOR = { lean: 0.2, rot: 4, x: 0.7, y: -0.5 };
+  var IDLE_GLANCES = [
+    { lean: 0, rot: 0, x: 0, y: 0 },              // back to typing
+    { lean: -0.08, rot: -2.5, x: -0.4, y: 0.4 },  // at the monitor
+    { lean: 0.05, rot: 1.5, x: 0.2, y: -0.6 },    // up at the whiteboards
+    { lean: 0.12, rot: 3, x: 0.5, y: -0.2 }       // a quick look at the visitor
+  ];
+
+  function poseTick(ts) {
+    var dt = poseLast ? Math.min(64, ts - poseLast) : 16;
+    poseLast = ts;
+    var kb = 1 - Math.exp(-dt / 170), kh = 1 - Math.exp(-dt / 120), done = true;
+    ['lean', 'rot', 'x', 'y'].forEach(function (k) {
+      pose[k] += (poseTarget[k] - pose[k]) * (k === 'lean' ? kb : kh);
+      if (Math.abs(poseTarget[k] - pose[k]) < 0.005) pose[k] = poseTarget[k]; else done = false;
+    });
+    css(kenn.fig, 'transform', 'translateX(' + (pose.lean * 4).toFixed(2) + 'px) rotate(' + (pose.lean * 7).toFixed(2) + 'deg)');
+    css(kenn.head, 'transform', 'translate(' + pose.x.toFixed(2) + 'px, ' + pose.y.toFixed(2) + 'px) rotate(' + pose.rot.toFixed(2) + 'deg)');
+    if (!done) poseRaf = window.requestAnimationFrame(poseTick);
+    else { poseRaf = 0; poseLast = 0; }
   }
-  function setLean(t) {
-    if (reduced) return;
-    leanTarget = t;
-    if (!leanRaf && lean !== leanTarget) leanRaf = window.requestAnimationFrame(leanTick);
+  function updatePose() {
+    if (reduced || !kenn.fig) return;
+    var t = look || (kennOn ? POSE_FACE_VISITOR : (idlePose || IDLE_GLANCES[0]));
+    poseTarget = { lean: t.lean, rot: t.rot, x: t.x, y: t.y };
+    if (!poseRaf) poseRaf = window.requestAnimationFrame(poseTick);
+  }
+  // Every few seconds, when nobody is near and he isn't talking, he glances somewhere.
+  function idleLoop() {
+    clearTimeout(idleT);
+    idleT = setTimeout(idleLoop, 2600 + Math.random() * 3000);
+    if (doc.hidden || look || kennOn || scrollTop() > S.introDist + S.H) return;
+    var next = IDLE_GLANCES[Math.floor(Math.random() * IDLE_GLANCES.length)];
+    idlePose = next === idlePose ? IDLE_GLANCES[0] : next;
+    updatePose();
   }
 
   function setNear(v, quiet) {
@@ -553,8 +581,9 @@
       say(nextLine());
       nextT = setInterval(function () { say(nextLine()); }, LINE_EVERY_MS);
     } else {
-      setLean(0);
+      look = null;
       if (quiet) hush(); else if (kennOn) say(KENN_BYE, 1600);
+      updatePose();
     }
   }
 
@@ -570,7 +599,11 @@
     if (!near) return;
     var m = kenn.fx.getScreenCTM();
     var hx = m ? m.a * HEAD.x + m.e : r.left + r.width * 0.27;
-    setLean(Math.max(-1, Math.min(1, (pointer.x - hx) / 260)));
+    var hy = m ? m.d * HEAD.y + m.f : r.top + r.height * 0.44;
+    var nx = Math.max(-1, Math.min(1, (pointer.x - hx) / (r.width * 0.45)));
+    var ny = Math.max(-1, Math.min(1, (pointer.y - hy) / (r.height * 0.45)));
+    look = { lean: nx * 0.9, rot: nx * 5, x: nx * 0.9, y: ny * 0.9 };
+    updatePose();
   }
   function schedulePointer() { if (!pointerRaf) pointerRaf = window.requestAnimationFrame(pointerUpdate); }
 
@@ -607,6 +640,7 @@
       setTimeout(checkGreet, 1500);  // e.g. reduced motion, where the hero is settled on load
     }
     doc.addEventListener('visibilitychange', function () { if (doc.hidden) setNear(false, true); });
+    if (!reduced) idleLoop();
   }
 
   /* ---------- small live touches: chat plays, test count, row count ---------- */
