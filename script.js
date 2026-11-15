@@ -905,11 +905,12 @@
     if (!reduced) idleLoop();
   }
 
-  /* ---------- thReady case study ---------- */
+  /* ---------- thReady case study (shared motion convention: CONTRIBUTING.md) ---------- */
 
   var caseDialog = byId('threadyDialog');
   var caseContent = byId('caseContent');
   var caseButton = byId('openThready');
+  var caseCard = doc.querySelector('.featured');
   var caseClose = byId('closeThready');
   var screenViewer = byId('screenViewer');
   var enlargeScreen = byId('enlargeScreen');
@@ -918,9 +919,67 @@
   var caseHash = '', caseScroll = 0, caseClosing = false;
   var caseRestoration = 'auto';
   var caseHasHistory = false;
+  var caseMotion = null, caseContentMotion = null, caseHiding = false;
+
+  function clearCaseMotion() {
+    if (caseMotion) { caseMotion.onfinish = null; caseMotion.cancel(); caseMotion = null; }
+    if (caseContentMotion) { caseContentMotion.cancel(); caseContentMotion = null; }
+    caseDialog.classList.remove('is-opening', 'is-closing');
+  }
+
+  function animateCaseStudy(opening, done) {
+    var style = window.getComputedStyle(caseDialog);
+    var interrupted = !!caseMotion;
+    var current = { transform: style.transform, opacity: style.opacity, borderRadius: style.borderRadius };
+    var contentStyle = window.getComputedStyle(caseContent);
+    var contentFrom = { opacity: contentStyle.opacity, transform: contentStyle.transform };
+    var backdropFrom = interrupted ? window.getComputedStyle(caseDialog, '::backdrop').opacity : (opening ? '0' : '1');
+    clearCaseMotion();
+    var card = caseCard && caseCard.getBoundingClientRect();
+    // Deep links have no visible card to expand from; keep them immediate.
+    if (!caseDialog.animate || (motionQuery && motionQuery.matches) || !card ||
+        card.bottom <= 0 || card.top >= window.innerHeight || !card.width || !card.height) {
+      if (done) done();
+      return;
+    }
+    var box = caseDialog.getBoundingClientRect();
+    var expanded = { transform: 'none', opacity: 1, borderRadius: style.borderRadius };
+    var collapsed = {
+      transform: 'translate(' + (card.left - box.left) + 'px, ' + (card.top - box.top) + 'px) scale(' + (card.width / box.width) + ', ' + (card.height / box.height) + ')',
+      opacity: opening ? 0.45 : 0,
+      borderRadius: window.getComputedStyle(caseCard).borderRadius
+    };
+    var duration = parseFloat(style.getPropertyValue(opening ? '--case-open-duration' : '--case-close-duration'));
+    var easing = opening ? 'cubic-bezier(.22, 1, .36, 1)' : 'cubic-bezier(.4, 0, .2, 1)';
+    caseDialog.style.setProperty('--case-backdrop-from', backdropFrom);
+    caseDialog.classList.add(opening ? 'is-opening' : 'is-closing');
+    caseMotion = caseDialog.animate([interrupted ? current : (opening ? collapsed : expanded), opening ? expanded : collapsed], {
+      duration: duration, easing: easing, fill: 'both'
+    });
+    if (opening) {
+      caseContentMotion = caseContent.animate([
+        interrupted ? contentFrom : { opacity: 0, transform: 'translateY(12px)' },
+        interrupted ? contentFrom : { opacity: 0, transform: 'translateY(12px)', offset: 0.25 },
+        { opacity: 1, transform: 'none' }
+      ], { duration: duration, easing: easing, fill: 'both' });
+    }
+    caseMotion.onfinish = function () { clearCaseMotion(); if (done) done(); };
+  }
+
+  function finishCaseMotion() {
+    if (caseMotion) caseMotion.finish();
+  }
 
   function openCase(fromHistory) {
-    if (!caseDialog || caseDialog.open) return;
+    if (!caseDialog) return;
+    if (caseDialog.open) {
+      if (caseHiding) {
+        caseHiding = false;
+        caseClosing = false;
+        animateCaseStudy(true);
+      }
+      return;
+    }
     finishLoad();
     var entry = fromHistory && history.state && history.state.threadyCaseStudy;
     caseHash = entry ? entry.hash : (location.hash === '#thready' ? '' : location.hash);
@@ -940,14 +999,22 @@
     caseDialog.showModal();
     caseContent.scrollTop = 0;
     caseClose.focus({ preventScroll: true });
+    animateCaseStudy(true);
   }
 
   function hideCase() {
-    if (!caseDialog || !caseDialog.open) return;
+    if (!caseDialog || !caseDialog.open || caseHiding) return;
+    caseHiding = true;
+    caseClosing = true;
     if (screenViewer.open) screenViewer.close();
+    animateCaseStudy(false, finishHideCase);
+  }
+
+  function finishHideCase() {
     caseDialog.close();
     root.classList.remove('case-open');
     caseClosing = false;
+    caseHiding = false;
     window.scrollTo(0, caseScroll);
     caseButton.focus({ preventScroll: true });
     // History traversal can restore scroll after popstate has finished.
@@ -960,7 +1027,7 @@
   }
 
   function closeCase() {
-    if (!caseDialog.open || caseClosing) return;
+    if (!root.classList.contains('case-open') || caseClosing) return;
     caseClosing = true;
     if (caseHasHistory && location.hash === '#thready') history.back();
     else {
@@ -988,9 +1055,20 @@
   }
 
   if (caseDialog && caseButton) {
+    window.addEventListener('resize', finishCaseMotion);
+    if (motionQuery && motionQuery.addEventListener) {
+      motionQuery.addEventListener('change', function (ev) { if (ev.matches) finishCaseMotion(); });
+    }
     caseButton.addEventListener('click', function () { openCase(false); });
     caseClose.addEventListener('click', closeCase);
     caseDialog.addEventListener('cancel', function (ev) { ev.preventDefault(); closeCase(); });
+    caseDialog.addEventListener('close', function () {
+      // Repeated Escape can force a native close before the exit animation finishes.
+      if (caseDialog.open || !root.classList.contains('case-open')) return;
+      closeCase();
+      clearCaseMotion();
+      finishHideCase();
+    });
     caseDialog.addEventListener('keydown', trapDialogFocus);
     var backdropStart = false;
     function onBackdrop(ev) {
@@ -1022,6 +1100,7 @@
     syncEnlarge();
     window.addEventListener('resize', syncEnlarge);
     enlargeScreen.addEventListener('click', function () {
+      if (caseClosing || !caseDialog.open) return;
       var image = byId('fullScreenImage');
       image.src = galleryImage.src;
       image.alt = galleryImage.alt;

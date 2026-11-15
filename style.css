@@ -599,13 +599,22 @@ section {
 .browser-frame img, .gallery-thumb img { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; }
 .case-open, .case-open body { overflow: hidden; }
 .case-study {
+  --case-open-duration: 520ms; --case-close-duration: 360ms;
   position: fixed; inset: 48px 24px auto; margin: 0 auto; padding: 0; width: calc(100% - 48px); max-width: 1200px;
   max-height: calc(100vh - 96px); max-height: calc(100dvh - 96px);
   overflow: hidden; border: 1px solid var(--line-strong); border-radius: 24px; background: var(--well); color: var(--text);
   box-shadow: 0 32px 120px rgba(0, 0, 0, 0.65);
+  transform-origin: 0 0;
 }
 .case-study[open] { display: flex; flex-direction: column; }
 .case-study::backdrop, .screen-viewer::backdrop { background: rgba(7, 8, 10, 0.82); }
+.case-study.is-opening::backdrop { animation: case-backdrop-in var(--case-open-duration) cubic-bezier(.22, 1, .36, 1) both; }
+.case-study.is-closing::backdrop { animation: case-backdrop-out var(--case-close-duration) cubic-bezier(.4, 0, .2, 1) both; }
+@keyframes case-backdrop-in { from { opacity: var(--case-backdrop-from, 0); } to { opacity: 1; } }
+@keyframes case-backdrop-out { from { opacity: var(--case-backdrop-from, 1); } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .case-study.is-opening::backdrop, .case-study.is-closing::backdrop { animation: none; }
+}
 .case-titlebar { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 28px; background: var(--well); border-bottom: 1px solid var(--line); }
 .case-titlebar h2 { margin: 4px 0 0; font: 600 32px/1 var(--f-head); letter-spacing: -0.035em; }
 .case-close { flex: none; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--paper); color: var(--text); cursor: pointer; }
