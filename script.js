@@ -20,6 +20,11 @@
   function all(sel, ctx) { return Array.prototype.slice.call((ctx || doc).querySelectorAll(sel)); }
 
   var el = {
+    bg: byId('siteBg'),
+    bgGrid: byId('siteBgGrid'),
+    bgTiles: byId('siteBgTiles'),
+    bgText: byId('siteBgText'),
+    bgPlane: byId('siteBgPlane'),
     track: byId('introTrack'),
     stage: byId('stage'),
     nameBox: byId('nameBox'),
@@ -86,7 +91,8 @@
     var key = '_k_' + prop;
     if (node[key] === val) return;
     node[key] = val;
-    node.style[prop] = val;
+    if (prop.slice(0, 2) === '--') node.style.setProperty(prop, val);
+    else node.style[prop] = val;
   }
   function vis(node, o) { css(node, 'visibility', o < 0.01 ? 'hidden' : 'visible'); }
   function fade(node, a, b, dy) {
@@ -103,6 +109,98 @@
     if (node && node._txt !== val) { node._txt = val; node.textContent = val; }
   }
 
+  /* ---------- queries on the floor ---------- */
+
+  var floorW = 0, floorH = 0, floorRate = null, floorResizeT;
+  var floorAnimations = [];
+  var floorQueries = [
+    "<span class=\"kw\">SELECT</span> * <span class=\"kw\">FROM</span> kenn <span class=\"kw\">WHERE</span> section = <span class=\"accent\">'me'</span>;",
+    '<span class="kw">SELECT</span> * <span class="kw">FROM</span> kenn.projects <span class="kw">ORDER BY</span> pride <span class="kw">DESC</span>;',
+    '<span class="kw">SELECT</span> category, tools <span class="kw">FROM</span> kenn.skills;',
+    "<span class=\"kw\">SELECT</span> * <span class=\"kw\">FROM</span> kenn.certs <span class=\"kw\">WHERE</span> status = <span class=\"accent\">'earned'</span>;",
+    '<span class="kw">SELECT</span> * <span class="kw">FROM</span> kenn.log <span class="kw">ORDER BY</span> date <span class="kw">DESC</span>;',
+    "<span class=\"kw\">INSERT INTO</span> kenn.inbox <span class=\"kw\">VALUES</span> (<span class=\"accent\">'you'</span>);"
+  ];
+
+  function measureFloor(w, h) {
+    if (!el.bg || (w === floorW && h === floorH)) return;
+    floorW = w; floorH = h;
+
+    var half = w / 3.464;
+    var top = -Math.ceil(half / 60) * 60;
+    var length = Math.ceil((h - top + half) / 60) * 60;
+    css(el.bgPlane, 'left', (52 + 104 * Math.round((w / 2 - 52) / 104)) + 'px');
+    css(el.bgPlane, 'top', top + 'px');
+    css(el.bgPlane, 'width', length + 'px');
+    css(el.bgPlane, 'height', length + 'px');
+
+    var nq = Math.max(6, Math.ceil(length / 420) + 1);
+    var speeds = [52, 68, 44, 76, 60];
+    var rows = doc.createDocumentFragment();
+    for (var i = 0; i < length / 60; i++) {
+      var sequence = '';
+      for (var j = 0; j < nq; j++) sequence += '<span>' + floorQueries[(i * 2 + j) % 6] + '</span>';
+      var row = doc.createElement('div');
+      row.className = 'site-bg-row';
+      var track = doc.createElement('span');
+      track.className = 'q-run';
+      track.innerHTML = sequence + sequence;
+      var duration = speeds[i % 5] * nq / 6;
+      css(track, 'animationDuration', duration + 's');
+      css(track, 'animationDelay', -((i * 7) % duration) + 's');
+      row.appendChild(track);
+      rows.appendChild(row);
+    }
+    el.bgPlane.textContent = '';
+    el.bgPlane.appendChild(rows);
+    floorAnimations = [];
+    if (!reduced) all('.q-run', el.bgPlane).forEach(function (track) {
+      if (!track.getAnimations) return;
+      var animation = track.getAnimations()[0];
+      if (animation && animation.updatePlaybackRate) floorAnimations.push(animation);
+    });
+    floorRate = null;
+
+    // A fixed cell hash keeps surviving cells in the same order across resizes.
+    var candidates = [];
+    for (var b = 0; b * 60 < h; b++) {
+      for (var a = -1; a * 104 < w; a++) {
+        for (var offset = 0; offset < 2; offset++) {
+          var x = a * 104 + offset * 52, y = b * 60 + offset * 30;
+          var cx = x + 52, cy = y + 30;
+          if (cx < 0 || cx > w || cy > h) continue;
+          if (Math.abs(cx - w / 2) < 420 && Math.abs(cy - h / 2) < 260) continue;
+          var hash = Math.sin((a + 1) * 127.1 + b * 311.7 + offset * 74.7) * 43758.5453;
+          candidates.push({ x: x, y: y, rank: hash - Math.floor(hash) });
+        }
+      }
+    }
+    candidates.sort(function (a, b) { return a.rank - b.rank || a.y - b.y || a.x - b.x; });
+    var tiles = doc.createDocumentFragment();
+    var count = Math.min(candidates.length, Math.max(4, Math.floor(w * h / 200000)));
+    for (i = 0; i < count; i++) {
+      var cell = candidates[i];
+      var tile = doc.createElementNS('http://www.w3.org/2000/svg', 'path');
+      tile.setAttribute('class', 'site-bg-lit');
+      tile.setAttribute('d', 'M0 30 L52 0 L104 30 L52 60 Z');
+      tile.setAttribute('transform', 'translate(' + cell.x + ' ' + cell.y + ')');
+      tiles.appendChild(tile);
+    }
+    el.bgTiles.textContent = '';
+    el.bgTiles.appendChild(tiles);
+  }
+
+  function renderFloor(k) {
+    if (!el.bg) return;
+    css(el.bgGrid, 'opacity', (1 - 0.3 * k).toFixed(3));
+    css(el.bgText, 'opacity', (0.5 - 0.2 * k).toFixed(3));
+    css(el.bg, '--hole', k.toFixed(3));
+    var rate = 1 - 0.75 * k;
+    if (rate === floorRate) return;
+    floorRate = rate;
+    floorAnimations.forEach(function (animation) { animation.updatePlaybackRate(rate); });
+  }
+
   /* ---------- measure ---------- */
 
   function measure(force) {
@@ -114,6 +212,14 @@
     S.H = H;
     S.mobile = W < 760;
     S.introDist = reduced ? 0 : Math.round(H * (S.mobile ? 0.75 : 1.3));
+    if (!floorW) measureFloor(W, H);
+    else if (W !== floorW || H !== floorH) {
+      clearTimeout(floorResizeT);
+      floorResizeT = setTimeout(function () {
+        measureFloor(S.W, S.H);
+        renderFloor(reduced ? 1 : io(seg(0.03, 0.6)));
+      }, 120);
+    }
 
     css(el.stage, 'height', H + 'px');
     css(el.track, 'height', (H + S.introDist) + 'px');
@@ -226,6 +332,7 @@
     // name: centred and scaled at p = 0, settles into its slot by p = 0.6
     var box = S.box || { x: 0, y: 0, w: 0, h: 0 };
     var e = io(seg(0.03, 0.6));
+    renderFloor(reduced ? 1 : e);
     var s0 = 1;
     if (box.w > 0) s0 = mobile ? Math.min(1.06, (W * 0.9) / box.w) : Math.min(1.2, (W * 0.64) / box.w, (H * 0.42) / box.h);
     var dx = W / 2 - (box.x + box.w / 2);
@@ -771,6 +878,7 @@
   var roomOnScreen = true;
   function syncPause() {
     if (el.room) el.room.classList.toggle('is-paused', doc.hidden || !roomOnScreen);
+    if (el.bg) el.bg.classList.toggle('is-paused', doc.hidden);
   }
   if ('IntersectionObserver' in window && el.room) {
     new IntersectionObserver(function (entries) {

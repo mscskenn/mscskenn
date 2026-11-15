@@ -13,6 +13,7 @@
   --muted: #8B919E;
   --sql-keyword: #7C8BA8;
   --accent: #3DDC97;   /* alternates kept in the design: #5B8CFF, #F5A524, #E6E8EC */
+  --floor-lit: rgba(61, 220, 151, 0.10);
 
   /* extra greys used by the design */
   --bubble: #1E2128;
@@ -50,13 +51,43 @@ html {
 body {
   margin: 0;
   overflow-x: hidden;
-  background: var(--bg);
+  background: transparent;
   color: var(--text);
   font-family: var(--f-body);
   font-size: 16px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
+
+/* ---------- queries on the floor ---------- */
+
+.site-bg {
+  position: fixed; inset: 0; z-index: -1;
+  overflow: hidden; pointer-events: none; contain: strict;
+}
+.site-bg-grid, .site-bg-text { position: absolute; inset: 0; }
+.site-bg-grid .site-bg-cell { stroke: var(--line); }
+.site-bg-lit {
+  fill: var(--floor-lit); stroke: var(--accent); stroke-opacity: 0.45; stroke-width: 1;
+  animation: kenn-twinkle 1.4s ease-in-out infinite alternate;
+}
+.site-bg-lit:nth-child(even) { animation-delay: -0.7s; }
+.site-bg-grid, .site-bg-text {
+  -webkit-mask-image: radial-gradient(ellipse 52% 46% at 50% 50%, rgba(0,0,0,var(--hole,0)) 0%, rgba(0,0,0,var(--hole,0)) 42%, #000 100%);
+          mask-image: radial-gradient(ellipse 52% 46% at 50% 50%, rgba(0,0,0,var(--hole,0)) 0%, rgba(0,0,0,var(--hole,0)) 42%, #000 100%);
+}
+.site-bg-text { overflow: hidden; opacity: 0.5; }
+.site-bg-plane {
+  position: absolute; transform-origin: 0 0;
+  transform: matrix(0.866, 0.5, -0.866, 0.5, 0, 0);
+  font: 15px var(--f-mono); color: var(--muted);
+}
+.site-bg-row { height: 60px; line-height: 60px; white-space: nowrap; overflow: hidden; }
+.q-run { display: inline-block; white-space: nowrap; will-change: transform; animation: q-run 60s linear infinite; }
+.q-run > span { margin-right: 120px; }
+@keyframes q-run { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.site-bg.is-paused .q-run, .site-bg.is-paused .site-bg-lit { animation-play-state: paused; }
+.reduced .site-bg .q-run, .reduced .site-bg .site-bg-lit { animation: none; }
 
 img, svg { max-width: none; }
 button { -webkit-tap-highlight-color: transparent; }
@@ -267,6 +298,7 @@ section:focus, section:focus-visible { outline: none; }
 @keyframes kenn-twinkle { from { opacity: 1; } to { opacity: 0.35; } }
 @keyframes kenn-pulse { 0% { opacity: 0.85; } 50% { opacity: 0.3; } }
 @media (prefers-reduced-motion: reduce) {
+  .site-bg .q-run, .site-bg .site-bg-lit { animation: none; }
   .room * { animation: none !important; }
   .room .murmur { opacity: 0.8; }
   .room .kenn-hop.is-hopping { animation: none; }
@@ -795,6 +827,7 @@ section {
 /* ---------- print ---------- */
 
 @media print {
+  .site-bg { display: none !important; }
   .topbar, .tabbar, .skip-intro, .cue, .cue-url, .composer, .room-notes { display: none !important; }
   .intro-track, .stage { height: auto !important; position: static; }
   .name-fx, .lede, .actions, .strip, .hero-illus { opacity: 1 !important; visibility: visible !important; transform: none !important; }
