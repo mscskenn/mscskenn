@@ -28,8 +28,8 @@
     if (!r.classList.contains('reduced') && !location.hash && !(window.pageYOffset || r.scrollTop)) r.classList.add('load-playing');
   })();
 </script>
-<link rel="stylesheet" href="style.css?v=17">
-<script src="script.js?v=17" defer></script>
+<link rel="stylesheet" href="style.css?v=18">
+<script src="script.js?v=18" defer></script>
 </head>
 <body>
 <div class="site-bg" id="siteBg" aria-hidden="true">
@@ -549,7 +549,7 @@
     </div>
     <div class="featured-action">
       <button type="button" class="btn btn-primary" id="openThready" aria-haspopup="dialog" aria-controls="threadyDialog">Open the case study →</button>
-      <span class="mono-meta">screens · test run · database</span>
+      <span class="mono-meta">walkthrough video · screens · test run · database</span>
     </div>
   </article>
 
@@ -600,7 +600,7 @@
 <section id="certs" aria-labelledby="certs-h" tabindex="-1">
   <p class="query"><span class="kw">SELECT</span> * <span class="kw">FROM</span> kenn.certs <span class="kw">WHERE</span> status = <span class="accent">'earned'</span>;</p>
   <h2 id="certs-h" class="h2">Certifications.</h2>
-  <p class="intro-p">Two SQL courses down, two data engineering tracks in progress.</p>
+  <p class="intro-p">Three certificates earned — two in SQL, one in Java — and two data engineering tracks in progress.</p>
   <div class="cert-grid">
     <article class="card card-pad cert">
       <span class="cert-ring" aria-hidden="true"></span>
@@ -610,11 +610,14 @@
       </div>
       <h3 class="cert-title">Introduction to SQL</h3>
       <dl class="cert-meta">
-        <div><dt>Completed</dt><dd>Aug 29, 2026</dd></div>
+        <div><dt>Completed</dt><dd>Aug 27, 2026</dd></div>
         <div><dt>CPE credits</dt><dd>1.2</dd></div>
         <div class="span-all"><dt>Credential ID</dt><dd class="cred-id">SQLI0021600307924</dd></div>
       </dl>
-      <a class="pill pill-cred" href="https://www.datacamp.com/completed/statement-of-accomplishment/course/c5226c01e41cffcfdd1634bdaf100ad9efa7776d" aria-label="View credential: Introduction to SQL on DataCamp">View credential <span aria-hidden="true" class="accent">↗</span></a>
+      <div class="cert-actions">
+        <a class="pill pill-cred" href="https://www.datacamp.com/completed/statement-of-accomplishment/course/c5226c01e41cffcfdd1634bdaf100ad9efa7776d" aria-label="View credential: Introduction to SQL on DataCamp">View credential <span aria-hidden="true" class="accent">↗</span></a>
+        <a class="pill pill-cred" href="assets/credentials/introduction-to-sql-certificate.pdf" target="_blank" rel="noopener" aria-label="View certificate: Introduction to SQL (PDF)">View certificate <span aria-hidden="true" class="accent">↗</span></a>
+      </div>
     </article>
     <article class="card card-pad cert">
       <span class="cert-ring" aria-hidden="true"></span>
@@ -628,7 +631,25 @@
         <div><dt>CPE credits</dt><dd>2.8</dd></div>
         <div class="span-all"><dt>Credential ID</dt><dd class="cred-id">ISQL0011778070225</dd></div>
       </dl>
-      <a class="pill pill-cred" href="https://www.datacamp.com/completed/statement-of-accomplishment/course/e7520ea6bd1463e66aa02a2590be819c66f81271" aria-label="View credential: Intermediate SQL on DataCamp">View credential <span aria-hidden="true" class="accent">↗</span></a>
+      <div class="cert-actions">
+        <a class="pill pill-cred" href="https://www.datacamp.com/completed/statement-of-accomplishment/course/e7520ea6bd1463e66aa02a2590be819c66f81271" aria-label="View credential: Intermediate SQL on DataCamp">View credential <span aria-hidden="true" class="accent">↗</span></a>
+        <a class="pill pill-cred" href="assets/credentials/intermediate-sql-certificate.pdf" target="_blank" rel="noopener" aria-label="View certificate: Intermediate SQL (PDF)">View certificate <span aria-hidden="true" class="accent">↗</span></a>
+      </div>
+    </article>
+    <article class="card card-pad cert">
+      <span class="cert-ring" aria-hidden="true"></span>
+      <div class="cert-top">
+        <p class="label label-tight">Oracle Academy · Award of course completion</p>
+        <span class="badge badge-sm"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>Earned</span>
+      </div>
+      <h3 class="cert-title">Java Fundamentals</h3>
+      <dl class="cert-meta">
+        <div><dt>Completed</dt><dd>Jun 19, 2024</dd></div>
+        <div><dt>Issued by</dt><dd>Oracle Academy</dd></div>
+      </dl>
+      <div class="cert-actions">
+        <a class="pill pill-cred" href="assets/credentials/java-fundamentals-certificate.pdf" target="_blank" rel="noopener" aria-label="View certificate: Java Fundamentals (PDF)">View certificate <span aria-hidden="true" class="accent">↗</span></a>
+      </div>
     </article>
   </div>
   <div class="in-progress">
@@ -648,8 +669,9 @@
     <li class="yap"><span class="avatar" aria-hidden="true">JK</span><div class="yap-bubble"><p class="yap-text">DICT Hackathon with Team JDK.</p><p class="yap-date">Oct 2026</p></div></li>
     <li class="yap more"><span class="avatar" aria-hidden="true">JK</span><div class="yap-bubble"><p class="yap-text">STI College Lucena Hackathon.</p><p class="yap-date">Feb 2026</p></div></li>
     <li class="yap more"><span class="avatar" aria-hidden="true">JK</span><div class="yap-bubble"><p class="yap-text">Joined STI Shiba Esports.</p><p class="yap-date">2026</p></div></li>
+    <li class="yap more"><span class="avatar" aria-hidden="true">JK</span><div class="yap-bubble"><p class="yap-text">Completed Java Fundamentals — Oracle Academy.</p><p class="yap-date">Jun 2024</p></div></li>
   </ol>
-  <button type="button" class="more-btn more-btn-log mobile-only" aria-expanded="false" aria-controls="logList" data-more="Show {n} older" data-less="Show less">Show 2 older</button>
+  <button type="button" class="more-btn more-btn-log mobile-only" aria-expanded="false" aria-controls="logList" data-more="Show {n} older" data-less="Show less">Show 3 older</button>
 </section>
 
 <section id="contact" aria-labelledby="contact-h" tabindex="-1">
@@ -702,10 +724,22 @@
     <p class="case-summary">An AI-enhanced production management system for a garment manufacturer. I led the team and owned everything behind the screens: the APIs, the database and the tests.</p>
     <div class="case-links">
       <span class="badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>Defended · Nov 2026</span>
-      <!-- TODO: walkthrough video URL -->
-      <a class="pill" id="walkthrough" href="#">Watch the walkthrough ↗</a>
       <span class="mono-meta">code is in a private team repo</span>
     </div>
+    <figure class="case-video">
+      <div class="browser-frame">
+        <div class="browser-bar" aria-hidden="true"><span class="browser-dots"><i></i><i></i><i></i></span><span class="browser-label">thReady · walkthrough</span></div>
+        <video id="walkthrough" controls playsinline preload="none" poster="assets/thready/thready-walkthrough-poster.webp" width="1920" height="1080" aria-label="thReady walkthrough video, 1 minute 55 seconds">
+          <source src="assets/thready/thready-walkthrough.mp4" type="video/mp4">
+          <track kind="captions" src="assets/thready/thready-walkthrough.vtt" srclang="en" label="English">
+          <a href="assets/thready/thready-walkthrough.mp4">Download the walkthrough video</a>
+        </video>
+      </div>
+      <figcaption>
+        <div><h3>Walkthrough</h3><p>One order from arrival to the production floor, then the numbers behind it. Recorded on a local copy of thReady.</p></div>
+        <span class="demo-label">1:55 · demo data · AI voice, my script</span>
+      </figcaption>
+    </figure>
     <div class="case-gallery">
       <div class="browser-frame">
         <div class="browser-bar" aria-hidden="true"><span class="browser-dots"><i></i><i></i><i></i></span><span class="browser-label">thReady · admin</span></div>

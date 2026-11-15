@@ -1007,6 +1007,8 @@
     caseHiding = true;
     caseClosing = true;
     if (screenViewer.open) screenViewer.close();
+    var walkthrough = byId('walkthrough');
+    if (walkthrough && !walkthrough.paused) walkthrough.pause();
     animateCaseStudy(false, finishHideCase);
   }
 
@@ -1038,7 +1040,7 @@
 
   function trapDialogFocus(ev) {
     if (ev.key !== 'Tab') return;
-    var items = all('a[href], button:not([disabled]), [tabindex="0"]', ev.currentTarget).filter(function (node) { return node.getClientRects().length; });
+    var items = all('a[href], button:not([disabled]), video[controls], [tabindex="0"]', ev.currentTarget).filter(function (node) { return node.getClientRects().length; });
     var first = items[0], last = items[items.length - 1];
     if (ev.shiftKey && doc.activeElement === first) { ev.preventDefault(); last.focus(); }
     else if (!ev.shiftKey && doc.activeElement === last) { ev.preventDefault(); first.focus(); }
@@ -1081,7 +1083,6 @@
       if (location.hash === '#thready') openCase(true);
       else hideCase();
     });
-    byId('walkthrough').addEventListener('click', function (ev) { ev.preventDefault(); });
     galleryThumbs.forEach(function (thumb, index) {
       thumb.addEventListener('click', function () { chooseScreen(index); });
       thumb.addEventListener('keydown', function (ev) {

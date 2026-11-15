@@ -1,0 +1,92 @@
+WEBVTT
+
+00:00:00.900 --> 00:00:01.966
+This is thReady,
+
+00:00:02.016 --> 00:00:07.964
+a production management system my team built for a garment manufacturer as our thesis.
+
+00:00:08.014 --> 00:00:11.940
+I led the team, and I built the backend and the database.
+
+00:00:11.990 --> 00:00:17.450
+Signing in is checked on the server, with a one-time code sent by text message.
+
+00:00:19.050 --> 00:00:24.041
+The dashboard is the owner's morning view: what is due, what finished today,
+
+00:00:24.091 --> 00:00:25.964
+and every order on the floor.
+
+00:00:26.014 --> 00:00:29.280
+Each number here is served by an API that I wrote.
+
+00:00:30.980 --> 00:00:32.450
+Let's follow one order.
+
+00:00:32.500 --> 00:00:37.672
+A new batch of shirts arrives, so the admin records it: the size, the quantity,
+
+00:00:37.722 --> 00:00:38.796
+and the due date.
+
+00:00:38.846 --> 00:00:44.018
+The backend checks every field, and that the batch number is not already taken,
+
+00:00:44.068 --> 00:00:45.670
+before anything is saved.
+
+00:00:47.370 --> 00:00:49.188
+Next, the order is planned.
+
+00:00:49.238 --> 00:00:51.954
+A shirt goes through seven sewing steps,
+
+00:00:52.004 --> 00:00:55.620
+and each step goes to a sewer with the right machine.
+
+00:00:55.670 --> 00:00:59.148
+The system estimates when each person will be free.
+
+00:00:59.198 --> 00:01:02.813
+Confirming the plan runs in one database transaction,
+
+00:01:02.863 --> 00:01:05.580
+so an order is never left half assigned.
+
+00:01:07.280 --> 00:01:12.648
+On the production board, every order shows its seven steps, who holds each one,
+
+00:01:12.698 --> 00:01:14.637
+and how many pieces are done.
+
+00:01:14.687 --> 00:01:18.340
+A step only opens after the one before it is released.
+
+00:01:20.040 --> 00:01:25.393
+Every status change is timestamped, so the system can answer real questions:
+
+00:01:25.443 --> 00:01:29.374
+how many orders were on time, how long each stage takes,
+
+00:01:29.424 --> 00:01:31.720
+and which step is the bottleneck.
+
+00:01:33.420 --> 00:01:37.004
+It also tracks the shop's sewing machines: who is on which,
+
+00:01:37.054 --> 00:01:38.790
+and which are out of service.
+
+00:01:40.490 --> 00:01:48.956
+Behind these screens are 36 database tables, and 2,467 automated backend tests,
+
+00:01:49.006 --> 00:01:50.250
+all passing.
+
+00:01:51.301 --> 00:01:51.952
+I'm Kenn.
+
+00:01:52.002 --> 00:01:53.511
+Thanks for watching.
+
