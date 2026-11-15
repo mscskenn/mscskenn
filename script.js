@@ -701,7 +701,7 @@
   var KENN_GREETING = 'oh hey! welcome to my room.';
   var KENN_WELCOME_BACK = 'oh, welcome back!';
   var KENN_LINES = [
-    "I'm Kenn. vibecoding, as usual.",
+    "I'm Kenn. building with AI, as usual.",
     'psst, my projects are just below ↓',
     "I'm looking for an OJT in web, backend or data.",
     'ask me about MySQL transactions. at your own risk.',
@@ -905,6 +905,212 @@
     if (!reduced) idleLoop();
   }
 
+  /* ---------- thReady case study (shared motion convention: CONTRIBUTING.md) ---------- */
+
+  var caseDialog = byId('threadyDialog');
+  var caseContent = byId('caseContent');
+  var caseButton = byId('openThready');
+  var caseCard = doc.querySelector('.featured');
+  var caseClose = byId('closeThready');
+  var screenViewer = byId('screenViewer');
+  var enlargeScreen = byId('enlargeScreen');
+  var galleryImage = byId('galleryImage');
+  var galleryThumbs = all('.gallery-thumb');
+  var caseHash = '', caseScroll = 0, caseClosing = false;
+  var caseRestoration = 'auto';
+  var caseHasHistory = false;
+  var caseMotion = null, caseContentMotion = null, caseHiding = false;
+
+  function clearCaseMotion() {
+    if (caseMotion) { caseMotion.onfinish = null; caseMotion.cancel(); caseMotion = null; }
+    if (caseContentMotion) { caseContentMotion.cancel(); caseContentMotion = null; }
+    caseDialog.classList.remove('is-opening', 'is-closing');
+  }
+
+  function animateCaseStudy(opening, done) {
+    var style = window.getComputedStyle(caseDialog);
+    var interrupted = !!caseMotion;
+    var current = { transform: style.transform, opacity: style.opacity, borderRadius: style.borderRadius };
+    var contentStyle = window.getComputedStyle(caseContent);
+    var contentFrom = { opacity: contentStyle.opacity, transform: contentStyle.transform };
+    var backdropFrom = interrupted ? window.getComputedStyle(caseDialog, '::backdrop').opacity : (opening ? '0' : '1');
+    clearCaseMotion();
+    var card = caseCard && caseCard.getBoundingClientRect();
+    // Deep links have no visible card to expand from; keep them immediate.
+    if (!caseDialog.animate || (motionQuery && motionQuery.matches) || !card ||
+        card.bottom <= 0 || card.top >= window.innerHeight || !card.width || !card.height) {
+      if (done) done();
+      return;
+    }
+    var box = caseDialog.getBoundingClientRect();
+    var expanded = { transform: 'none', opacity: 1, borderRadius: style.borderRadius };
+    var collapsed = {
+      transform: 'translate(' + (card.left - box.left) + 'px, ' + (card.top - box.top) + 'px) scale(' + (card.width / box.width) + ', ' + (card.height / box.height) + ')',
+      opacity: opening ? 0.45 : 0,
+      borderRadius: window.getComputedStyle(caseCard).borderRadius
+    };
+    var duration = parseFloat(style.getPropertyValue(opening ? '--case-open-duration' : '--case-close-duration'));
+    var easing = opening ? 'cubic-bezier(.22, 1, .36, 1)' : 'cubic-bezier(.4, 0, .2, 1)';
+    caseDialog.style.setProperty('--case-backdrop-from', backdropFrom);
+    caseDialog.classList.add(opening ? 'is-opening' : 'is-closing');
+    caseMotion = caseDialog.animate([interrupted ? current : (opening ? collapsed : expanded), opening ? expanded : collapsed], {
+      duration: duration, easing: easing, fill: 'both'
+    });
+    if (opening) {
+      caseContentMotion = caseContent.animate([
+        interrupted ? contentFrom : { opacity: 0, transform: 'translateY(12px)' },
+        interrupted ? contentFrom : { opacity: 0, transform: 'translateY(12px)', offset: 0.25 },
+        { opacity: 1, transform: 'none' }
+      ], { duration: duration, easing: easing, fill: 'both' });
+    }
+    caseMotion.onfinish = function () { clearCaseMotion(); if (done) done(); };
+  }
+
+  function finishCaseMotion() {
+    if (caseMotion) caseMotion.finish();
+  }
+
+  function openCase(fromHistory) {
+    if (!caseDialog) return;
+    if (caseDialog.open) {
+      if (caseHiding) {
+        caseHiding = false;
+        caseClosing = false;
+        animateCaseStudy(true);
+      }
+      return;
+    }
+    finishLoad();
+    var entry = fromHistory && history.state && history.state.threadyCaseStudy;
+    caseHash = entry ? entry.hash : (location.hash === '#thready' ? '' : location.hash);
+    caseScroll = entry ? entry.scroll : scrollTop();
+    caseRestoration = history.scrollRestoration;
+    history.scrollRestoration = 'manual';
+    caseHasHistory = false;
+    try {
+      if (!entry) {
+        if (location.hash === '#thready') history.replaceState(history.state, '', location.pathname + location.search + caseHash);
+        history.pushState({ threadyCaseStudy: { hash: caseHash, scroll: caseScroll } }, '', '#thready');
+      }
+      caseHasHistory = true;
+    } catch (e) {}
+    caseClosing = false;
+    root.classList.add('case-open');
+    caseDialog.showModal();
+    caseContent.scrollTop = 0;
+    caseClose.focus({ preventScroll: true });
+    animateCaseStudy(true);
+  }
+
+  function hideCase() {
+    if (!caseDialog || !caseDialog.open || caseHiding) return;
+    caseHiding = true;
+    caseClosing = true;
+    if (screenViewer.open) screenViewer.close();
+    animateCaseStudy(false, finishHideCase);
+  }
+
+  function finishHideCase() {
+    caseDialog.close();
+    root.classList.remove('case-open');
+    caseClosing = false;
+    caseHiding = false;
+    window.scrollTo(0, caseScroll);
+    caseButton.focus({ preventScroll: true });
+    // History traversal can restore scroll after popstate has finished.
+    window.requestAnimationFrame(function () {
+      if (caseDialog.open) return;
+      window.scrollTo(0, caseScroll);
+      if (caseRestoration) history.scrollRestoration = caseRestoration;
+      schedule();
+    });
+  }
+
+  function closeCase() {
+    if (!root.classList.contains('case-open') || caseClosing) return;
+    caseClosing = true;
+    if (caseHasHistory && location.hash === '#thready') history.back();
+    else {
+      try { history.replaceState(history.state, '', location.pathname + location.search + caseHash); } catch (e) {}
+      hideCase();
+    }
+  }
+
+  function trapDialogFocus(ev) {
+    if (ev.key !== 'Tab') return;
+    var items = all('a[href], button:not([disabled]), [tabindex="0"]', ev.currentTarget).filter(function (node) { return node.getClientRects().length; });
+    var first = items[0], last = items[items.length - 1];
+    if (ev.shiftKey && doc.activeElement === first) { ev.preventDefault(); last.focus(); }
+    else if (!ev.shiftKey && doc.activeElement === last) { ev.preventDefault(); first.focus(); }
+  }
+
+  function chooseScreen(index) {
+    var thumb = galleryThumbs[index];
+    var title = thumb.getAttribute('data-title');
+    galleryImage.src = thumb.querySelector('img').getAttribute('src');
+    galleryImage.alt = 'thReady ' + title + ' screen, with demo data';
+    text(byId('galleryTitle'), title);
+    text(byId('galleryCaption'), thumb.getAttribute('data-caption'));
+    galleryThumbs.forEach(function (button) { button.setAttribute('aria-pressed', button === thumb ? 'true' : 'false'); });
+  }
+
+  if (caseDialog && caseButton) {
+    window.addEventListener('resize', finishCaseMotion);
+    if (motionQuery && motionQuery.addEventListener) {
+      motionQuery.addEventListener('change', function (ev) { if (ev.matches) finishCaseMotion(); });
+    }
+    caseButton.addEventListener('click', function () { openCase(false); });
+    caseClose.addEventListener('click', closeCase);
+    caseDialog.addEventListener('cancel', function (ev) { ev.preventDefault(); closeCase(); });
+    caseDialog.addEventListener('close', function () {
+      // Repeated Escape can force a native close before the exit animation finishes.
+      if (caseDialog.open || !root.classList.contains('case-open')) return;
+      closeCase();
+      clearCaseMotion();
+      finishHideCase();
+    });
+    caseDialog.addEventListener('keydown', trapDialogFocus);
+    var backdropStart = false;
+    function onBackdrop(ev) {
+      var box = caseDialog.getBoundingClientRect();
+      return ev.target === caseDialog && (ev.clientX < box.left || ev.clientX > box.right || ev.clientY < box.top || ev.clientY > box.bottom);
+    }
+    caseDialog.addEventListener('pointerdown', function (ev) { backdropStart = onBackdrop(ev); });
+    caseDialog.addEventListener('click', function (ev) { if (backdropStart && onBackdrop(ev)) closeCase(); backdropStart = false; });
+    window.addEventListener('popstate', function () {
+      if (location.hash === '#thready') openCase(true);
+      else hideCase();
+    });
+    byId('walkthrough').addEventListener('click', function (ev) { ev.preventDefault(); });
+    galleryThumbs.forEach(function (thumb, index) {
+      thumb.addEventListener('click', function () { chooseScreen(index); });
+      thumb.addEventListener('keydown', function (ev) {
+        var next = index;
+        if (ev.key === 'ArrowRight' || ev.key === 'ArrowDown') next = (index + 1) % galleryThumbs.length;
+        else if (ev.key === 'ArrowLeft' || ev.key === 'ArrowUp') next = (index + galleryThumbs.length - 1) % galleryThumbs.length;
+        else return;
+        ev.preventDefault();
+        chooseScreen(next);
+        galleryThumbs[next].focus({ preventScroll: true });
+        var scroller = thumb.parentNode;
+        scroller.scrollLeft = Math.max(0, galleryThumbs[next].offsetLeft - scroller.offsetLeft - 4);
+      });
+    });
+    function syncEnlarge() { enlargeScreen.disabled = window.innerWidth >= 760; }
+    syncEnlarge();
+    window.addEventListener('resize', syncEnlarge);
+    enlargeScreen.addEventListener('click', function () {
+      if (caseClosing || !caseDialog.open) return;
+      var image = byId('fullScreenImage');
+      image.src = galleryImage.src;
+      image.alt = galleryImage.alt;
+      screenViewer.showModal();
+    });
+    screenViewer.addEventListener('keydown', trapDialogFocus);
+    byId('closeScreen').addEventListener('click', function () { screenViewer.close(); });
+    screenViewer.addEventListener('close', function () { if (caseDialog.open) enlargeScreen.focus({ preventScroll: true }); });
+  }
+
   /* ---------- small live touches: chat plays, test count, row count ---------- */
 
   var rowCount = byId('rowCount');
@@ -912,24 +1118,23 @@
 
   function countUp(node) {
     var end = parseInt(node.getAttribute('data-count'), 10);
-    var suffix = node.getAttribute('data-suffix') || '';
     if (!end) return;
     var t0 = 0, dur = 1400;
     function tick(ts) {
       if (!t0) t0 = ts;
       var k = Math.min(1, (ts - t0) / dur);
-      node.textContent = Math.round(end * out(k)) + suffix;
+      node.textContent = Math.round(end * out(k)).toLocaleString('en-US');
       if (k < 1) window.requestAnimationFrame(tick);
     }
     window.requestAnimationFrame(tick);
   }
 
-  function onceVisible(node, fn) {
+  function onceVisible(node, fn, scrollRoot) {
     var obs = new IntersectionObserver(function (entries) {
       for (var i = 0; i < entries.length; i++) {
         if (entries[i].isIntersecting) { obs.disconnect(); fn(); return; }
       }
-    }, { threshold: 0.6 });
+    }, { threshold: 0.6, root: scrollRoot || null });
     obs.observe(node);
   }
 
@@ -942,8 +1147,8 @@
     var counter = byId('testCount');
     if (counter) {
       counter.classList.add('will-count');
-      counter.textContent = '0' + (counter.getAttribute('data-suffix') || '');
-      onceVisible(counter, function () { countUp(counter); });
+      counter.textContent = '0';
+      onceVisible(counter, function () { countUp(counter); }, caseContent);
     }
   }
 
@@ -1082,6 +1287,7 @@
     if ('scrollRestoration' in history) { try { history.scrollRestoration = 'manual'; } catch (e) {} }
     landOnHash();
   }
+  if (hash === 'thready') openCase(true);
 
   try {
     if (doc.fonts && doc.fonts.ready) {
