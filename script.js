@@ -6,13 +6,14 @@
 
   var doc = document;
   var root = doc.documentElement;
-  var TOTAL = 19;
-  var L1 = 'John Kenneth', L2 = 'Moscosa';
   var SECS = ['me', 'projects', 'skills', 'certs', 'log', 'contact'];
   var EMAIL = 'moscosajohnkenneth1@gmail.com';
 
-  var reduced = false;
-  try { reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
+  var reduced = false, motionQuery = null;
+  try {
+    motionQuery = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+    reduced = !!(motionQuery && motionQuery.matches);
+  } catch (e) {}
   var coarse = false;
   try { coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches); } catch (e) {}
 
@@ -22,6 +23,7 @@
   var el = {
     bg: byId('siteBg'),
     bgGrid: byId('siteBgGrid'),
+    bgGlow: byId('siteBgGlow'),
     bgTiles: byId('siteBgTiles'),
     bgText: byId('siteBgText'),
     bgPlane: byId('siteBgPlane'),
@@ -29,11 +31,16 @@
     stage: byId('stage'),
     nameBox: byId('nameBox'),
     nameFx: byId('nameFx'),
+    nameLoad: byId('nameLoad'),
+    loadQuery: byId('loadQuery'),
+    loadQueryRun: byId('loadQueryRun'),
+    loadFlash: byId('loadFlash'),
+    loadVignette: byId('loadVignette'),
+    loadRipple: byId('loadRipple'),
+    loadResult: byId('loadResult'),
+    loadGhost: byId('loadGhost'),
     eyebrow: byId('eyebrow'),
     line: byId('eyebrowLine'),
-    dotsWrap: byId('typingDots'),
-    t1: byId('typed1'), r1: byId('rest1'), c1: byId('caret1'),
-    t2: byId('typed2'), r2: byId('rest2'), c2: byId('caret2'),
     sub: byId('sub'),
     lede: byId('lede'),
     actions: byId('actions'),
@@ -55,7 +62,6 @@
   };
   if (!el.track || !el.stage || !el.nameBox) return;
 
-  el.dots = el.dotsWrap ? all('span', el.dotsWrap) : [];
   el.reveal = {
     board: all('[data-reveal="board"]'),
     notes: all('[data-reveal="notes"]'),
@@ -70,13 +76,14 @@
   var S = {
     W: 0, H: 0, mobile: false, introDist: 0,
     box: null,
-    typed: reduced ? TOTAL : 0,
     p: reduced ? 1 : 0,
     pTarget: reduced ? 1 : 0,
     beat: 0,
-    introIn: reduced,
     active: null
   };
+  var loadPlaying = root.classList.contains('load-playing');
+  var loadAnimations = [], loadNameAnimation = null, loadGhostName = null, loadStart = 0;
+  var loadFlat = 'matrix(0.866, 0.5, -0.866, 0.5, 0, 0) scale(1)';
 
   /* ---------- helpers ported from renderVals() ---------- */
 
@@ -111,8 +118,11 @@
 
   /* ---------- queries on the floor ---------- */
 
-  var floorW = 0, floorH = 0, floorRate = null, floorResizeT;
-  var floorAnimations = [];
+  var floorW = 0, floorH = 0, floorRate = 1, floorResizeT;
+  var floorRows = [], floorContext, floorSize = 0, floorRatio = 1;
+  var floorX = 0, floorY = 0;
+  var floorTime = 0, floorLast = 0, floorRaf = 0;
+  var floorMotion = !reduced;
   var floorQueries = [
     "<span class=\"kw\">SELECT</span> * <span class=\"kw\">FROM</span> kenn <span class=\"kw\">WHERE</span> section = <span class=\"accent\">'me'</span>;",
     '<span class="kw">SELECT</span> * <span class="kw">FROM</span> kenn.projects <span class="kw">ORDER BY</span> pride <span class="kw">DESC</span>;',
@@ -122,44 +132,85 @@
     "<span class=\"kw\">INSERT INTO</span> kenn.inbox <span class=\"kw\">VALUES</span> (<span class=\"accent\">'you'</span>);"
   ];
 
-  function measureFloor(w, h) {
-    if (!el.bg || (w === floorW && h === floorH)) return;
+  function drawFloor(ts) {
+    floorRaf = 0;
+    if (floorLast) floorTime += (ts - floorLast) * floorRate;
+    floorLast = ts;
+    floorContext.setTransform(floorRatio, 0, 0, floorRatio, 0, 0);
+    floorContext.clearRect(0, 0, floorW, floorH);
+    floorContext.transform(0.866, 0.5, -0.866, 0.5, floorX, floorY);
+    for (var i = 0; i < floorRows.length; i++) {
+      var row = floorRows[i];
+      var x = -row.width * ((floorTime / 1000 + row.delay) % row.duration) / row.duration;
+      for (; x < floorSize; x += row.width) {
+        floorContext.drawImage(row.strip, x, i * 60, row.width, 60);
+      }
+    }
+    if (floorMotion && !doc.hidden) floorRaf = window.requestAnimationFrame(drawFloor);
+  }
+
+  function measureFloor(w, h, force) {
+    if (!el.bg || (w === floorW && h === floorH && !force)) return;
     floorW = w; floorH = h;
 
     var half = w / 3.464;
     var top = -Math.ceil(half / 60) * 60;
     var length = Math.ceil((h - top + half) / 60) * 60;
-    css(el.bgPlane, 'left', (52 + 104 * Math.round((w / 2 - 52) / 104)) + 'px');
-    css(el.bgPlane, 'top', top + 'px');
-    css(el.bgPlane, 'width', length + 'px');
-    css(el.bgPlane, 'height', length + 'px');
+    floorX = 52 + 104 * Math.round((w / 2 - 52) / 104);
+    floorY = top;
+    css(el.bgPlane, 'width', w + 'px');
+    css(el.bgPlane, 'height', h + 'px');
 
     var nq = Math.max(6, Math.ceil(length / 420) + 1);
     var speeds = [52, 68, 44, 76, 60];
-    var rows = doc.createDocumentFragment();
-    for (var i = 0; i < length / 60; i++) {
-      var sequence = '';
-      for (var j = 0; j < nq; j++) sequence += '<span>' + floorQueries[(i * 2 + j) % 6] + '</span>';
-      var row = doc.createElement('div');
-      row.className = 'site-bg-row';
-      var track = doc.createElement('span');
-      track.className = 'q-run';
-      track.innerHTML = sequence + sequence;
-      var duration = speeds[i % 5] * nq / 6;
-      css(track, 'animationDuration', duration + 's');
-      css(track, 'animationDelay', -((i * 7) % duration) + 's');
-      row.appendChild(track);
-      rows.appendChild(row);
+    var style = window.getComputedStyle(el.bgPlane);
+    var palette = window.getComputedStyle(root);
+    var colors = { kw: palette.getPropertyValue('--sql-keyword').trim(), accent: palette.getPropertyValue('--accent').trim() };
+    var strips = [], widths = [];
+    floorSize = length;
+    // Bound texture memory and stay inside mobile canvas dimension limits.
+    floorRatio = Math.min(window.devicePixelRatio || 1, 1.5, Math.sqrt(3000000 / (w * h)), 4096 / w, 4096 / h);
+    if (floorRaf) window.cancelAnimationFrame(floorRaf);
+    floorRaf = 0; floorLast = 0; floorRows = [];
+    el.bgPlane.width = Math.min(4096, Math.ceil(w * floorRatio));
+    el.bgPlane.height = Math.min(4096, Math.ceil(h * floorRatio));
+    floorContext = el.bgPlane.getContext('2d');
+    if (!floorContext) { css(el.bgText, 'display', 'none'); return; }
+    floorContext.scale(floorRatio, floorRatio);
+    for (var start = 0; start < 3; start++) {
+      var parts = [], width = 0;
+      floorContext.font = style.font;
+      for (var j = 0; j < nq; j++) {
+        var query = doc.createElement('span');
+        query.innerHTML = floorQueries[(start * 2 + j) % 6];
+        Array.prototype.forEach.call(query.childNodes, function (part) {
+          parts.push({ text: part.textContent, x: width, color: colors[part.className] || style.color });
+          width += floorContext.measureText(part.textContent).width;
+        });
+        width += 120;
+      }
+      var strip = doc.createElement('canvas');
+      var stripRatio = Math.min(floorRatio, 4096 / width);
+      strip.width = Math.min(4096, Math.ceil(width * stripRatio));
+      strip.height = Math.ceil(60 * stripRatio);
+      var context = strip.getContext('2d');
+      if (!context) { floorContext = null; css(el.bgText, 'display', 'none'); return; }
+      context.scale(stripRatio, stripRatio);
+      context.font = style.font;
+      context.textBaseline = 'middle';
+      parts.forEach(function (part) {
+        context.fillStyle = part.color;
+        context.fillText(part.text, part.x, 30);
+      });
+      strips.push(strip);
+      widths.push(width);
     }
-    el.bgPlane.textContent = '';
-    el.bgPlane.appendChild(rows);
-    floorAnimations = [];
-    if (!reduced) all('.q-run', el.bgPlane).forEach(function (track) {
-      if (!track.getAnimations) return;
-      var animation = track.getAnimations()[0];
-      if (animation && animation.updatePlaybackRate) floorAnimations.push(animation);
-    });
-    floorRate = null;
+    for (var i = 0; i < length / 60; i++) {
+      var duration = speeds[i % 5] * nq / 6;
+      floorRows.push({ strip: strips[i % 3], width: widths[i % 3], duration: duration, delay: reduced ? 0 : (i * 7) % duration });
+    }
+    css(el.bgText, 'display', '');
+    drawFloor(0);
 
     // A fixed cell hash keeps surviving cells in the same order across resizes.
     var candidates = [];
@@ -195,10 +246,7 @@
     css(el.bgGrid, 'opacity', (1 - 0.3 * k).toFixed(3));
     css(el.bgText, 'opacity', (0.5 - 0.2 * k).toFixed(3));
     css(el.bg, '--hole', k.toFixed(3));
-    var rate = 1 - 0.75 * k;
-    if (rate === floorRate) return;
-    floorRate = rate;
-    floorAnimations.forEach(function (animation) { animation.updatePlaybackRate(rate); });
+    floorRate = 1 - 0.75 * k;
   }
 
   /* ---------- measure ---------- */
@@ -217,7 +265,8 @@
       clearTimeout(floorResizeT);
       floorResizeT = setTimeout(function () {
         measureFloor(S.W, S.H);
-        renderFloor(reduced ? 1 : io(seg(0.03, 0.6)));
+        if (!loadPlaying) renderFloor(reduced ? 1 : io(seg(0.03, 0.6)));
+        else renderFloor(0);
       }, 120);
     }
 
@@ -228,6 +277,7 @@
     var sr = el.stage.getBoundingClientRect();
     var nr = el.nameBox.getBoundingClientRect();
     S.box = { x: nr.left - sr.left, y: nr.top - sr.top, w: nr.width, h: nr.height };
+    if (loadPlaying && loadGhostName) placeLoadName();
 
     readScroll();
     S.p = S.pTarget;
@@ -256,7 +306,7 @@
   function readScroll() {
     var top = scrollTop();
     S.pTarget = S.introDist ? clamp(top / S.introDist) : 1;
-    if (S.pTarget > 0.03 && S.typed < TOTAL) finishTyping();
+    if (loadPlaying && top > 0) finishLoad();
     S.active = activeAt(top);
   }
 
@@ -322,50 +372,44 @@
 
   /* ---------- render ---------- */
 
+  function startNameScale(box) {
+    if (box.w <= 0) return 1;
+    return S.mobile ? Math.min(1.06, (S.W * 0.9) / box.w) : Math.min(1.2, (S.W * 0.64) / box.w, (S.H * 0.42) / box.h);
+  }
+
   var lastActive;
   function render() {
     var mobile = S.mobile, W = S.W, H = S.H;
-    var n = S.typed;
-    var typing = n < TOTAL;
     var tick = Math.floor(S.beat / 2) % 2 === 0;
 
     // name: centred and scaled at p = 0, settles into its slot by p = 0.6
     var box = S.box || { x: 0, y: 0, w: 0, h: 0 };
     var e = io(seg(0.03, 0.6));
-    renderFloor(reduced ? 1 : e);
-    var s0 = 1;
-    if (box.w > 0) s0 = mobile ? Math.min(1.06, (W * 0.9) / box.w) : Math.min(1.2, (W * 0.64) / box.w, (H * 0.42) / box.h);
+    if (!loadPlaying) {
+      renderFloor(reduced ? 1 : e);
+      css(el.loadVignette, 'opacity', (1 - e).toFixed(3));
+    }
+    var s0 = startNameScale(box);
     var dx = W / 2 - (box.x + box.w / 2);
     var dy = H / 2 - (box.y + box.h / 2);
     var sc = s0 + (1 - s0) * e;
     css(el.nameFx, 'transform', 'translate(' + (dx * (1 - e)).toFixed(1) + 'px, ' + (dy * (1 - e)).toFixed(1) + 'px) scale(' + sc.toFixed(4) + ')');
     css(el.nameFx, 'opacity', box.w > 0 ? '1' : '0');
 
-    // typing
-    var k1 = Math.min(n, 12), k2 = Math.max(0, n - 12);
-    text(el.t1, L1.slice(0, k1)); text(el.r1, L1.slice(k1));
-    text(el.t2, L2.slice(0, k2)); text(el.r2, L2.slice(k2));
-    css(el.c1, 'display', n < 12 ? 'inline-block' : 'none');
-    css(el.c2, 'display', n >= 12 ? 'inline-block' : 'none');
-    var caretO = (typing || tick) ? '1' : '0';
-    css(el.c1, 'opacity', caretO);
-    css(el.c2, 'opacity', caretO);
-
     // intro chrome
-    css(el.eyebrow, 'opacity', S.introIn ? '1' : '0');
-    css(el.line, 'transform', 'scaleX(' + (S.introIn ? 1 : 0) + ')');
-    css(el.dotsWrap, 'opacity', (S.introIn && n === 0) ? '1' : '0');
-    var phase = S.beat % 3;
-    for (var i = 0; i < el.dots.length; i++) css(el.dots[i], 'opacity', phase === i ? '1' : '0.3');
-    css(el.sub, 'opacity', typing ? '0' : '1');
-    css(el.sub, 'transform', 'translateY(' + (typing ? 8 : 0) + 'px)');
+    css(el.eyebrow, 'opacity', '1');
+    css(el.line, 'transform', 'scaleX(1)');
+    css(el.sub, 'opacity', '1');
+    css(el.sub, 'transform', 'translateY(0px)');
 
-    var cueO = typing ? 0 : (1 - seg(0, 0.1));
-    css(el.cue, 'opacity', cueO.toFixed(3)); vis(el.cue, cueO);
-    var urlO = mobile ? 0 : cueO;
-    css(el.cueUrl, 'opacity', urlO.toFixed(3)); vis(el.cueUrl, urlO);
+    if (!loadPlaying) {
+      var cueO = 1 - seg(0, 0.1);
+      css(el.cue, 'opacity', cueO.toFixed(3)); vis(el.cue, cueO);
+      var urlO = mobile ? 0 : cueO;
+      css(el.cueUrl, 'opacity', urlO.toFixed(3)); vis(el.cueUrl, urlO);
+    }
     css(el.cueArrow, 'transform', 'translateY(' + (tick ? 6 : 0) + 'px)');
-    var skipO = reduced ? 0 : (1 - seg(0.2, 0.45));
+    var skipO = loadPlaying ? 1 : (reduced ? 0 : (1 - seg(0.2, 0.45)));
     css(el.skip, 'opacity', skipO.toFixed(3)); vis(el.skip, skipO);
 
     // hero fades
@@ -398,27 +442,114 @@
     }
   }
 
-  /* ---------- typing + beat ---------- */
+  /* ---------- once-per-load sequence ---------- */
 
-  var startT, typeT, beatT;
-  function finishTyping() {
-    S.typed = TOTAL;
-    clearTimeout(startT);
-    clearInterval(typeT);
+  function nameLoadFrames() {
+    return [
+      { offset: 0, opacity: 0, filter: 'blur(3px)', transform: loadFlat },
+      { offset: 550 / 2300, opacity: 0.45, filter: 'blur(0px)', transform: loadFlat },
+      { offset: 750 / 2300, opacity: 0.45, filter: 'blur(0px)', transform: loadFlat, easing: 'cubic-bezier(0.3, 0, 0.1, 1)' },
+      { offset: 1, opacity: 1, filter: 'blur(0px)', transform: 'matrix(1, 0, 0, 1, 0, 0) scale(1)' }
+    ];
   }
+
+  function placeLoadName() {
+    var box = S.box, scale = startNameScale(box);
+    var flatScale = Math.min(1, (S.W * 0.9) / (0.866 * (box.w + box.h) * scale));
+    loadFlat = 'matrix(0.866, 0.5, -0.866, 0.5, 0, 0) scale(' + flatScale.toFixed(4) + ')';
+    css(el.loadGhost, 'left', (S.W / 2) + 'px');
+    css(el.loadGhost, 'top', (S.H / 2) + 'px');
+    css(el.loadGhost, 'width', box.w + 'px');
+    css(el.loadGhost, 'height', box.h + 'px');
+    css(el.loadGhost, 'transform', 'translate(-50%, -50%) scale(' + scale + ')');
+    css(loadGhostName, 'transform', loadFlat);
+    if (loadNameAnimation) loadNameAnimation.effect.setKeyframes(nameLoadFrames());
+  }
+
+  function animateLoad(node, frames, duration, delay, easing, fill) {
+    var animation = node.animate(frames, { duration: duration, delay: delay, easing: easing || 'linear', fill: fill || 'both' });
+    animation.startTime = loadStart;
+    loadAnimations.push(animation);
+    return animation;
+  }
+
+  function finishLoad() {
+    if (!loadPlaying) return;
+    loadPlaying = false;
+    ['wheel', 'touchstart', 'scroll', 'keydown'].forEach(function (type) { window.removeEventListener(type, finishLoad, true); });
+    window.removeEventListener('click', skipLoad, true);
+    css(el.cue, 'transition', 'none');
+    css(el.cueUrl, 'transition', 'none');
+    [el.loadQuery, el.loadFlash, el.loadRipple, el.loadGhost, el.loadResult, el.bgGlow].forEach(function (node) { css(node, 'opacity', '0'); });
+    css(el.nameLoad, 'opacity', '1');
+    css(el.nameLoad, 'transform', 'none');
+    css(el.nameLoad, 'filter', 'none');
+    css(el.bg, 'opacity', '1');
+    css(el.bg, 'transform', 'none');
+    css(el.bg, 'filter', 'none');
+    loadAnimations.forEach(function (animation) { animation.cancel(); });
+    loadAnimations = [];
+    loadNameAnimation = null;
+    root.classList.remove('load-playing');
+    render();
+    window.requestAnimationFrame(function () { window.requestAnimationFrame(function () {
+      css(el.cue, 'transition', ''); css(el.cueUrl, 'transition', '');
+    }); });
+  }
+
+  function skipLoad(ev) {
+    if (!loadPlaying || !ev.target.closest || !ev.target.closest('#skipIntro')) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    finishLoad();
+  }
+
+  function startLoad() {
+    if (!el.nameLoad.animate || reduced || location.hash || scrollTop()) { finishLoad(); return; }
+    loadGhostName = el.nameLoad.cloneNode(true);
+    loadGhostName.removeAttribute('id');
+    loadGhostName.className = 'load-ghost-name';
+    all('[id]', loadGhostName).forEach(function (node) { node.removeAttribute('id'); });
+    el.loadGhost.appendChild(loadGhostName);
+    placeLoadName();
+    renderFloor(0);
+    css(el.bg, '--hole', '1');
+    loadStart = doc.timeline.currentTime;
+    animateLoad(el.loadQuery, [
+      { offset: 0, opacity: 0, transform: 'scale(1)', filter: 'blur(0px)' },
+      { offset: 450 / 2650, opacity: 1, transform: 'scale(1)', filter: 'blur(0px)' },
+      { offset: 2150 / 2650, opacity: 1, transform: 'scale(1)', filter: 'blur(0px)', easing: 'cubic-bezier(0.6, 0, 0.9, 0.4)' },
+      { offset: 1, opacity: 0, transform: 'scale(5)', filter: 'blur(10px)' }
+    ], 2650, 0);
+    animateLoad(el.loadQueryRun, [{ width: '0ch' }, { width: '19ch' }], 1300, 550, 'steps(19)');
+    animateLoad(el.loadFlash, [{ opacity: 0 }, { offset: 350 / 1550, opacity: 1 }, { opacity: 0 }], 1550, 2200);
+    animateLoad(el.loadVignette, [{ opacity: 0 }, { opacity: 1 }], 1100, 2200);
+    var flight = animateLoad(el.bg, [
+      { offset: 0, opacity: 0, transform: 'scale(7)' },
+      { offset: 350 / 8300, opacity: 1, transform: 'scale(7)', easing: 'cubic-bezier(0.6, 0, 0.1, 1)' },
+      { offset: 2400 / 8300, opacity: 1, transform: 'scale(1.07)' },
+      { offset: 1, opacity: 1, transform: 'scale(1)' }
+    ], 8300, 2200);
+    // Clear before the flat-name hold so floor queries cannot cross its letters.
+    animateLoad(el.bg, [{ '--hole': 1 }, { offset: 0.35, '--hole': 0 }, { '--hole': 0 }], 1000, 4500);
+    loadNameAnimation = animateLoad(el.nameLoad, nameLoadFrames(), 2300, 4300);
+    animateLoad(el.loadGhost, [{ opacity: 0 }, { offset: 200 / 2300, opacity: 0.32 }, { opacity: 0 }], 2300, 4950);
+    animateLoad(el.loadRipple, [{ transform: 'scale(0.2)', opacity: 0.9 }, { transform: 'scale(9)', opacity: 0 }], 2000, 5050, 'cubic-bezier(0.15, 0.6, 0.2, 1)', 'forwards');
+    animateLoad(el.bgGlow, [{ opacity: 0 }, { offset: 350 / 2200, opacity: 0.45 }, { opacity: 0 }], 2200, 5050);
+    animateLoad(el.loadResult, [{ opacity: 0 }, { offset: 450 / 2550, opacity: 1 }, { offset: 1900 / 2550, opacity: 1 }, { opacity: 0 }], 2550, 6800);
+    animateLoad(el.cue, [{ opacity: 0 }, { opacity: 1 }], 850, 7500);
+    animateLoad(el.cueUrl, [{ opacity: 0 }, { opacity: 1 }], 850, 7500);
+    flight.finished.then(finishLoad, function () {});
+    ['wheel', 'touchstart', 'scroll', 'keydown'].forEach(function (type) { window.addEventListener(type, finishLoad, { passive: true, capture: true }); });
+    window.addEventListener('click', skipLoad, true);
+  }
+
+  /* ---------- beat ---------- */
 
   function stageVisible() { return scrollTop() < S.introDist + S.H; }
 
   if (!reduced) {
-    setTimeout(function () { S.introIn = true; schedule(); }, 150);
-    startT = setTimeout(function () {
-      typeT = setInterval(function () {
-        if (S.typed >= TOTAL) { clearInterval(typeT); return; }
-        S.typed += 1;
-        schedule();
-      }, 80);
-    }, 1500);
-    beatT = setInterval(function () {
+    setInterval(function () {
       if (doc.hidden || !stageVisible()) return;
       S.beat += 1;
       schedule();
@@ -436,7 +567,7 @@
     var top = 0;
     if (id === 'home') top = S.introDist;
     else if (id !== 'top') top = sectionTop(id);
-    finishTyping();
+    finishLoad();
     schedule();
     var behavior = (reduced || instant) ? 'auto' : 'smooth';
     try { window.scrollTo({ top: top, behavior: behavior }); } catch (e) { window.scrollTo(0, top); }
@@ -878,7 +1009,13 @@
   var roomOnScreen = true;
   function syncPause() {
     if (el.room) el.room.classList.toggle('is-paused', doc.hidden || !roomOnScreen);
-    if (el.bg) el.bg.classList.toggle('is-paused', doc.hidden);
+    if (el.bg) el.bg.classList.toggle('is-paused', doc.hidden || !floorMotion);
+    if ((doc.hidden || !floorMotion) && floorRaf) {
+      window.cancelAnimationFrame(floorRaf);
+      floorRaf = 0; floorLast = 0;
+    } else if (!doc.hidden && floorMotion && !floorRaf && floorContext) {
+      floorRaf = window.requestAnimationFrame(drawFloor);
+    }
   }
   if ('IntersectionObserver' in window && el.room) {
     new IntersectionObserver(function (entries) {
@@ -887,6 +1024,13 @@
     }).observe(el.room);
   }
   doc.addEventListener('visibilitychange', function () { syncPause(); if (!doc.hidden) { updateTime(); schedule(); } });
+  function changeFloorMotion(event) {
+    floorMotion = !event.matches && !reduced;
+    if (event.matches) finishLoad();
+    syncPause();
+  }
+  if (motionQuery && motionQuery.addEventListener) motionQuery.addEventListener('change', changeFloorMotion);
+  else if (motionQuery && motionQuery.addListener) motionQuery.addListener(changeFloorMotion);
 
   // Murmurs: three words float up from Kenn's mouth and fade, staggered.
   // (From assets/room-demo.html; the only change is the pause check.)
@@ -925,6 +1069,7 @@
   window.addEventListener('orientationchange', function () { setTimeout(function () { measure(true); }, 150); });
 
   measure(true);
+  if (loadPlaying) startLoad();
 
   // Deep links such as #certs (credentials.html redirects there): land under the top bar.
   var userScrolled = false;
@@ -940,7 +1085,7 @@
 
   try {
     if (doc.fonts && doc.fonts.ready) {
-      doc.fonts.ready.then(function () { measure(true); landOnHash(); });
+      doc.fonts.ready.then(function () { measureFloor(S.W, S.H, true); measure(true); landOnHash(); });
     }
   } catch (e) {}
   window.addEventListener('load', function () { measure(true); landOnHash(); });
