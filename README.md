@@ -56,8 +56,9 @@ An AI-enhanced production management system for a garment manufacturer. I led th
 
 ## 📜 Certifications
 
-- [Introduction to SQL](https://www.datacamp.com/completed/statement-of-accomplishment/course/c5226c01e41cffcfdd1634bdaf100ad9efa7776d) — DataCamp, Aug 29, 2026
+- [Introduction to SQL](https://www.datacamp.com/completed/statement-of-accomplishment/course/c5226c01e41cffcfdd1634bdaf100ad9efa7776d) — DataCamp, Aug 27, 2026
 - [Intermediate SQL](https://www.datacamp.com/completed/statement-of-accomplishment/course/e7520ea6bd1463e66aa02a2590be819c66f81271) — DataCamp, Aug 29, 2026
+- Java Fundamentals — Oracle Academy, Jun 19, 2024
 
 ## 🎯 Currently Learning
 
