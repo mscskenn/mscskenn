@@ -9,8 +9,11 @@
   var SECS = ['me', 'projects', 'skills', 'certs', 'log', 'contact'];
   var EMAIL = 'moscosajohnkenneth1@gmail.com';
 
-  var reduced = false;
-  try { reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
+  var reduced = false, motionQuery = null;
+  try {
+    motionQuery = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+    reduced = !!(motionQuery && motionQuery.matches);
+  } catch (e) {}
   var coarse = false;
   try { coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches); } catch (e) {}
 
@@ -115,8 +118,11 @@
 
   /* ---------- queries on the floor ---------- */
 
-  var floorW = 0, floorH = 0, floorRate = null, floorResizeT;
-  var floorAnimations = [];
+  var floorW = 0, floorH = 0, floorRate = 1, floorResizeT;
+  var floorRows = [], floorContext, floorSize = 0, floorRatio = 1;
+  var floorX = 0, floorY = 0;
+  var floorTime = 0, floorLast = 0, floorRaf = 0;
+  var floorMotion = !reduced;
   var floorQueries = [
     "<span class=\"kw\">SELECT</span> * <span class=\"kw\">FROM</span> kenn <span class=\"kw\">WHERE</span> section = <span class=\"accent\">'me'</span>;",
     '<span class="kw">SELECT</span> * <span class="kw">FROM</span> kenn.projects <span class="kw">ORDER BY</span> pride <span class="kw">DESC</span>;',
@@ -126,44 +132,85 @@
     "<span class=\"kw\">INSERT INTO</span> kenn.inbox <span class=\"kw\">VALUES</span> (<span class=\"accent\">'you'</span>);"
   ];
 
-  function measureFloor(w, h) {
-    if (!el.bg || (w === floorW && h === floorH)) return;
+  function drawFloor(ts) {
+    floorRaf = 0;
+    if (floorLast) floorTime += (ts - floorLast) * floorRate;
+    floorLast = ts;
+    floorContext.setTransform(floorRatio, 0, 0, floorRatio, 0, 0);
+    floorContext.clearRect(0, 0, floorW, floorH);
+    floorContext.transform(0.866, 0.5, -0.866, 0.5, floorX, floorY);
+    for (var i = 0; i < floorRows.length; i++) {
+      var row = floorRows[i];
+      var x = -row.width * ((floorTime / 1000 + row.delay) % row.duration) / row.duration;
+      for (; x < floorSize; x += row.width) {
+        floorContext.drawImage(row.strip, x, i * 60, row.width, 60);
+      }
+    }
+    if (floorMotion && !doc.hidden) floorRaf = window.requestAnimationFrame(drawFloor);
+  }
+
+  function measureFloor(w, h, force) {
+    if (!el.bg || (w === floorW && h === floorH && !force)) return;
     floorW = w; floorH = h;
 
     var half = w / 3.464;
     var top = -Math.ceil(half / 60) * 60;
     var length = Math.ceil((h - top + half) / 60) * 60;
-    css(el.bgPlane, 'left', (52 + 104 * Math.round((w / 2 - 52) / 104)) + 'px');
-    css(el.bgPlane, 'top', top + 'px');
-    css(el.bgPlane, 'width', length + 'px');
-    css(el.bgPlane, 'height', length + 'px');
+    floorX = 52 + 104 * Math.round((w / 2 - 52) / 104);
+    floorY = top;
+    css(el.bgPlane, 'width', w + 'px');
+    css(el.bgPlane, 'height', h + 'px');
 
     var nq = Math.max(6, Math.ceil(length / 420) + 1);
     var speeds = [52, 68, 44, 76, 60];
-    var rows = doc.createDocumentFragment();
-    for (var i = 0; i < length / 60; i++) {
-      var sequence = '';
-      for (var j = 0; j < nq; j++) sequence += '<span>' + floorQueries[(i * 2 + j) % 6] + '</span>';
-      var row = doc.createElement('div');
-      row.className = 'site-bg-row';
-      var track = doc.createElement('span');
-      track.className = 'q-run';
-      track.innerHTML = sequence + sequence;
-      var duration = speeds[i % 5] * nq / 6;
-      css(track, 'animationDuration', duration + 's');
-      css(track, 'animationDelay', -((i * 7) % duration) + 's');
-      row.appendChild(track);
-      rows.appendChild(row);
+    var style = window.getComputedStyle(el.bgPlane);
+    var palette = window.getComputedStyle(root);
+    var colors = { kw: palette.getPropertyValue('--sql-keyword').trim(), accent: palette.getPropertyValue('--accent').trim() };
+    var strips = [], widths = [];
+    floorSize = length;
+    // Bound texture memory and stay inside mobile canvas dimension limits.
+    floorRatio = Math.min(window.devicePixelRatio || 1, 1.5, Math.sqrt(3000000 / (w * h)), 4096 / w, 4096 / h);
+    if (floorRaf) window.cancelAnimationFrame(floorRaf);
+    floorRaf = 0; floorLast = 0; floorRows = [];
+    el.bgPlane.width = Math.min(4096, Math.ceil(w * floorRatio));
+    el.bgPlane.height = Math.min(4096, Math.ceil(h * floorRatio));
+    floorContext = el.bgPlane.getContext('2d');
+    if (!floorContext) { css(el.bgText, 'display', 'none'); return; }
+    floorContext.scale(floorRatio, floorRatio);
+    for (var start = 0; start < 3; start++) {
+      var parts = [], width = 0;
+      floorContext.font = style.font;
+      for (var j = 0; j < nq; j++) {
+        var query = doc.createElement('span');
+        query.innerHTML = floorQueries[(start * 2 + j) % 6];
+        Array.prototype.forEach.call(query.childNodes, function (part) {
+          parts.push({ text: part.textContent, x: width, color: colors[part.className] || style.color });
+          width += floorContext.measureText(part.textContent).width;
+        });
+        width += 120;
+      }
+      var strip = doc.createElement('canvas');
+      var stripRatio = Math.min(floorRatio, 4096 / width);
+      strip.width = Math.min(4096, Math.ceil(width * stripRatio));
+      strip.height = Math.ceil(60 * stripRatio);
+      var context = strip.getContext('2d');
+      if (!context) { floorContext = null; css(el.bgText, 'display', 'none'); return; }
+      context.scale(stripRatio, stripRatio);
+      context.font = style.font;
+      context.textBaseline = 'middle';
+      parts.forEach(function (part) {
+        context.fillStyle = part.color;
+        context.fillText(part.text, part.x, 30);
+      });
+      strips.push(strip);
+      widths.push(width);
     }
-    el.bgPlane.textContent = '';
-    el.bgPlane.appendChild(rows);
-    floorAnimations = [];
-    if (!reduced) all('.q-run', el.bgPlane).forEach(function (track) {
-      if (!track.getAnimations) return;
-      var animation = track.getAnimations()[0];
-      if (animation && animation.updatePlaybackRate) floorAnimations.push(animation);
-    });
-    floorRate = null;
+    for (var i = 0; i < length / 60; i++) {
+      var duration = speeds[i % 5] * nq / 6;
+      floorRows.push({ strip: strips[i % 3], width: widths[i % 3], duration: duration, delay: reduced ? 0 : (i * 7) % duration });
+    }
+    css(el.bgText, 'display', '');
+    drawFloor(0);
 
     // A fixed cell hash keeps surviving cells in the same order across resizes.
     var candidates = [];
@@ -199,10 +246,7 @@
     css(el.bgGrid, 'opacity', (1 - 0.3 * k).toFixed(3));
     css(el.bgText, 'opacity', (0.5 - 0.2 * k).toFixed(3));
     css(el.bg, '--hole', k.toFixed(3));
-    var rate = 1 - 0.75 * k;
-    if (rate === floorRate) return;
-    floorRate = rate;
-    floorAnimations.forEach(function (animation) { animation.updatePlaybackRate(rate); });
+    floorRate = 1 - 0.75 * k;
   }
 
   /* ---------- measure ---------- */
@@ -480,12 +524,11 @@
     animateLoad(el.loadQueryRun, [{ width: '0ch' }, { width: '19ch' }], 1300, 550, 'steps(19)');
     animateLoad(el.loadFlash, [{ opacity: 0 }, { offset: 350 / 1550, opacity: 1 }, { opacity: 0 }], 1550, 2200);
     animateLoad(el.loadVignette, [{ opacity: 0 }, { opacity: 1 }], 1100, 2200);
-    var floorBlur = S.mobile ? 'blur(0px)' : 'blur(14px)';
     var flight = animateLoad(el.bg, [
-      { offset: 0, opacity: 0, transform: 'scale(7)', filter: floorBlur },
-      { offset: 350 / 8300, opacity: 1, transform: 'scale(7)', filter: floorBlur, easing: 'cubic-bezier(0.6, 0, 0.1, 1)' },
-      { offset: 2400 / 8300, opacity: 1, transform: 'scale(1.07)', filter: 'blur(0px)' },
-      { offset: 1, opacity: 1, transform: 'scale(1)', filter: 'blur(0px)' }
+      { offset: 0, opacity: 0, transform: 'scale(7)' },
+      { offset: 350 / 8300, opacity: 1, transform: 'scale(7)', easing: 'cubic-bezier(0.6, 0, 0.1, 1)' },
+      { offset: 2400 / 8300, opacity: 1, transform: 'scale(1.07)' },
+      { offset: 1, opacity: 1, transform: 'scale(1)' }
     ], 8300, 2200);
     // Clear before the flat-name hold so floor queries cannot cross its letters.
     animateLoad(el.bg, [{ '--hole': 1 }, { offset: 0.35, '--hole': 0 }, { '--hole': 0 }], 1000, 4500);
@@ -966,7 +1009,13 @@
   var roomOnScreen = true;
   function syncPause() {
     if (el.room) el.room.classList.toggle('is-paused', doc.hidden || !roomOnScreen);
-    if (el.bg) el.bg.classList.toggle('is-paused', doc.hidden);
+    if (el.bg) el.bg.classList.toggle('is-paused', doc.hidden || !floorMotion);
+    if ((doc.hidden || !floorMotion) && floorRaf) {
+      window.cancelAnimationFrame(floorRaf);
+      floorRaf = 0; floorLast = 0;
+    } else if (!doc.hidden && floorMotion && !floorRaf && floorContext) {
+      floorRaf = window.requestAnimationFrame(drawFloor);
+    }
   }
   if ('IntersectionObserver' in window && el.room) {
     new IntersectionObserver(function (entries) {
@@ -975,6 +1024,13 @@
     }).observe(el.room);
   }
   doc.addEventListener('visibilitychange', function () { syncPause(); if (!doc.hidden) { updateTime(); schedule(); } });
+  function changeFloorMotion(event) {
+    floorMotion = !event.matches && !reduced;
+    if (event.matches) finishLoad();
+    syncPause();
+  }
+  if (motionQuery && motionQuery.addEventListener) motionQuery.addEventListener('change', changeFloorMotion);
+  else if (motionQuery && motionQuery.addListener) motionQuery.addListener(changeFloorMotion);
 
   // Murmurs: three words float up from Kenn's mouth and fade, staggered.
   // (From assets/room-demo.html; the only change is the pause check.)
@@ -1029,7 +1085,7 @@
 
   try {
     if (doc.fonts && doc.fonts.ready) {
-      doc.fonts.ready.then(function () { measure(true); landOnHash(); });
+      doc.fonts.ready.then(function () { measureFloor(S.W, S.H, true); measure(true); landOnHash(); });
     }
   } catch (e) {}
   window.addEventListener('load', function () { measure(true); landOnHash(); });
