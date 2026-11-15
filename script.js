@@ -701,7 +701,7 @@
   var KENN_GREETING = 'oh hey! welcome to my room.';
   var KENN_WELCOME_BACK = 'oh, welcome back!';
   var KENN_LINES = [
-    "I'm Kenn. vibecoding, as usual.",
+    "I'm Kenn. building with AI, as usual.",
     'psst, my projects are just below ↓',
     "I'm looking for an OJT in web, backend or data.",
     'ask me about MySQL transactions. at your own risk.',
@@ -905,6 +905,133 @@
     if (!reduced) idleLoop();
   }
 
+  /* ---------- thReady case study ---------- */
+
+  var caseDialog = byId('threadyDialog');
+  var caseContent = byId('caseContent');
+  var caseButton = byId('openThready');
+  var caseClose = byId('closeThready');
+  var screenViewer = byId('screenViewer');
+  var enlargeScreen = byId('enlargeScreen');
+  var galleryImage = byId('galleryImage');
+  var galleryThumbs = all('.gallery-thumb');
+  var caseHash = '', caseScroll = 0, caseClosing = false;
+  var caseRestoration = 'auto';
+  var caseHasHistory = false;
+
+  function openCase(fromHistory) {
+    if (!caseDialog || caseDialog.open) return;
+    finishLoad();
+    var entry = fromHistory && history.state && history.state.threadyCaseStudy;
+    caseHash = entry ? entry.hash : (location.hash === '#thready' ? '' : location.hash);
+    caseScroll = entry ? entry.scroll : scrollTop();
+    caseRestoration = history.scrollRestoration;
+    history.scrollRestoration = 'manual';
+    caseHasHistory = false;
+    try {
+      if (!entry) {
+        if (location.hash === '#thready') history.replaceState(history.state, '', location.pathname + location.search + caseHash);
+        history.pushState({ threadyCaseStudy: { hash: caseHash, scroll: caseScroll } }, '', '#thready');
+      }
+      caseHasHistory = true;
+    } catch (e) {}
+    caseClosing = false;
+    root.classList.add('case-open');
+    caseDialog.showModal();
+    caseContent.scrollTop = 0;
+    caseClose.focus({ preventScroll: true });
+  }
+
+  function hideCase() {
+    if (!caseDialog || !caseDialog.open) return;
+    if (screenViewer.open) screenViewer.close();
+    caseDialog.close();
+    root.classList.remove('case-open');
+    caseClosing = false;
+    window.scrollTo(0, caseScroll);
+    caseButton.focus({ preventScroll: true });
+    // History traversal can restore scroll after popstate has finished.
+    window.requestAnimationFrame(function () {
+      if (caseDialog.open) return;
+      window.scrollTo(0, caseScroll);
+      if (caseRestoration) history.scrollRestoration = caseRestoration;
+      schedule();
+    });
+  }
+
+  function closeCase() {
+    if (!caseDialog.open || caseClosing) return;
+    caseClosing = true;
+    if (caseHasHistory && location.hash === '#thready') history.back();
+    else {
+      try { history.replaceState(history.state, '', location.pathname + location.search + caseHash); } catch (e) {}
+      hideCase();
+    }
+  }
+
+  function trapDialogFocus(ev) {
+    if (ev.key !== 'Tab') return;
+    var items = all('a[href], button:not([disabled]), [tabindex="0"]', ev.currentTarget).filter(function (node) { return node.getClientRects().length; });
+    var first = items[0], last = items[items.length - 1];
+    if (ev.shiftKey && doc.activeElement === first) { ev.preventDefault(); last.focus(); }
+    else if (!ev.shiftKey && doc.activeElement === last) { ev.preventDefault(); first.focus(); }
+  }
+
+  function chooseScreen(index) {
+    var thumb = galleryThumbs[index];
+    var title = thumb.getAttribute('data-title');
+    galleryImage.src = thumb.querySelector('img').getAttribute('src');
+    galleryImage.alt = 'thReady ' + title + ' screen, with demo data';
+    text(byId('galleryTitle'), title);
+    text(byId('galleryCaption'), thumb.getAttribute('data-caption'));
+    galleryThumbs.forEach(function (button) { button.setAttribute('aria-pressed', button === thumb ? 'true' : 'false'); });
+  }
+
+  if (caseDialog && caseButton) {
+    caseButton.addEventListener('click', function () { openCase(false); });
+    caseClose.addEventListener('click', closeCase);
+    caseDialog.addEventListener('cancel', function (ev) { ev.preventDefault(); closeCase(); });
+    caseDialog.addEventListener('keydown', trapDialogFocus);
+    var backdropStart = false;
+    function onBackdrop(ev) {
+      var box = caseDialog.getBoundingClientRect();
+      return ev.target === caseDialog && (ev.clientX < box.left || ev.clientX > box.right || ev.clientY < box.top || ev.clientY > box.bottom);
+    }
+    caseDialog.addEventListener('pointerdown', function (ev) { backdropStart = onBackdrop(ev); });
+    caseDialog.addEventListener('click', function (ev) { if (backdropStart && onBackdrop(ev)) closeCase(); backdropStart = false; });
+    window.addEventListener('popstate', function () {
+      if (location.hash === '#thready') openCase(true);
+      else hideCase();
+    });
+    byId('walkthrough').addEventListener('click', function (ev) { ev.preventDefault(); });
+    galleryThumbs.forEach(function (thumb, index) {
+      thumb.addEventListener('click', function () { chooseScreen(index); });
+      thumb.addEventListener('keydown', function (ev) {
+        var next = index;
+        if (ev.key === 'ArrowRight' || ev.key === 'ArrowDown') next = (index + 1) % galleryThumbs.length;
+        else if (ev.key === 'ArrowLeft' || ev.key === 'ArrowUp') next = (index + galleryThumbs.length - 1) % galleryThumbs.length;
+        else return;
+        ev.preventDefault();
+        chooseScreen(next);
+        galleryThumbs[next].focus({ preventScroll: true });
+        var scroller = thumb.parentNode;
+        scroller.scrollLeft = Math.max(0, galleryThumbs[next].offsetLeft - scroller.offsetLeft - 4);
+      });
+    });
+    function syncEnlarge() { enlargeScreen.disabled = window.innerWidth >= 760; }
+    syncEnlarge();
+    window.addEventListener('resize', syncEnlarge);
+    enlargeScreen.addEventListener('click', function () {
+      var image = byId('fullScreenImage');
+      image.src = galleryImage.src;
+      image.alt = galleryImage.alt;
+      screenViewer.showModal();
+    });
+    screenViewer.addEventListener('keydown', trapDialogFocus);
+    byId('closeScreen').addEventListener('click', function () { screenViewer.close(); });
+    screenViewer.addEventListener('close', function () { if (caseDialog.open) enlargeScreen.focus({ preventScroll: true }); });
+  }
+
   /* ---------- small live touches: chat plays, test count, row count ---------- */
 
   var rowCount = byId('rowCount');
@@ -912,24 +1039,23 @@
 
   function countUp(node) {
     var end = parseInt(node.getAttribute('data-count'), 10);
-    var suffix = node.getAttribute('data-suffix') || '';
     if (!end) return;
     var t0 = 0, dur = 1400;
     function tick(ts) {
       if (!t0) t0 = ts;
       var k = Math.min(1, (ts - t0) / dur);
-      node.textContent = Math.round(end * out(k)) + suffix;
+      node.textContent = Math.round(end * out(k)).toLocaleString('en-US');
       if (k < 1) window.requestAnimationFrame(tick);
     }
     window.requestAnimationFrame(tick);
   }
 
-  function onceVisible(node, fn) {
+  function onceVisible(node, fn, scrollRoot) {
     var obs = new IntersectionObserver(function (entries) {
       for (var i = 0; i < entries.length; i++) {
         if (entries[i].isIntersecting) { obs.disconnect(); fn(); return; }
       }
-    }, { threshold: 0.6 });
+    }, { threshold: 0.6, root: scrollRoot || null });
     obs.observe(node);
   }
 
@@ -942,8 +1068,8 @@
     var counter = byId('testCount');
     if (counter) {
       counter.classList.add('will-count');
-      counter.textContent = '0' + (counter.getAttribute('data-suffix') || '');
-      onceVisible(counter, function () { countUp(counter); });
+      counter.textContent = '0';
+      onceVisible(counter, function () { countUp(counter); }, caseContent);
     }
   }
 
@@ -1082,6 +1208,7 @@
     if ('scrollRestoration' in history) { try { history.scrollRestoration = 'manual'; } catch (e) {} }
     landOnHash();
   }
+  if (hash === 'thready') openCase(true);
 
   try {
     if (doc.fonts && doc.fonts.ready) {
